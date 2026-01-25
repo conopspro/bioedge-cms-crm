@@ -74,18 +74,17 @@ export default async function EventLayout({ children, params }: LayoutProps) {
     notFound()
   }
 
-  // Fetch other upcoming published events (excluding current event)
+  // Fetch all upcoming published events (including current event)
   const today = new Date().toISOString().split('T')[0]
-  const { data: otherEventsData } = await supabase
+  const { data: allEventsData } = await supabase
     .from("events")
     .select("slug, city, start_date, end_date")
     .eq("status", "published")
-    .neq("slug", slug)
     .gte("end_date", today)
     .order("start_date", { ascending: true })
     .limit(3)
 
-  const otherEvents: OtherEvent[] = otherEventsData || []
+  const allEvents: OtherEvent[] = allEventsData || []
 
   // Extract counts from the joined data
   const leadersCount = event.event_contacts?.length || 0
@@ -132,19 +131,19 @@ export default async function EventLayout({ children, params }: LayoutProps) {
               </Link>
             </div>
 
-            {/* Other Events - right justified on desktop */}
-            {otherEvents.length > 0 && (
+            {/* Event Links - right justified on desktop */}
+            {allEvents.length > 0 && (
               <div className="flex flex-col sm:items-end gap-0.5">
-                {otherEvents.map((otherEvent) => (
+                {allEvents.map((eventItem) => (
                   <Link
-                    key={otherEvent.slug}
-                    href={`/${otherEvent.slug}`}
+                    key={eventItem.slug}
+                    href={`/${eventItem.slug}`}
                     className="font-mono font-semibold text-gold text-sm hover:text-white transition-colors"
                   >
-                    {otherEvent.city && <span>{otherEvent.city}</span>}
-                    {otherEvent.city && otherEvent.start_date && <span className="mx-2">•</span>}
-                    {otherEvent.start_date && (
-                      <span>{formatDateRange(otherEvent.start_date, otherEvent.end_date)}</span>
+                    {eventItem.city && <span>{eventItem.city}</span>}
+                    {eventItem.city && eventItem.start_date && <span className="mx-2">•</span>}
+                    {eventItem.start_date && (
+                      <span>{formatDateRange(eventItem.start_date, eventItem.end_date)}</span>
                     )}
                   </Link>
                 ))}
