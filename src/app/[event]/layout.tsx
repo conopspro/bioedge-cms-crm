@@ -74,12 +74,13 @@ export default async function EventLayout({ children, params }: LayoutProps) {
     notFound()
   }
 
-  // Fetch all upcoming published events (including current event)
+  // Fetch all upcoming live events (including current event)
+  // Include all "live" statuses: published, registration_open, announced, sold_out
   const today = new Date().toISOString().split('T')[0]
   const { data: allEventsData } = await supabase
     .from("events")
     .select("slug, city, start_date, end_date")
-    .eq("status", "published")
+    .in("status", ["published", "registration_open", "announced", "sold_out"])
     .gte("end_date", today)
     .order("start_date", { ascending: true })
     .limit(3)
@@ -133,15 +134,15 @@ export default async function EventLayout({ children, params }: LayoutProps) {
 
             {/* Event Links - right justified on desktop */}
             {allEvents.length > 0 && (
-              <div className="flex flex-col sm:items-end gap-0.5">
+              <div className="flex flex-col sm:items-end gap-1">
                 {allEvents.map((eventItem) => (
                   <Link
                     key={eventItem.slug}
                     href={`/${eventItem.slug}`}
-                    className="font-mono font-semibold text-gold text-sm hover:text-white transition-colors"
+                    className="font-heading font-semibold text-gold text-sm hover:text-white transition-colors"
                   >
                     {eventItem.city && <span>{eventItem.city}</span>}
-                    {eventItem.city && eventItem.start_date && <span className="mx-2">•</span>}
+                    {eventItem.city && eventItem.start_date && <span> </span>}
                     {eventItem.start_date && (
                       <span>{formatDateRange(eventItem.start_date, eventItem.end_date)}</span>
                     )}
@@ -158,7 +159,7 @@ export default async function EventLayout({ children, params }: LayoutProps) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="px-3 py-1.5 text-sm font-bold text-white hover:text-white hover:bg-white/10 rounded-md transition-colors whitespace-nowrap"
+                  className="font-heading px-3 py-1.5 text-sm font-bold text-white hover:text-white hover:bg-white/10 rounded-md transition-colors whitespace-nowrap"
                 >
                   {item.label}
                 </Link>
@@ -169,7 +170,7 @@ export default async function EventLayout({ children, params }: LayoutProps) {
                   href={event.registration_url!}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="sm:hidden px-3 py-1.5 text-sm font-bold text-white bg-gold hover:bg-gold/90 rounded-md transition-colors whitespace-nowrap"
+                  className="font-heading sm:hidden px-3 py-1.5 text-sm font-bold text-white bg-gold hover:bg-gold/90 rounded-md transition-colors whitespace-nowrap"
                 >
                   Tickets
                 </a>

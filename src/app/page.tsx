@@ -28,6 +28,16 @@ export default async function HomePage() {
     .select("*")
     .single()
 
+  // Fetch upcoming events for header (all "live" statuses)
+  const today = new Date().toISOString().split('T')[0]
+  const { data: headerEvents } = await supabase
+    .from("events")
+    .select("name, slug, city, start_date, end_date")
+    .in("status", ["published", "registration_open", "announced", "sold_out"])
+    .gte("end_date", today)
+    .order("start_date", { ascending: true })
+    .limit(3)
+
   // Fetch visible sections ordered by display_order
   const { data: sections } = await supabase
     .from("homepage_sections")
@@ -215,7 +225,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-off-white">
-      <PublicHeader />
+      <PublicHeader events={headerEvents || []} />
       <main className="flex-1">
         {/* Hero is always first */}
         <HomepageHero settings={settings} />

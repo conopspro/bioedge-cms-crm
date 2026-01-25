@@ -91,25 +91,25 @@ export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
         <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 lg:gap-6">
           <Link
             href="/articles"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             Articles
           </Link>
           <Link
             href="/companies"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             Companies
           </Link>
           <Link
             href="/leaders"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             Leaders
           </Link>
           <Link
             href="/presentations"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             Presentations
           </Link>
@@ -117,7 +117,7 @@ export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
             href="https://www.bioedgecoach.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             Coach
           </a>
@@ -125,13 +125,13 @@ export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
             href="https://www.bioedgedecoder.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             Decoder
           </a>
           <Link
             href="/systems"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             Systems
           </Link>
@@ -139,7 +139,7 @@ export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
             href="https://www.bioedgecoach.com/"
             target="_blank"
             rel="noopener noreferrer"
-            className="font-heading text-xs lg:text-sm font-bold uppercase tracking-wide text-white transition-colors hover:text-gold"
+            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
           >
             News
           </a>

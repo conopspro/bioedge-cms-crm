@@ -22,14 +22,15 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Fetch upcoming published events for the header
+  // Fetch upcoming published/live events for the header
+  // Include all "live" statuses: published, registration_open, announced, sold_out
   const supabase = await createClient()
   const today = new Date().toISOString().split('T')[0]
 
   const { data: events } = await supabase
     .from("events")
     .select("name, slug, city, start_date, end_date")
-    .eq("status", "published")
+    .in("status", ["published", "registration_open", "announced", "sold_out"])
     .gte("end_date", today)
     .order("start_date", { ascending: true })
     .limit(3)
