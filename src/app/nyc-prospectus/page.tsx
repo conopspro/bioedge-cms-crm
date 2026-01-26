@@ -12,8 +12,6 @@ export default function NYCProspectusPage() {
       {/* Hero Section */}
       <section className="prospectus-hero">
         <div className="prospectus-container">
-          <div className="prospectus-hero-badge">Exhibits & Sponsorships</div>
-
           <div className="prospectus-logo">
             <span className="prospectus-logo-text">
               <span className="bio">BIO</span>
@@ -22,25 +20,34 @@ export default function NYCProspectusPage() {
             <span className="prospectus-logo-subtitle">LONGEVITY SUMMIT</span>
           </div>
 
+          <div className="prospectus-hero-badge">Year 3 • Expanding Nationwide</div>
+
           <h1 className="prospectus-hero-headline">
-            NYC 2026
+            The human body is designed to live 120 years.
           </h1>
 
           <p className="prospectus-hero-tagline">
-            Partner With Us to Reach the Longevity Consumer
+            So why's life expectancy 77?
           </p>
 
-          <div className="prospectus-hero-details" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px', maxWidth: '600px', margin: '0 auto' }}>
+          <div className="prospectus-hero-details">
             <div className="prospectus-hero-detail">
-              <div className="prospectus-hero-detail-value">📍 Metropolitan Pavilion</div>
+              <div className="prospectus-hero-detail-label">Location</div>
+              <div className="prospectus-hero-detail-value">NYC Metropolitan Pavilion</div>
             </div>
             <div className="prospectus-hero-detail">
-              <div className="prospectus-hero-detail-value">📅 July 10-11, 2026</div>
+              <div className="prospectus-hero-detail-label">Setup & VIP Dinner</div>
+              <div className="prospectus-hero-detail-value">July 10, 2026</div>
             </div>
             <div className="prospectus-hero-detail">
-              <div className="prospectus-hero-detail-value">🎟️ 500+ Attendees</div>
+              <div className="prospectus-hero-detail-label">Main Event</div>
+              <div className="prospectus-hero-detail-value">July 11, 2026</div>
             </div>
           </div>
+
+          <a href="mailto:peter@bioedgelongevity.com" className="prospectus-hero-cta">
+            Reserve Your Booth <span>→</span>
+          </a>
         </div>
       </section>
 
@@ -49,30 +56,38 @@ export default function NYCProspectusPage() {
         <div className="prospectus-container">
           <div className="prospectus-about-grid">
             <div className="prospectus-about-text">
+              <p className="prospectus-section-label">About the Event</p>
+              <h2 className="prospectus-section-title">A Transformational Live Experience</h2>
+
               <p>
-                bioEDGE Longevity Summit is a transformational health experience designed specifically for health-conscious consumers who want to optimize their healthspan and lifespan.
+                <strong>bioEDGE Longevity Summit</strong> brings the EDGE Framework to major cities across the USA. After two successful years in Miami, we're expanding to New York City.
               </p>
+
               <p>
-                Unlike clinical conferences, our events connect longevity brands directly with motivated consumers actively seeking cutting-edge health solutions. Attendees arrive ready to learn, engage, and invest in their longevity journey.
+                This isn't another wellness expo. Our attendees are serious health optimizers and clinical practitioners actively seeking evidence-based solutions to extend healthspan.
               </p>
             </div>
 
-            <div className="prospectus-stats-row">
-              <div className="prospectus-stat-item">
-                <div className="prospectus-stat-value">500+</div>
-                <div className="prospectus-stat-label">Expected Attendees</div>
+            <div className="prospectus-stats-grid">
+              <div className="prospectus-stat-card">
+                <p className="prospectus-stat-label">Venue</p>
+                <p className="prospectus-stat-value venue">Metropolitan Pavilion</p>
+                <p className="prospectus-stat-desc">New York City</p>
               </div>
-              <div className="prospectus-stat-item">
-                <div className="prospectus-stat-value">30+</div>
-                <div className="prospectus-stat-label">Expert Speakers</div>
+              <div className="prospectus-stat-card gold">
+                <p className="prospectus-stat-label">Expected Attendance</p>
+                <p className="prospectus-stat-value">750+</p>
+                <p className="prospectus-stat-desc">Health optimizers & practitioners</p>
               </div>
-              <div className="prospectus-stat-item">
-                <div className="prospectus-stat-value">2</div>
-                <div className="prospectus-stat-label">Full Days</div>
+              <div className="prospectus-stat-card pink">
+                <p className="prospectus-stat-label">Exhibit Spaces</p>
+                <p className="prospectus-stat-value">50</p>
+                <p className="prospectus-stat-desc">Premier, Corner & Table options</p>
               </div>
-              <div className="prospectus-stat-item">
-                <div className="prospectus-stat-value">20+</div>
-                <div className="prospectus-stat-label">Exhibitors</div>
+              <div className="prospectus-stat-card">
+                <p className="prospectus-stat-label">Speakers</p>
+                <p className="prospectus-stat-value">50</p>
+                <p className="prospectus-stat-desc">Industry experts & practitioners</p>
               </div>
             </div>
           </div>
@@ -82,10 +97,10 @@ export default function NYCProspectusPage() {
       {/* Who Attends Section */}
       <section className="prospectus-section">
         <div className="prospectus-container">
-          <div className="prospectus-section-label">Audience</div>
-          <h2 className="prospectus-section-title">Who Attends</h2>
+          <div className="prospectus-section-label">Who Attends</div>
+          <h2 className="prospectus-section-title">High-Intent Buyers & Decision Makers</h2>
           <p className="prospectus-section-subtitle">
-            Our audience consists of high-intent consumers actively seeking longevity solutions
+            Our attendees aren't browsers—they're buyers actively seeking the next solution for their health journey.
           </p>
 
           <div className="prospectus-audience-grid">
@@ -93,244 +108,308 @@ export default function NYCProspectusPage() {
               <div className="prospectus-audience-percent">75%</div>
               <div className="prospectus-audience-type">Health Optimizers</div>
               <p className="prospectus-audience-desc">
-                Affluent consumers actively investing in their health. Interested in supplements, diagnostics, therapeutics, biohacking tools, and longevity services.
+                Status-driven high performers who view their biology as a strategic asset. These are executives, founders, and professionals who invest significantly in their health and make fast purchasing decisions.
               </p>
+              <div className="prospectus-audience-tags">
+                <span className="prospectus-audience-tag">High Purchase Intent</span>
+                <span className="prospectus-audience-tag">Decision Makers</span>
+                <span className="prospectus-audience-tag">Early Adopters</span>
+                <span className="prospectus-audience-tag">High Net Worth</span>
+              </div>
             </div>
             <div className="prospectus-audience-card practitioners">
               <div className="prospectus-audience-percent">25%</div>
               <div className="prospectus-audience-type">Clinical Practitioners</div>
               <p className="prospectus-audience-desc">
-                Physicians, health coaches, and wellness practitioners seeking to expand their longevity practice offerings.
+                Licensed healthcare providers seeking advanced protocols and technologies for their practices.
               </p>
+              <div className="prospectus-audience-tags">
+                <span className="prospectus-audience-tag">MDs & DOs</span>
+                <span className="prospectus-audience-tag">Nurse Practitioners</span>
+                <span className="prospectus-audience-tag">Chiropractors</span>
+                <span className="prospectus-audience-tag">Acupuncturists</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Market Opportunity Section */}
+      {/* Opportunity Section */}
       <section className="prospectus-opportunity">
         <div className="prospectus-container">
-          <div className="prospectus-section-label">Market</div>
-          <h2 className="prospectus-section-title">The Opportunity</h2>
-          <p className="prospectus-section-subtitle">
-            The longevity market is experiencing unprecedented growth
+          <div className="prospectus-section-label">The Opportunity</div>
+          <h2 className="prospectus-section-title white">The Business of Living Longer</h2>
+          <p className="prospectus-section-subtitle white">
+            The longevity economy is booming. From health tech and biotech to wellness and personalized medicine, investors and consumers are betting big on extending healthspan.
           </p>
 
           <div className="prospectus-market-stats">
             <div className="prospectus-market-stat">
-              <div className="prospectus-market-stat-value">$44B</div>
-              <div className="prospectus-market-stat-label">Current Market</div>
-              <p className="prospectus-market-stat-desc">Global longevity market size in 2024</p>
+              <a href="https://www.ubs.com/global/en/wealthmanagement/insights/chief-investment-office/house-view/daily/2025/latest-28032025.html" target="_blank" rel="noopener noreferrer" className="prospectus-market-stat-link">
+                <div className="prospectus-market-stat-value">$8T</div>
+                <div className="prospectus-market-stat-label">Longevity Spending by 2030</div>
+                <p className="prospectus-market-stat-desc">UBS projection</p>
+              </a>
             </div>
             <div className="prospectus-market-stat">
-              <div className="prospectus-market-stat-value">$193B</div>
-              <div className="prospectus-market-stat-label">Projected by 2034</div>
-              <p className="prospectus-market-stat-desc">Expected market size within a decade</p>
+              <a href="https://www.wsj.com/health/wellness/billionaires-longevity-health-04dd205c" target="_blank" rel="noopener noreferrer" className="prospectus-market-stat-link">
+                <div className="prospectus-market-stat-value">$5B+</div>
+                <div className="prospectus-market-stat-label">Billionaire Investment</div>
+                <p className="prospectus-market-stat-desc">In longevity startups</p>
+              </a>
             </div>
             <div className="prospectus-market-stat">
-              <div className="prospectus-market-stat-value">16%</div>
-              <div className="prospectus-market-stat-label">Annual Growth</div>
-              <p className="prospectus-market-stat-desc">Compound annual growth rate (CAGR)</p>
+              <a href="https://www.medicaleconomics.com/view/as-the-world-and-the-nation-get-older-investments-in-longevity-hold-opportunity" target="_blank" rel="noopener noreferrer" className="prospectus-market-stat-link">
+                <div className="prospectus-market-stat-value">50%</div>
+                <div className="prospectus-market-stat-label">65+ Population Growth</div>
+                <p className="prospectus-market-stat-desc">By 2030 in the U.S.</p>
+              </a>
             </div>
+          </div>
+
+          <p className="prospectus-section-label" style={{ textAlign: 'center', marginBottom: '20px' }}>Industries We Serve</p>
+          <div className="prospectus-industries">
+            <span className="prospectus-industry-tag">Diagnostics & Testing</span>
+            <span className="prospectus-industry-tag">Energy & Light Therapy</span>
+            <span className="prospectus-industry-tag">Environment</span>
+            <span className="prospectus-industry-tag">Fitness</span>
+            <span className="prospectus-industry-tag">Mind & Neurotech</span>
+            <span className="prospectus-industry-tag">Recovery</span>
+            <span className="prospectus-industry-tag">Sleep Technology</span>
+            <span className="prospectus-industry-tag">Supplements & Compounds</span>
+            <span className="prospectus-industry-tag">Wearables & Monitoring</span>
           </div>
         </div>
       </section>
 
       {/* Booth Packages Section */}
-      <section className="prospectus-section">
+      <section className="prospectus-booths">
         <div className="prospectus-container">
-          <div className="prospectus-section-label">Exhibit</div>
+          <div className="prospectus-section-label">Exhibiting Opportunities</div>
           <h2 className="prospectus-section-title">Booth Packages</h2>
           <p className="prospectus-section-subtitle">
-            Connect directly with motivated longevity consumers
+            Connect face-to-face with 750+ high-intent health optimizers and practitioners actively seeking solutions.
           </p>
 
-          <div className="prospectus-packages-grid">
-            <div className="prospectus-package-card featured">
-              <div className="prospectus-package-badge">Most Popular</div>
-              <div className="prospectus-package-name">Premium Booth</div>
-              <div className="prospectus-package-price">$5,000</div>
-              <ul className="prospectus-package-features">
-                <li>10' x 10' prime floor space</li>
-                <li>Premium corner or entrance location</li>
-                <li>6' draped table + 2 chairs</li>
-                <li>Company listing on event website</li>
-                <li>4 exhibitor passes (2-day access)</li>
-                <li>Logo on event signage</li>
-                <li>Lead capture tools</li>
-                <li>Priority booth selection</li>
-              </ul>
+          <div className="prospectus-booths-grid">
+            <div className="prospectus-booth-card">
+              <div className="prospectus-booth-header premier">
+                <p className="prospectus-booth-tier">8x8 Corner Booth in Prime Location</p>
+              </div>
+              <div className="prospectus-booth-body">
+                <p className="prospectus-booth-price">$5,000</p>
+              </div>
             </div>
 
-            <div className="prospectus-package-card">
-              <div className="prospectus-package-name">Standard Booth</div>
-              <div className="prospectus-package-price">$3,500</div>
-              <ul className="prospectus-package-features">
-                <li>10' x 10' floor space</li>
-                <li>6' draped table + 2 chairs</li>
-                <li>Company listing on event website</li>
-                <li>3 exhibitor passes (2-day access)</li>
-                <li>Standard signage placement</li>
-                <li>Lead capture tools</li>
-              </ul>
+            <div className="prospectus-booth-card">
+              <div className="prospectus-booth-header corner">
+                <p className="prospectus-booth-tier">8x8 Corner Booth</p>
+              </div>
+              <div className="prospectus-booth-body">
+                <p className="prospectus-booth-price">$3,500</p>
+              </div>
             </div>
 
-            <div className="prospectus-package-card">
-              <div className="prospectus-package-name">Tabletop Display</div>
-              <div className="prospectus-package-price">$2,500</div>
-              <ul className="prospectus-package-features">
-                <li>6' tabletop space (shared area)</li>
-                <li>2 chairs</li>
-                <li>Company listing on event website</li>
-                <li>2 exhibitor passes (2-day access)</li>
-                <li>Perfect for startups & services</li>
-              </ul>
+            <div className="prospectus-booth-card">
+              <div className="prospectus-booth-header table">
+                <p className="prospectus-booth-tier">6 Foot Skirted Table</p>
+              </div>
+              <div className="prospectus-booth-body">
+                <p className="prospectus-booth-price">$2,500</p>
+              </div>
             </div>
           </div>
+
+          <div className="prospectus-all-exhibitors">
+            <p className="prospectus-all-exhibitors-label">All Exhibitors Get</p>
+            <ul className="prospectus-all-exhibitors-list">
+              <li>1 Skirted 6 Foot Table</li>
+              <li>1 Chair</li>
+              <li>4 Exhibitor Badges</li>
+              <li>Logo on bioedgelongevity.com</li>
+            </ul>
+          </div>
+
+          <p className="prospectus-booth-note">Additional exhibitor badges: $199 each • Lead retrieval: $400</p>
         </div>
       </section>
 
       {/* Sponsorship Opportunities */}
-      <section className="prospectus-opportunity">
+      <section className="prospectus-sponsorships">
         <div className="prospectus-container">
-          <div className="prospectus-section-label">Sponsor</div>
-          <h2 className="prospectus-section-title">Sponsorship Opportunities</h2>
+          <div className="prospectus-section-label">Sponsorship Opportunities</div>
+          <h2 className="prospectus-section-title">Activation Menu</h2>
           <p className="prospectus-section-subtitle">
-            Elevate your brand with premium visibility and engagement
+            Maximize your visibility with exclusive branding opportunities that put your brand in front of every attendee.
           </p>
 
           {/* Title Sponsor */}
-          <div className="prospectus-sponsor-highlight">
-            <div className="prospectus-sponsor-highlight-badge">Exclusive</div>
-            <h3 className="prospectus-sponsor-highlight-title">Title Sponsor</h3>
-            <div className="prospectus-sponsor-highlight-price">$100,000</div>
-            <div className="prospectus-sponsor-highlight-grid">
-              <div className="prospectus-sponsor-benefit">
-                <span className="benefit-icon">🎤</span>
-                <span>Keynote speaking slot (30 min)</span>
-              </div>
-              <div className="prospectus-sponsor-benefit">
-                <span className="benefit-icon">🏷️</span>
-                <span>"Presented by [Your Brand]" naming rights</span>
-              </div>
-              <div className="prospectus-sponsor-benefit">
-                <span className="benefit-icon">📍</span>
-                <span>Premium 20' x 20' booth space</span>
-              </div>
-              <div className="prospectus-sponsor-benefit">
-                <span className="benefit-icon">🎟️</span>
-                <span>20 VIP passes + private reception</span>
-              </div>
-              <div className="prospectus-sponsor-benefit">
-                <span className="benefit-icon">📧</span>
-                <span>Full attendee list access</span>
-              </div>
-              <div className="prospectus-sponsor-benefit">
-                <span className="benefit-icon">🎬</span>
-                <span>Custom video content production</span>
-              </div>
-            </div>
+          <div className="prospectus-title-sponsor">
+            <p className="prospectus-title-sponsor-label">Exclusive Opportunity</p>
+            <p className="prospectus-title-sponsor-name">Title Sponsor</p>
+            <p className="prospectus-title-sponsor-price">$100,000</p>
+            <p className="prospectus-title-sponsor-desc">
+              Premier branding across all event materials, signage, sampling, and communications, including the bioEDGE Longevity Magazine Cover plus centerfold. The ultimate visibility package.
+            </p>
           </div>
 
-          {/* Other Sponsorships */}
-          <div className="prospectus-sponsors-grid">
-            <div className="prospectus-sponsor-card">
-              <div className="prospectus-sponsor-name">Lunch Sponsor</div>
-              <div className="prospectus-sponsor-price">$25,000</div>
-              <p className="prospectus-sponsor-desc">
-                Branded lunch experience with signage, napkins, and 5-minute welcome remarks to all attendees.
-              </p>
+          {/* Sponsor Categories */}
+          <div className="prospectus-sponsor-categories">
+            <div className="prospectus-sponsor-category">
+              <h3 className="prospectus-sponsor-cat-title">Premier Activations</h3>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">VIP Party Sponsor</span>
+                <span className="prospectus-sponsor-price">$15,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Coffee Sponsor</span>
+                <span className="prospectus-sponsor-price">$15,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Practitioner Meetup</span>
+                <span className="prospectus-sponsor-price">$15,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Swag Bag Sponsor</span>
+                <span className="prospectus-sponsor-price">$15,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Pet Zone Sponsor</span>
+                <span className="prospectus-sponsor-price">$10,000</span>
+              </div>
             </div>
-            <div className="prospectus-sponsor-card">
-              <div className="prospectus-sponsor-name">Coffee Lounge</div>
-              <div className="prospectus-sponsor-price">$15,000</div>
-              <p className="prospectus-sponsor-desc">
-                Exclusive branding of the networking coffee area with logo cups, signage, and sampling opportunity.
-              </p>
+
+            <div className="prospectus-sponsor-category">
+              <h3 className="prospectus-sponsor-cat-title">Brand Visibility</h3>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Main Stage Banner</span>
+                <span className="prospectus-sponsor-price">$10,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Expo Hall / Welcome Banner</span>
+                <span className="prospectus-sponsor-price">$10,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Badge Sponsor</span>
+                <span className="prospectus-sponsor-price">$10,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Internet Sponsor</span>
+                <span className="prospectus-sponsor-price">$10,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Step & Repeat</span>
+                <span className="prospectus-sponsor-price">$10,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Lanyard Sponsor</span>
+                <span className="prospectus-sponsor-price">$5,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Ticket Confirmation Page</span>
+                <span className="prospectus-sponsor-price">$5,000</span>
+              </div>
             </div>
-            <div className="prospectus-sponsor-card">
-              <div className="prospectus-sponsor-name">Wellness Lounge</div>
-              <div className="prospectus-sponsor-price">$20,000</div>
-              <p className="prospectus-sponsor-desc">
-                Create a branded wellness experience zone for demos, treatments, or consultations.
-              </p>
+
+            <div className="prospectus-sponsor-category">
+              <h3 className="prospectus-sponsor-cat-title">Digital & Print</h3>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Program Guide Front Cover</span>
+                <span className="prospectus-sponsor-price">$5,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Program Guide Back Cover</span>
+                <span className="prospectus-sponsor-price">$3,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Program Guide Inside Cover</span>
+                <span className="prospectus-sponsor-price">$2,500</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Program Full Page Ad</span>
+                <span className="prospectus-sponsor-price">$2,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Program Half Page Ad</span>
+                <span className="prospectus-sponsor-price">$1,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Program 1/4 Page Ad</span>
+                <span className="prospectus-sponsor-price">$500</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Newsletter Inclusion</span>
+                <span className="prospectus-sponsor-price">$800</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Social Media Post</span>
+                <span className="prospectus-sponsor-price">$500</span>
+              </div>
             </div>
-            <div className="prospectus-sponsor-card">
-              <div className="prospectus-sponsor-name">Lanyard Sponsor</div>
-              <div className="prospectus-sponsor-price">$10,000</div>
-              <p className="prospectus-sponsor-desc">
-                Your logo on every attendee lanyard—maximum visibility throughout the event.
-              </p>
-            </div>
-            <div className="prospectus-sponsor-card">
-              <div className="prospectus-sponsor-name">Swag Bag Sponsor</div>
-              <div className="prospectus-sponsor-price">$7,500</div>
-              <p className="prospectus-sponsor-desc">
-                Include your product sample or promotional item in every attendee welcome bag.
-              </p>
-            </div>
-            <div className="prospectus-sponsor-card">
-              <div className="prospectus-sponsor-name">App Sponsor</div>
-              <div className="prospectus-sponsor-price">$12,000</div>
-              <p className="prospectus-sponsor-desc">
-                Prominent branding in the event mobile app with push notification capability.
-              </p>
+
+            <div className="prospectus-sponsor-category">
+              <h3 className="prospectus-sponsor-cat-title">On-Site Activations</h3>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Sponsor Reel - 60 Second</span>
+                <span className="prospectus-sponsor-price">$2,500</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Dedicated Intro/Pre-Show</span>
+                <span className="prospectus-sponsor-price">$2,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Sponsor Reel - 30 Second</span>
+                <span className="prospectus-sponsor-price">$1,500</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Bag Stuffer</span>
+                <span className="prospectus-sponsor-price">$1,500</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Sponsor Reel - 15 Second</span>
+                <span className="prospectus-sponsor-price">$1,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Pull-Up Banner</span>
+                <span className="prospectus-sponsor-price">$1,000</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Seat Drops</span>
+                <span className="prospectus-sponsor-price">$500</span>
+              </div>
+              <div className="prospectus-sponsor-item">
+                <span className="prospectus-sponsor-name">Registration Area Handouts</span>
+                <span className="prospectus-sponsor-price">$500</span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Speaker Opportunities */}
-      <section className="prospectus-section">
+      <section className="prospectus-speaker-opps">
         <div className="prospectus-container">
-          <div className="prospectus-section-label">Speak</div>
-          <h2 className="prospectus-section-title">Speaker Opportunities</h2>
+          <div className="prospectus-section-label">Speaker Opportunities</div>
+          <h2 className="prospectus-section-title">Presentation Slots</h2>
           <p className="prospectus-section-subtitle">
-            Position your brand as a thought leader in longevity
+            Position your brand as a thought leader with a 25-minute presentation slot on our main stage.
           </p>
 
           <div className="prospectus-speaker-grid">
-            <div className="prospectus-speaker-card">
-              <div className="prospectus-speaker-duration">45 min</div>
-              <div className="prospectus-speaker-type">Breakout Session</div>
-              <div className="prospectus-speaker-price">$15,000</div>
-              <p className="prospectus-speaker-desc">
-                Present your research, case studies, or methodology to a focused audience in a dedicated breakout room.
-              </p>
-              <ul className="prospectus-speaker-includes">
-                <li>Standard booth included</li>
-                <li>Session recording rights</li>
-                <li>2 VIP passes</li>
-              </ul>
+            <div className="prospectus-speaker-slot">
+              <p className="prospectus-speaker-slot-time">12:00 PM & 1:00 PM</p>
+              <p className="prospectus-speaker-slot-tier">Prime Slots</p>
+              <p className="prospectus-speaker-slot-price">$5,000</p>
             </div>
-            <div className="prospectus-speaker-card featured">
-              <div className="prospectus-speaker-badge">High Impact</div>
-              <div className="prospectus-speaker-duration">20 min</div>
-              <div className="prospectus-speaker-type">Main Stage Presentation</div>
-              <div className="prospectus-speaker-price">$25,000</div>
-              <p className="prospectus-speaker-desc">
-                Address the full audience from the main stage. Maximum visibility and thought leadership positioning.
-              </p>
-              <ul className="prospectus-speaker-includes">
-                <li>Premium booth included</li>
-                <li>Full video production</li>
-                <li>4 VIP passes</li>
-                <li>Social media promotion</li>
-              </ul>
+            <div className="prospectus-speaker-slot">
+              <p className="prospectus-speaker-slot-time">11:00 AM & 3:00 PM</p>
+              <p className="prospectus-speaker-slot-tier">Secondary Slots</p>
+              <p className="prospectus-speaker-slot-price">$3,000</p>
             </div>
-            <div className="prospectus-speaker-card">
-              <div className="prospectus-speaker-duration">60 min</div>
-              <div className="prospectus-speaker-type">Workshop</div>
-              <div className="prospectus-speaker-price">$20,000</div>
-              <p className="prospectus-speaker-desc">
-                Lead an interactive, hands-on workshop. Perfect for product demonstrations or educational deep-dives.
-              </p>
-              <ul className="prospectus-speaker-includes">
-                <li>Standard booth included</li>
-                <li>Workshop recording rights</li>
-                <li>3 VIP passes</li>
-                <li>Branded materials</li>
-              </ul>
+            <div className="prospectus-speaker-slot">
+              <p className="prospectus-speaker-slot-time">10AM, 4PM & 5PM</p>
+              <p className="prospectus-speaker-slot-tier">Tertiary Slots</p>
+              <p className="prospectus-speaker-slot-price">$2,000</p>
             </div>
           </div>
         </div>
@@ -339,24 +418,59 @@ export default function NYCProspectusPage() {
       {/* Testimonials */}
       <section className="prospectus-testimonials">
         <div className="prospectus-container">
-          <div className="prospectus-section-label">Results</div>
-          <h2 className="prospectus-section-title">What Partners Say</h2>
+          <div className="prospectus-section-label">What People Say</div>
+          <h2 className="prospectus-section-title">From Past Events</h2>
 
           <div className="prospectus-testimonials-grid">
             <div className="prospectus-testimonial-card">
               <p className="prospectus-testimonial-quote">
-                "Our booth was constantly engaged. The quality of conversations and leads exceeded any other health conference we've exhibited at."
+                "I had the pleasure of attending the Biohacker Expo organized by Sandy Martin, and it was nothing short of outstanding. The event was impeccably organized, featuring a roster of amazing thought leaders... What truly made this event special was Sandy. Her professionalism and warmth created an unforgettable experience for all involved."
               </p>
               <div className="prospectus-testimonial-author">
-                <div className="prospectus-testimonial-name">— Previous Exhibitor</div>
+                <div className="prospectus-testimonial-avatar">CP</div>
+                <div>
+                  <p className="prospectus-testimonial-name">Dr. Christopher Palmer, MD</p>
+                  <p className="prospectus-testimonial-role">Psychiatrist & Researcher</p>
+                </div>
               </div>
             </div>
+
             <div className="prospectus-testimonial-card">
               <p className="prospectus-testimonial-quote">
-                "The audience is unlike any other event—they're educated, motivated, and ready to invest in their longevity."
+                "At last year's Biohacker Expo, with the support of the enthusiastic crowd there, we officially launched our new book 'Lies I Taught in Medical School' to become a New York Times Bestseller! I wouldn't miss this year's event with the unusual combination of fascinating and useful information presented in a celebratory and fun environment!"
               </p>
               <div className="prospectus-testimonial-author">
-                <div className="prospectus-testimonial-name">— Supplement Brand Sponsor</div>
+                <div className="prospectus-testimonial-avatar">RL</div>
+                <div>
+                  <p className="prospectus-testimonial-name">Dr. Robert Lufkin, MD</p>
+                  <p className="prospectus-testimonial-role">Medical School Professor</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="prospectus-testimonial-card">
+              <p className="prospectus-testimonial-quote">
+                "The event was an excellent opportunity to educate on the connection between red light therapy and the gut-brain axis... The Expo enabled me to forge valuable connections, engage in meaningful dialogues, and explore cutting-edge advancements. I am already looking forward to next year's event."
+              </p>
+              <div className="prospectus-testimonial-author">
+                <div className="prospectus-testimonial-avatar">ST</div>
+                <div>
+                  <p className="prospectus-testimonial-name">Sarah Turner</p>
+                  <p className="prospectus-testimonial-role">CEO & Co-Founder, CeraThrive LLC</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="prospectus-testimonial-card">
+              <p className="prospectus-testimonial-quote">
+                "It was an honor to speak at the Biohacker Expo. Sandy brought the best speakers in the biohacking space, and incredible vendors. I loved the intimate touch of being able to connect with my audience in person during my book signings. The connections and friendships I made from this event are invaluable!"
+              </p>
+              <div className="prospectus-testimonial-author">
+                <div className="prospectus-testimonial-avatar">BA</div>
+                <div>
+                  <p className="prospectus-testimonial-name">Ben Azadi</p>
+                  <p className="prospectus-testimonial-role">Author & Health Expert</p>
+                </div>
               </div>
             </div>
           </div>
@@ -366,34 +480,49 @@ export default function NYCProspectusPage() {
       {/* Leadership Section */}
       <section className="prospectus-leadership">
         <div className="prospectus-container">
-          <div className="prospectus-section-label">Team</div>
-          <h2 className="prospectus-section-title">Event Leadership</h2>
+          <div className="prospectus-section-label">Leadership</div>
+          <h2 className="prospectus-section-title">Meet Our Team</h2>
+          <p className="prospectus-section-subtitle">
+            bioEDGE Longevity is led by proven event producers with combined 40+ years of experience building large, engaging conferences.
+          </p>
 
           <div className="prospectus-leaders-grid">
-            <div className="prospectus-leader-card">
+            <div className="prospectus-leader-card sandy">
               <div className="prospectus-leader-header">
-                <div className="prospectus-leader-info">
-                  <h3 className="prospectus-leader-name">Sandy Martin</h3>
-                  <p className="prospectus-leader-role">Founder & Host</p>
+                <div className="prospectus-leader-avatar sandy">SM</div>
+                <div>
+                  <p className="prospectus-leader-name">Sandy Martin</p>
+                  <p className="prospectus-leader-role">Founder</p>
                 </div>
               </div>
-              <div className="prospectus-leader-bio">
-                <p>
-                  Sandy is the creator of bioEDGE and a leading voice in consumer longevity education. With a background in biotechnology and a passion for democratizing healthspan science, she designed the EDGE Framework to make longevity actionable for everyone.
+              <p className="prospectus-leader-bio">
+                Before entering the longevity space, Sandy spent 15 years producing large-scale comic cons like Supercon and GalaxyCon drawing more than 50,000 attendees to each one. After a health crisis from mold exposure led to a $97,000 recovery journey, she founded bioEDGE to help others navigate the longevity landscape.
+              </p>
+              <div className="prospectus-leader-highlight">
+                <p className="prospectus-leader-highlight-label">Author</p>
+                <p className="prospectus-leader-highlight-value">
+                  <a href="https://www.amazon.com/dp/B0GJQ5NDGF" target="_blank" rel="noopener noreferrer">Biological EDGE: A Practical Guide to Longevity</a>
+                </p>
+                <p className="prospectus-leader-highlight-value">
+                  <a href="https://www.amazon.com/dp/B0F9VZHVY3" target="_blank" rel="noopener noreferrer">Biohacking Starts with NO: A Radical Guide to Longevity</a>
                 </p>
               </div>
             </div>
-            <div className="prospectus-leader-card">
+
+            <div className="prospectus-leader-card peter">
               <div className="prospectus-leader-header">
-                <div className="prospectus-leader-info">
-                  <h3 className="prospectus-leader-name">Peter Martin</h3>
-                  <p className="prospectus-leader-role">Co-Founder & Operations</p>
+                <div className="prospectus-leader-avatar peter">PK</div>
+                <div>
+                  <p className="prospectus-leader-name">Peter Katz</p>
+                  <p className="prospectus-leader-role">President</p>
                 </div>
               </div>
-              <div className="prospectus-leader-bio">
-                <p>
-                  Peter brings decades of experience in event production and business operations. He ensures every bioEDGE event delivers exceptional experiences for attendees and partners alike.
-                </p>
+              <p className="prospectus-leader-bio">
+                Peter is a lifelong distance runner with multiple marathons under his belt. His professional track record lies in crossing the chasm—when he entered the comic con industry over 20 years ago, it was niche. Through leadership at Wizard World, Fan Expo, and GalaxyCon, he has connected over a million fans with their heroes.
+              </p>
+              <div className="prospectus-leader-highlight">
+                <p className="prospectus-leader-highlight-label">Expertise</p>
+                <p className="prospectus-leader-highlight-value">Event Scaling • Operations • Strategic Growth</p>
               </div>
             </div>
           </div>
@@ -401,30 +530,39 @@ export default function NYCProspectusPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="prospectus-cta">
+      <section className="prospectus-cta" id="contact">
         <div className="prospectus-container">
-          <h2 className="prospectus-cta-title">Ready to Partner?</h2>
+          <h2 className="prospectus-cta-title">Secure Your Position</h2>
           <p className="prospectus-cta-subtitle">
-            Limited booth and sponsorship opportunities available. Secure your presence at NYC 2026 today.
+            Booth spaces and sponsorships are limited. Connect with 750+ high-intent health optimizers in NYC.
           </p>
           <div className="prospectus-cta-buttons">
-            <a href="mailto:partners@bioedgelongevity.com" className="prospectus-cta-button primary">
-              Contact Us
-            </a>
-            <a href="/nyc-2026" className="prospectus-cta-button secondary">
-              Learn About NYC 2026
+            <a href="mailto:peter@bioedgelongevity.com" className="prospectus-cta-button primary">
+              Reserve Your Booth →
             </a>
           </div>
-          <p className="prospectus-cta-contact">
-            Questions? Email <a href="mailto:partners@bioedgelongevity.com">partners@bioedgelongevity.com</a>
-          </p>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="prospectus-footer">
+        <div className="prospectus-container">
+          <div className="prospectus-logo" style={{ marginBottom: '20px' }}>
+            <span className="prospectus-logo-text">
+              <span className="bio">BIO</span>
+              <span className="edge">EDGE</span>
+            </span>
+            <span className="prospectus-logo-subtitle">LONGEVITY SUMMIT</span>
+          </div>
+          <p>NYC Metropolitan Pavilion • July 10-11, 2026</p>
+          <p>© {new Date().getFullYear()} bioEDGE Longevity LLC. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
   )
 }
 
 export const metadata = {
   title: "NYC 2026 Exhibits & Sponsorships | bioEDGE Longevity Summit",
-  description: "Partner with bioEDGE Longevity Summit NYC 2026. Booth packages, sponsorship opportunities, and speaker slots available. Connect with 500+ motivated longevity consumers.",
+  description: "Partner with bioEDGE Longevity Summit NYC 2026. Booth packages, sponsorship opportunities, and speaker slots available. Connect with 750+ motivated longevity consumers at Metropolitan Pavilion.",
 }

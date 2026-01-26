@@ -15,18 +15,42 @@
 /* Hero Section */
 .prospectus-hero {
   background: linear-gradient(135deg, #0d2840 0%, #0d598a 50%, #017ab2 100%);
-  padding: 80px 0 60px;
-  text-align: center;
-  color: white;
+  padding: 60px 0 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.prospectus-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 80%;
+  height: 200%;
+  background: radial-gradient(ellipse at center, rgba(255,145,77,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.prospectus-hero::after {
+  content: '';
+  position: absolute;
+  bottom: -30%;
+  left: -10%;
+  width: 60%;
+  height: 100%;
+  background: radial-gradient(ellipse at center, rgba(248,59,137,0.08) 0%, transparent 50%);
+  pointer-events: none;
 }
 
 .prospectus-hero-badge {
   display: inline-block;
-  background: rgba(255, 255, 255, 0.15);
-  padding: 8px 24px;
-  border-radius: 20px;
+  background: rgba(255,145,77,0.15);
+  border: 1px solid rgba(255,145,77,0.4);
+  color: #ff914d;
+  padding: 8px 20px;
+  border-radius: 4px;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -34,14 +58,15 @@
 }
 
 .prospectus-logo {
-  margin-bottom: 32px;
+  margin-bottom: 40px;
 }
 
 .prospectus-logo-text {
   display: block;
   font-family: "IBM Plex Mono", monospace;
   font-weight: 700;
-  letter-spacing: 4px;
+  line-height: 1;
+  letter-spacing: 2px;
 }
 
 .prospectus-logo-text .bio {
@@ -57,103 +82,93 @@
 .prospectus-logo-subtitle {
   display: block;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 6px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 2px;
   color: white;
   margin-top: -4px;
 }
 
 .prospectus-hero-headline {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 56px;
+  font-size: clamp(32px, 5vw, 52px);
   font-weight: 700;
-  letter-spacing: 4px;
+  color: white;
   line-height: 1.2;
   margin-bottom: 16px;
+  max-width: 700px;
+  text-transform: uppercase;
+  letter-spacing: -1px;
 }
 
 .prospectus-hero-tagline {
-  font-size: 24px;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: clamp(20px, 3vw, 28px);
   color: #ff914d;
-  margin-bottom: 48px;
+  margin-bottom: 32px;
+  font-weight: 400;
 }
 
 .prospectus-hero-details {
-  margin-top: 40px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 40px;
 }
 
 .prospectus-hero-detail {
-  text-align: center;
+  color: white;
+}
+
+.prospectus-hero-detail-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-bottom: 6px;
 }
 
 .prospectus-hero-detail-value {
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.prospectus-hero-cta {
+  background: #ff914d;
+  color: #0d2840;
+  padding: 16px 32px;
+  border-radius: 4px;
   font-family: "IBM Plex Mono", monospace;
   font-size: 14px;
   font-weight: 600;
-  letter-spacing: 1px;
-}
-
-/* About Section */
-.prospectus-about {
-  padding: 80px 0;
-  background: white;
-}
-
-.prospectus-about-grid {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.prospectus-about-text p {
-  font-size: 18px;
-  margin-bottom: 20px;
-  color: #2c3e50;
-  text-align: center;
-}
-
-.prospectus-stats-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 24px;
-  margin-top: 48px;
-}
-
-.prospectus-stat-item {
-  text-align: center;
-  padding: 24px;
-  background: #f8f9fa;
-  border-radius: 12px;
-}
-
-.prospectus-stat-value {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 36px;
-  font-weight: 700;
-  color: #ff914d;
-}
-
-.prospectus-stat-label {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 1px;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.3s ease;
   text-transform: uppercase;
-  color: #0d2840;
-  margin-top: 8px;
+  letter-spacing: 1px;
+}
+
+.prospectus-hero-cta:hover {
+  background: #ffab75;
+  transform: translateY(-2px);
+}
+
+.prospectus-hero-cta span {
+  margin-left: 8px;
 }
 
 /* Section Styles */
-.prospectus-section {
+section {
   padding: 80px 0;
-  background: #f8f9fa;
 }
 
 .prospectus-section-label {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 2px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
   text-transform: uppercase;
   color: #ff914d;
   margin-bottom: 12px;
@@ -161,429 +176,711 @@
 
 .prospectus-section-title {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 36px;
+  font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
-  letter-spacing: 2px;
   color: #0d2840;
   margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.prospectus-section-title.white {
+  color: white;
 }
 
 .prospectus-section-subtitle {
+  font-family: "Source Sans 3", sans-serif;
   font-size: 18px;
-  color: #5a6a7a;
-  max-width: 700px;
-  margin-bottom: 40px;
+  color: #7f8c8d;
+  max-width: 600px;
+  margin-bottom: 48px;
+}
+
+.prospectus-section-subtitle.white {
+  color: rgba(255,255,255,0.7);
+}
+
+/* About Section */
+.prospectus-about {
+  background: white;
+}
+
+.prospectus-about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.prospectus-about-text p {
+  font-size: 17px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.prospectus-about-text strong {
+  color: #0d598a;
+}
+
+.prospectus-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.prospectus-stat-card {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 24px;
+  border-left: 4px solid #0d598a;
+}
+
+.prospectus-stat-card.gold {
+  border-left-color: #ff914d;
+}
+
+.prospectus-stat-card.pink {
+  border-left-color: #f83b89;
+}
+
+.prospectus-stat-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #7f8c8d;
+  margin-bottom: 8px;
+}
+
+.prospectus-stat-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 36px;
+  font-weight: 700;
+  color: #0d598a;
+}
+
+.prospectus-stat-value.venue {
+  font-size: 22px;
+}
+
+.prospectus-stat-desc {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin-top: 4px;
+}
+
+/* Background Section */
+.prospectus-section {
+  background: #f8f9fa;
 }
 
 /* Audience Grid */
 .prospectus-audience-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr 1fr;
   gap: 32px;
 }
 
 .prospectus-audience-card {
   background: white;
-  padding: 40px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 32px;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
 }
 
-.prospectus-audience-card.optimizers {
-  border-top: 4px solid #ff914d;
+.prospectus-audience-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
 }
 
-.prospectus-audience-card.practitioners {
-  border-top: 4px solid #017ab2;
+.prospectus-audience-card.optimizers::before {
+  background: linear-gradient(90deg, #0d598a, #017ab2);
+}
+
+.prospectus-audience-card.practitioners::before {
+  background: linear-gradient(90deg, #ff914d, #f83b89);
 }
 
 .prospectus-audience-percent {
   font-family: "IBM Plex Mono", monospace;
   font-size: 56px;
   font-weight: 700;
-  color: #0d2840;
+  color: #0d598a;
   margin-bottom: 8px;
+  line-height: 1;
+}
+
+.prospectus-audience-card.practitioners .prospectus-audience-percent {
+  color: #ff914d;
 }
 
 .prospectus-audience-type {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   color: #0d2840;
   margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .prospectus-audience-desc {
-  font-size: 16px;
-  color: #5a6a7a;
-  line-height: 1.6;
-  margin: 0;
+  font-size: 15px;
+  color: #7f8c8d;
+  margin-bottom: 20px;
+}
+
+.prospectus-audience-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.prospectus-audience-tag {
+  background: #f8f9fa;
+  color: #2c3e50;
+  padding: 6px 14px;
+  border-radius: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 /* Opportunity Section */
 .prospectus-opportunity {
-  padding: 80px 0;
-  background: white;
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%);
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.prospectus-opportunity::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 100%;
+  background: radial-gradient(ellipse at 70% 30%, rgba(255,145,77,0.1) 0%, transparent 50%);
 }
 
 .prospectus-market-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
+  gap: 24px;
+  margin-bottom: 32px;
 }
 
 .prospectus-market-stat {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 24px 20px;
   text-align: center;
-  padding: 40px;
-  background: #f8f9fa;
-  border-radius: 12px;
+  position: relative;
+}
+
+.prospectus-market-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #ff914d, #f83b89);
+  border-radius: 8px 8px 0 0;
+}
+
+.prospectus-market-stat-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease;
+}
+
+.prospectus-market-stat-link:hover {
+  transform: translateY(-2px);
 }
 
 .prospectus-market-stat-value {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 48px;
+  font-size: 40px;
   font-weight: 700;
   color: #ff914d;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .prospectus-market-stat-label {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 16px;
-  font-weight: 700;
-  color: #0d2840;
-  margin-bottom: 8px;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
 }
 
 .prospectus-market-stat-desc {
-  font-size: 14px;
-  color: #5a6a7a;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: white;
   margin: 0;
 }
 
-/* Package Cards */
-.prospectus-packages-grid {
+.prospectus-industries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+
+.prospectus-industry-tag {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Booths Section */
+.prospectus-booths {
+  background: #f8f9fa;
+}
+
+.prospectus-booths-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
-.prospectus-package-card {
+.prospectus-booth-card {
   background: white;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
-.prospectus-package-card.featured {
-  border: 2px solid #ff914d;
-  transform: scale(1.02);
+.prospectus-booth-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(13,37,64,0.12);
 }
 
-.prospectus-package-badge {
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ff914d;
-  color: white;
-  padding: 4px 16px;
-  border-radius: 12px;
+.prospectus-booth-header {
+  padding: 20px;
+  text-align: center;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prospectus-booth-header.premier {
+  background: linear-gradient(135deg, #ff914d, #f83b89);
+}
+
+.prospectus-booth-header.corner {
+  background: linear-gradient(135deg, #0d598a, #017ab2);
+}
+
+.prospectus-booth-header.table {
+  background: #0d2840;
+}
+
+.prospectus-booth-tier {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
+  color: white;
+  margin: 0;
 }
 
-.prospectus-package-name {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 24px;
-  font-weight: 700;
-  color: #0d2840;
-  margin-bottom: 8px;
+.prospectus-booth-body {
+  padding: 24px;
 }
 
-.prospectus-package-price {
+.prospectus-booth-price {
   font-family: "IBM Plex Mono", monospace;
   font-size: 36px;
   font-weight: 700;
-  color: #ff914d;
-  margin-bottom: 24px;
+  color: #0d2840;
+  text-align: center;
+  margin: 0;
 }
 
-.prospectus-package-features {
+.prospectus-all-exhibitors {
+  background: white;
+  border-radius: 8px;
+  padding: 28px;
+  margin-top: 32px;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+.prospectus-all-exhibitors-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d598a;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 16px;
+}
+
+.prospectus-all-exhibitors-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px 32px;
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.prospectus-package-features li {
-  padding: 10px 0;
-  border-bottom: 1px solid #e8ecef;
-  color: #5a6a7a;
+.prospectus-all-exhibitors-list li {
+  font-family: "Source Sans 3", sans-serif;
   font-size: 15px;
+  color: #2c3e50;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.prospectus-package-features li:last-child {
-  border-bottom: none;
-}
-
-/* Sponsor Highlight (Title Sponsor) */
-.prospectus-sponsor-highlight {
-  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%);
-  padding: 48px;
-  border-radius: 16px;
-  margin-bottom: 40px;
-  position: relative;
-  color: white;
-}
-
-.prospectus-sponsor-highlight-badge {
-  position: absolute;
-  top: -12px;
-  left: 48px;
-  background: #ff914d;
-  color: white;
-  padding: 4px 16px;
-  border-radius: 12px;
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 12px;
+.prospectus-all-exhibitors-list li::before {
+  content: '✓';
+  color: #ff914d;
   font-weight: 700;
-  letter-spacing: 1px;
+}
+
+.prospectus-booth-note {
+  text-align: center;
+  margin-top: 32px;
+  color: #7f8c8d;
+  font-size: 14px;
+  font-family: "IBM Plex Mono", monospace;
+}
+
+/* Sponsorships Section */
+.prospectus-sponsorships {
+  background: white;
+}
+
+.prospectus-title-sponsor {
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%);
+  border-radius: 8px;
+  padding: 48px;
+  text-align: center;
+  margin-bottom: 32px;
+  position: relative;
+  overflow: hidden;
+}
+
+.prospectus-title-sponsor::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff914d, #f83b89);
+}
+
+.prospectus-title-sponsor-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #ff914d;
+  margin-bottom: 12px;
+}
+
+.prospectus-title-sponsor-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 8px;
   text-transform: uppercase;
 }
 
-.prospectus-sponsor-highlight-title {
+.prospectus-title-sponsor-price {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 8px;
-  color: white;
-}
-
-.prospectus-sponsor-highlight-price {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 48px;
-  font-weight: 700;
-  color: #ff914d;
-  margin-bottom: 32px;
-}
-
-.prospectus-sponsor-highlight-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-}
-
-.prospectus-sponsor-benefit {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.benefit-icon {
-  font-size: 20px;
-}
-
-/* Sponsor Cards Grid */
-.prospectus-sponsors-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.prospectus-sponsor-card {
-  background: #f8f9fa;
-  padding: 32px;
-  border-radius: 12px;
-}
-
-.prospectus-sponsor-name {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 20px;
-  font-weight: 700;
-  color: #0d2840;
-  margin-bottom: 8px;
-}
-
-.prospectus-sponsor-price {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 28px;
+  font-size: 52px;
   font-weight: 700;
   color: #ff914d;
   margin-bottom: 16px;
 }
 
-.prospectus-sponsor-desc {
+.prospectus-title-sponsor-desc {
   font-size: 15px;
-  color: #5a6a7a;
-  line-height: 1.6;
-  margin: 0;
+  color: rgba(255,255,255,0.7);
+  max-width: 500px;
+  margin: 0 auto;
 }
 
-/* Speaker Cards */
+.prospectus-sponsor-categories {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.prospectus-sponsor-category {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 28px;
+}
+
+.prospectus-sponsor-cat-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ff914d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.prospectus-sponsor-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.prospectus-sponsor-item:last-child {
+  border-bottom: none;
+}
+
+.prospectus-sponsor-name {
+  font-size: 14px;
+  color: #2c3e50;
+}
+
+.prospectus-sponsor-price {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d598a;
+}
+
+/* Speaker Opportunities */
+.prospectus-speaker-opps {
+  background: #f8f9fa;
+}
+
 .prospectus-speaker-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
-.prospectus-speaker-card {
+.prospectus-speaker-slot {
   background: white;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  padding: 28px;
+  text-align: center;
+  border: 2px solid #e2e8f0;
+  transition: all 0.3s ease;
   position: relative;
+  overflow: hidden;
 }
 
-.prospectus-speaker-card.featured {
-  border: 2px solid #ff914d;
-}
-
-.prospectus-speaker-badge {
+.prospectus-speaker-slot::before {
+  content: '';
   position: absolute;
-  top: -12px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ff914d;
-  color: white;
-  padding: 4px 16px;
-  border-radius: 12px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #ff914d, #f83b89);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.prospectus-speaker-slot:hover {
+  border-color: #ff914d;
+}
+
+.prospectus-speaker-slot:hover::before {
+  opacity: 1;
+}
+
+.prospectus-speaker-slot-time {
   font-family: "IBM Plex Mono", monospace;
   font-size: 12px;
+  font-weight: 500;
+  color: #7f8c8d;
+  margin-bottom: 8px;
+}
+
+.prospectus-speaker-slot-tier {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 16px;
   font-weight: 700;
-  letter-spacing: 1px;
+  color: #0d2840;
+  margin-bottom: 12px;
   text-transform: uppercase;
 }
 
-.prospectus-speaker-duration {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: #017ab2;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-
-.prospectus-speaker-type {
-  font-family: "IBM Plex Mono", monospace;
-  font-size: 22px;
-  font-weight: 700;
-  color: #0d2840;
-  margin-bottom: 8px;
-}
-
-.prospectus-speaker-price {
+.prospectus-speaker-slot-price {
   font-family: "IBM Plex Mono", monospace;
   font-size: 32px;
   font-weight: 700;
-  color: #ff914d;
-  margin-bottom: 16px;
-}
-
-.prospectus-speaker-desc {
-  font-size: 15px;
-  color: #5a6a7a;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-
-.prospectus-speaker-includes {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  border-top: 1px solid #e8ecef;
-  padding-top: 16px;
-}
-
-.prospectus-speaker-includes li {
-  padding: 6px 0;
-  color: #5a6a7a;
-  font-size: 14px;
-}
-
-.prospectus-speaker-includes li::before {
-  content: "✓";
-  color: #ff914d;
-  margin-right: 8px;
-  font-weight: 700;
+  color: #0d598a;
+  margin-bottom: 0;
 }
 
 /* Testimonials */
 .prospectus-testimonials {
-  padding: 80px 0;
-  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%);
-  color: white;
-}
-
-.prospectus-testimonials .prospectus-section-label {
-  color: #ff914d;
-}
-
-.prospectus-testimonials .prospectus-section-title {
-  color: white;
+  background: white;
 }
 
 .prospectus-testimonials-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 32px;
-  margin-top: 40px;
+  gap: 24px;
 }
 
 .prospectus-testimonial-card {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 32px;
-  border-radius: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.prospectus-testimonial-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(180deg, #0d598a, #017ab2);
 }
 
 .prospectus-testimonial-quote {
-  font-size: 18px;
-  font-style: italic;
+  font-size: 15px;
+  color: #2c3e50;
   line-height: 1.7;
-  margin-bottom: 24px;
-  color: rgba(255, 255, 255, 0.95);
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.prospectus-testimonial-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.prospectus-testimonial-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0d598a, #017ab2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 700;
+  font-size: 14px;
 }
 
 .prospectus-testimonial-name {
   font-family: "IBM Plex Mono", monospace;
   font-size: 14px;
-  font-weight: 600;
-  color: #ff914d;
+  font-weight: 700;
+  color: #0d2840;
+  margin: 0;
+}
+
+.prospectus-testimonial-role {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin: 0;
 }
 
 /* Leadership Section */
 .prospectus-leadership {
-  padding: 80px 0;
   background: #f8f9fa;
 }
 
 .prospectus-leaders-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 40px;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
 }
 
 .prospectus-leader-card {
   background: white;
+  border-radius: 8px;
   padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.prospectus-leader-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: 8px 0 0 8px;
+}
+
+.prospectus-leader-card.sandy::before {
+  background: linear-gradient(180deg, #ff914d, #f83b89);
+}
+
+.prospectus-leader-card.peter::before {
+  background: linear-gradient(180deg, #0d598a, #017ab2);
 }
 
 .prospectus-leader-header {
   display: flex;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-.prospectus-leader-info {
-  flex: 1;
+.prospectus-leader-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: white;
+}
+
+.prospectus-leader-avatar.sandy {
+  background: linear-gradient(135deg, #ff914d, #f83b89);
+}
+
+.prospectus-leader-avatar.peter {
+  background: linear-gradient(135deg, #0d598a, #017ab2);
 }
 
 .prospectus-leader-name {
@@ -591,47 +888,99 @@
   font-size: 20px;
   font-weight: 700;
   color: #0d2840;
-  margin: 0 0 4px;
-}
-
-.prospectus-leader-role {
-  font-size: 14px;
-  color: #ff914d;
-  font-weight: 600;
+  text-transform: uppercase;
   margin: 0;
 }
 
-.prospectus-leader-bio p {
-  font-size: 15px;
-  color: #5a6a7a;
-  line-height: 1.7;
-  margin-bottom: 16px;
+.prospectus-leader-role {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+  color: #ff914d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0;
 }
 
-.prospectus-leader-bio p:last-child {
-  margin-bottom: 0;
+.prospectus-leader-bio {
+  font-size: 15px;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+
+.prospectus-leader-highlight {
+  border-top: 1px solid #e2e8f0;
+  padding-top: 16px;
+}
+
+.prospectus-leader-highlight-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #7f8c8d;
+  margin-bottom: 6px;
+}
+
+.prospectus-leader-highlight-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0d598a;
+  font-style: italic;
+  margin: 0 0 4px;
+}
+
+.prospectus-leader-highlight-value a {
+  color: #0d598a;
+  text-decoration: none;
+  transition: text-decoration 0.2s ease;
+}
+
+.prospectus-leader-highlight-value a::after {
+  content: ' →';
+  color: #0d598a;
+}
+
+.prospectus-leader-highlight-value a:hover {
+  text-decoration: underline;
 }
 
 /* CTA Section */
 .prospectus-cta {
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%);
   padding: 80px 0;
-  background: linear-gradient(135deg, #ff914d 0%, #ff7b2e 100%);
   text-align: center;
-  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.prospectus-cta::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ff914d, #f83b89, #ff914d);
 }
 
 .prospectus-cta-title {
   font-family: "IBM Plex Mono", monospace;
-  font-size: 42px;
+  font-size: clamp(28px, 4vw, 40px);
   font-weight: 700;
+  color: white;
   margin-bottom: 16px;
+  text-transform: uppercase;
 }
 
 .prospectus-cta-subtitle {
-  font-size: 20px;
+  font-size: 18px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 32px;
   max-width: 600px;
-  margin: 0 auto 32px;
-  opacity: 0.95;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .prospectus-cta-buttons {
@@ -639,134 +988,121 @@
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
-  margin-bottom: 32px;
 }
 
 .prospectus-cta-button {
-  display: inline-block;
-  padding: 16px 40px;
-  border-radius: 8px;
+  padding: 16px 32px;
+  border-radius: 4px;
   font-family: "IBM Plex Mono", monospace;
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .prospectus-cta-button.primary {
-  background: #0d2840;
-  color: white;
-}
-
-.prospectus-cta-button.primary:hover {
-  background: #0d598a;
-}
-
-.prospectus-cta-button.secondary {
-  background: white;
+  background: #ff914d;
   color: #0d2840;
 }
 
-.prospectus-cta-button.secondary:hover {
-  background: rgba(255, 255, 255, 0.9);
+.prospectus-cta-button.primary:hover {
+  background: #ffab75;
 }
 
-.prospectus-cta-contact {
-  font-size: 16px;
-  opacity: 0.9;
-}
-
-.prospectus-cta-contact a {
+.prospectus-cta-button.secondary {
+  background: transparent;
   color: white;
-  text-decoration: underline;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.prospectus-cta-button.secondary:hover {
+  border-color: white;
+}
+
+/* Footer */
+.prospectus-footer {
+  background: #0d2840;
+  color: white;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.prospectus-footer p {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin: 0 0 8px;
+}
+
+.prospectus-footer .prospectus-logo-text .bio {
+  font-size: 18px;
+}
+
+.prospectus-footer .prospectus-logo-text .edge {
+  font-size: 32px;
+}
+
+.prospectus-footer .prospectus-logo-subtitle {
+  font-size: 18px;
 }
 
 /* Responsive Styles */
-@media (max-width: 1024px) {
-  .prospectus-packages-grid,
-  .prospectus-sponsors-grid,
-  .prospectus-speaker-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .prospectus-sponsor-highlight-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .prospectus-hero-headline {
-    font-size: 36px;
-  }
-
-  .prospectus-logo-text .bio {
-    font-size: 22px;
-  }
-
-  .prospectus-logo-text .edge {
-    font-size: 36px;
-  }
-
-  .prospectus-logo-subtitle {
-    font-size: 14px;
-    letter-spacing: 4px;
-  }
-
-  .prospectus-hero-details {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-
-  .prospectus-section-title {
-    font-size: 28px;
-  }
-
-  .prospectus-stats-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .prospectus-audience-grid {
+@media (max-width: 968px) {
+  .prospectus-about-grid,
+  .prospectus-audience-grid,
+  .prospectus-leaders-grid,
+  .prospectus-sponsor-categories {
     grid-template-columns: 1fr;
+  }
+
+  .prospectus-booths-grid,
+  .prospectus-speaker-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectus-all-exhibitors-list {
+    flex-direction: column;
+    align-items: center;
   }
 
   .prospectus-market-stats {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
   }
 
-  .prospectus-packages-grid,
-  .prospectus-sponsors-grid,
-  .prospectus-speaker-grid {
-    grid-template-columns: 1fr;
+  .prospectus-market-stat {
+    padding: 20px 12px;
   }
 
-  .prospectus-package-card.featured {
-    transform: none;
+  .prospectus-market-stat-value {
+    font-size: 32px;
   }
 
-  .prospectus-sponsor-highlight-grid {
-    grid-template-columns: 1fr;
+  .prospectus-market-stat-label {
+    font-size: 12px;
+  }
+
+  .prospectus-market-stat-desc {
+    font-size: 10px;
   }
 
   .prospectus-testimonials-grid {
     grid-template-columns: 1fr;
   }
 
-  .prospectus-leaders-grid {
+  .prospectus-hero-details {
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .prospectus-market-stats {
     grid-template-columns: 1fr;
   }
 
-  .prospectus-cta-title {
-    font-size: 32px;
-  }
-
-  .prospectus-cta-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .prospectus-cta-button {
-    width: 100%;
-    max-width: 300px;
-    text-align: center;
+  .prospectus-stats-grid {
+    grid-template-columns: 1fr;
   }
 }
