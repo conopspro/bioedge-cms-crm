@@ -1,0 +1,772 @@
+/* NYC Prospectus Page Styles */
+
+.prospectus-page {
+  font-family: "Source Sans 3", sans-serif;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.prospectus-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Hero Section */
+.prospectus-hero {
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 50%, #017ab2 100%);
+  padding: 80px 0 60px;
+  text-align: center;
+  color: white;
+}
+
+.prospectus-hero-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.prospectus-logo {
+  margin-bottom: 32px;
+}
+
+.prospectus-logo-text {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.prospectus-logo-text .bio {
+  font-size: 28px;
+  color: white;
+}
+
+.prospectus-logo-text .edge {
+  font-size: 48px;
+  color: #ff914d;
+}
+
+.prospectus-logo-subtitle {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  color: white;
+  margin-top: -4px;
+}
+
+.prospectus-hero-headline {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.prospectus-hero-tagline {
+  font-size: 24px;
+  color: #ff914d;
+  margin-bottom: 48px;
+}
+
+.prospectus-hero-details {
+  margin-top: 40px;
+}
+
+.prospectus-hero-detail {
+  text-align: center;
+}
+
+.prospectus-hero-detail-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* About Section */
+.prospectus-about {
+  padding: 80px 0;
+  background: white;
+}
+
+.prospectus-about-grid {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.prospectus-about-text p {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  text-align: center;
+}
+
+.prospectus-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+}
+
+.prospectus-stat-item {
+  text-align: center;
+  padding: 24px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.prospectus-stat-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 36px;
+  font-weight: 700;
+  color: #ff914d;
+}
+
+.prospectus-stat-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #0d2840;
+  margin-top: 8px;
+}
+
+/* Section Styles */
+.prospectus-section {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.prospectus-section-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ff914d;
+  margin-bottom: 12px;
+}
+
+.prospectus-section-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #0d2840;
+  margin-bottom: 16px;
+}
+
+.prospectus-section-subtitle {
+  font-size: 18px;
+  color: #5a6a7a;
+  max-width: 700px;
+  margin-bottom: 40px;
+}
+
+/* Audience Grid */
+.prospectus-audience-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.prospectus-audience-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.prospectus-audience-card.optimizers {
+  border-top: 4px solid #ff914d;
+}
+
+.prospectus-audience-card.practitioners {
+  border-top: 4px solid #017ab2;
+}
+
+.prospectus-audience-percent {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 56px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 8px;
+}
+
+.prospectus-audience-type {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 16px;
+}
+
+.prospectus-audience-desc {
+  font-size: 16px;
+  color: #5a6a7a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Opportunity Section */
+.prospectus-opportunity {
+  padding: 80px 0;
+  background: white;
+}
+
+.prospectus-market-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.prospectus-market-stat {
+  text-align: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.prospectus-market-stat-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: #ff914d;
+  margin-bottom: 8px;
+}
+
+.prospectus-market-stat-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 8px;
+}
+
+.prospectus-market-stat-desc {
+  font-size: 14px;
+  color: #5a6a7a;
+  margin: 0;
+}
+
+/* Package Cards */
+.prospectus-packages-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.prospectus-package-card {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.prospectus-package-card.featured {
+  border: 2px solid #ff914d;
+  transform: scale(1.02);
+}
+
+.prospectus-package-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff914d;
+  color: white;
+  padding: 4px 16px;
+  border-radius: 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.prospectus-package-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 8px;
+}
+
+.prospectus-package-price {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 36px;
+  font-weight: 700;
+  color: #ff914d;
+  margin-bottom: 24px;
+}
+
+.prospectus-package-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.prospectus-package-features li {
+  padding: 10px 0;
+  border-bottom: 1px solid #e8ecef;
+  color: #5a6a7a;
+  font-size: 15px;
+}
+
+.prospectus-package-features li:last-child {
+  border-bottom: none;
+}
+
+/* Sponsor Highlight (Title Sponsor) */
+.prospectus-sponsor-highlight {
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%);
+  padding: 48px;
+  border-radius: 16px;
+  margin-bottom: 40px;
+  position: relative;
+  color: white;
+}
+
+.prospectus-sponsor-highlight-badge {
+  position: absolute;
+  top: -12px;
+  left: 48px;
+  background: #ff914d;
+  color: white;
+  padding: 4px 16px;
+  border-radius: 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.prospectus-sponsor-highlight-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.prospectus-sponsor-highlight-price {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: #ff914d;
+  margin-bottom: 32px;
+}
+
+.prospectus-sponsor-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.prospectus-sponsor-benefit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.benefit-icon {
+  font-size: 20px;
+}
+
+/* Sponsor Cards Grid */
+.prospectus-sponsors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.prospectus-sponsor-card {
+  background: #f8f9fa;
+  padding: 32px;
+  border-radius: 12px;
+}
+
+.prospectus-sponsor-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 8px;
+}
+
+.prospectus-sponsor-price {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 28px;
+  font-weight: 700;
+  color: #ff914d;
+  margin-bottom: 16px;
+}
+
+.prospectus-sponsor-desc {
+  font-size: 15px;
+  color: #5a6a7a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Speaker Cards */
+.prospectus-speaker-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.prospectus-speaker-card {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.prospectus-speaker-card.featured {
+  border: 2px solid #ff914d;
+}
+
+.prospectus-speaker-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ff914d;
+  color: white;
+  padding: 4px 16px;
+  border-radius: 12px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.prospectus-speaker-duration {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #017ab2;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.prospectus-speaker-type {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 8px;
+}
+
+.prospectus-speaker-price {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 32px;
+  font-weight: 700;
+  color: #ff914d;
+  margin-bottom: 16px;
+}
+
+.prospectus-speaker-desc {
+  font-size: 15px;
+  color: #5a6a7a;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.prospectus-speaker-includes {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-top: 1px solid #e8ecef;
+  padding-top: 16px;
+}
+
+.prospectus-speaker-includes li {
+  padding: 6px 0;
+  color: #5a6a7a;
+  font-size: 14px;
+}
+
+.prospectus-speaker-includes li::before {
+  content: "✓";
+  color: #ff914d;
+  margin-right: 8px;
+  font-weight: 700;
+}
+
+/* Testimonials */
+.prospectus-testimonials {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%);
+  color: white;
+}
+
+.prospectus-testimonials .prospectus-section-label {
+  color: #ff914d;
+}
+
+.prospectus-testimonials .prospectus-section-title {
+  color: white;
+}
+
+.prospectus-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+  margin-top: 40px;
+}
+
+.prospectus-testimonial-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 32px;
+  border-radius: 12px;
+}
+
+.prospectus-testimonial-quote {
+  font-size: 18px;
+  font-style: italic;
+  line-height: 1.7;
+  margin-bottom: 24px;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.prospectus-testimonial-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ff914d;
+}
+
+/* Leadership Section */
+.prospectus-leadership {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.prospectus-leaders-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+}
+
+.prospectus-leader-card {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.prospectus-leader-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.prospectus-leader-info {
+  flex: 1;
+}
+
+.prospectus-leader-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2840;
+  margin: 0 0 4px;
+}
+
+.prospectus-leader-role {
+  font-size: 14px;
+  color: #ff914d;
+  font-weight: 600;
+  margin: 0;
+}
+
+.prospectus-leader-bio p {
+  font-size: 15px;
+  color: #5a6a7a;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.prospectus-leader-bio p:last-child {
+  margin-bottom: 0;
+}
+
+/* CTA Section */
+.prospectus-cta {
+  padding: 80px 0;
+  background: linear-gradient(135deg, #ff914d 0%, #ff7b2e 100%);
+  text-align: center;
+  color: white;
+}
+
+.prospectus-cta-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 42px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.prospectus-cta-subtitle {
+  font-size: 20px;
+  max-width: 600px;
+  margin: 0 auto 32px;
+  opacity: 0.95;
+}
+
+.prospectus-cta-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+
+.prospectus-cta-button {
+  display: inline-block;
+  padding: 16px 40px;
+  border-radius: 8px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.prospectus-cta-button.primary {
+  background: #0d2840;
+  color: white;
+}
+
+.prospectus-cta-button.primary:hover {
+  background: #0d598a;
+}
+
+.prospectus-cta-button.secondary {
+  background: white;
+  color: #0d2840;
+}
+
+.prospectus-cta-button.secondary:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.prospectus-cta-contact {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+.prospectus-cta-contact a {
+  color: white;
+  text-decoration: underline;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .prospectus-packages-grid,
+  .prospectus-sponsors-grid,
+  .prospectus-speaker-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .prospectus-sponsor-highlight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .prospectus-hero-headline {
+    font-size: 36px;
+  }
+
+  .prospectus-logo-text .bio {
+    font-size: 22px;
+  }
+
+  .prospectus-logo-text .edge {
+    font-size: 36px;
+  }
+
+  .prospectus-logo-subtitle {
+    font-size: 14px;
+    letter-spacing: 4px;
+  }
+
+  .prospectus-hero-details {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .prospectus-section-title {
+    font-size: 28px;
+  }
+
+  .prospectus-stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .prospectus-audience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectus-market-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectus-packages-grid,
+  .prospectus-sponsors-grid,
+  .prospectus-speaker-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectus-package-card.featured {
+    transform: none;
+  }
+
+  .prospectus-sponsor-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectus-testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectus-leaders-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .prospectus-cta-title {
+    font-size: 32px;
+  }
+
+  .prospectus-cta-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .prospectus-cta-button {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
+}
