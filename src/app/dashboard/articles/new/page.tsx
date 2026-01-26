@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { ArticleForm } from "@/components/articles/article-form"
 
@@ -25,7 +26,9 @@ export default async function NewArticlePage() {
 
       {/* Form */}
       <div className="max-w-3xl">
-        <ArticleForm companies={companies || []} mode="create" />
+        <Suspense fallback={<div>Loading...</div>}>
+          <ArticleForm companies={companies || []} mode="create" />
+        </Suspense>
       </div>
     </div>
   )
