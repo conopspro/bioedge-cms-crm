@@ -4,6 +4,11 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "BioEdge CMS",
   description: "Content Management System and CRM for BioEdge Magazine",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+  },
 }
 
 /**

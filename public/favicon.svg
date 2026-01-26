@@ -1,0 +1,6 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" fill="#0d2840"/>
+  <text x="2" y="24" font-family="IBM Plex Mono, monospace" font-weight="700" font-size="20">
+    <tspan fill="#ffffff">B</tspan><tspan fill="#ff914d">E</tspan>
+  </text>
+</svg>
