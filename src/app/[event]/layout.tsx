@@ -2,8 +2,8 @@ import { notFound } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
 
-// TODO: Re-enable caching for production
-// export const revalidate = 60
+// Revalidate pages every 60 seconds to reflect database changes
+export const revalidate = 60
 
 interface LayoutProps {
   children: React.ReactNode

@@ -10,7 +10,7 @@ import { VideoPlaylist } from "@/components/events/public/video-playlist"
 import { FinalCtaSection } from "@/components/events/final-cta-section"
 
 // TODO: Re-enable caching for production
-// export const revalidate = 60
+export const revalidate = 60
 
 interface PageProps {
   params: Promise<{ event: string }>
