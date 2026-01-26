@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     if (error) {
       console.error("Error creating company:", error)
       return NextResponse.json(
-        { error: "Failed to create company" },
+        { error: `Failed to create company: ${error.message}` },
         { status: 500 }
       )
     }
