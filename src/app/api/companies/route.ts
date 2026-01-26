@@ -118,14 +118,14 @@ export async function POST(request: NextRequest) {
     // Auto-generate slug from company name
     const slug = generateSlug(body.name)
 
-    // Build insert data with only the fields we want to set
+    // Build insert data with explicit fields matching the database schema
     const insertData: Record<string, unknown> = {
       name: body.name,
       slug,
       website: body.website || null,
       domain: (body as Record<string, unknown>).domain || null,
       description: body.description || null,
-      status: body.status || "lead",
+      status: body.status || "researching",
       category: body.category || null,
       is_draft: true,
     }

@@ -106,10 +106,22 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Construct the name field from first_name and last_name
-    const contactData = {
-      ...body,
+    // Build insert data with explicit fields matching the database schema
+    const contactData: Record<string, unknown> = {
+      company_id: body.company_id,
       name: `${body.first_name} ${body.last_name}`.trim(),
+      first_name: body.first_name,
+      last_name: body.last_name,
+      email: body.email,
+      phone: body.phone || null,
+      title: body.title || null,
+      linkedin_url: body.linkedin_url || null,
+      notes: body.notes || null,
+      source: body.source || "manual",
+      outreach_status: body.outreach_status || "not_contacted",
+      show_on_articles: body.show_on_articles || false,
+      bio: body.bio || null,
+      avatar_url: body.avatar_url || null,
     }
 
     const { data, error } = await supabase

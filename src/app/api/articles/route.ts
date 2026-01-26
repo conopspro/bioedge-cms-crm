@@ -116,9 +116,23 @@ export async function POST(request: NextRequest) {
       body.slug = `${body.slug}-${Date.now()}`
     }
 
+    // Build insert data with explicit fields matching the database schema
+    const articleData: Record<string, unknown> = {
+      company_id: body.company_id,
+      title: body.title,
+      slug: body.slug,
+      content: body.content || null,
+      excerpt: body.excerpt || null,
+      status: body.status || "draft",
+      ai_enhanced: false,
+      youtube_url: body.youtube_url || null,
+      featured_image_url: body.featured_image_url || null,
+      featured_image_alt: body.featured_image_alt || null,
+    }
+
     const { data, error } = await supabase
       .from("articles")
-      .insert(body)
+      .insert(articleData)
       .select(`
         *,
         company:companies(id, name)
