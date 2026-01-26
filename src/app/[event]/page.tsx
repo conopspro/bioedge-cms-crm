@@ -306,6 +306,10 @@ export default async function EventLandingPage({ params }: PageProps) {
       expand_first?: boolean
     }
     final_cta?: { visible?: boolean; title?: string; subtitle?: string; description?: string; button_text?: string }
+    tickets?: { visible?: boolean; title?: string; subtitle?: string }
+    leaders?: { visible?: boolean; title?: string; subtitle?: string }
+    companies?: { visible?: boolean; title?: string; subtitle?: string }
+    venue?: { visible?: boolean; title?: string; subtitle?: string }
     section_order?: string[]
   } | null
 
@@ -351,11 +355,11 @@ export default async function EventLandingPage({ params }: PageProps) {
     media_partner: "Media Partners",
   }
 
-  const hasLeaders = (leaders?.length || 0) > 0
-  const hasCompanies = (companies?.length || 0) > 0
-  const hasTickets = (ticketTiers?.length || 0) > 0
-  const hasTestimonials = (testimonials?.length || 0) > 0
-  const hasValueProps = valueProps.length > 0
+  const hasLeaders = (leaders?.length || 0) > 0 && (landingPageSettings?.leaders?.visible !== false)
+  const hasCompanies = (companies?.length || 0) > 0 && (landingPageSettings?.companies?.visible !== false)
+  const hasTickets = (ticketTiers?.length || 0) > 0 && (landingPageSettings?.tickets?.visible !== false)
+  const hasTestimonials = (testimonials?.length || 0) > 0 && (landingPageSettings?.testimonials?.visible !== false)
+  const hasValueProps = valueProps.length > 0 && (landingPageSettings?.value_props?.visible !== false)
 
   // Combine custom FAQs and linked template FAQs
   const allFaqs = [
@@ -1375,7 +1379,7 @@ export default async function EventLandingPage({ params }: PageProps) {
       {/* ============================================ */}
       {/* VENUE - WHERE (detailed) */}
       {/* ============================================ */}
-      {(event.venue_name || event.venue_description) && (
+      {(event.venue_name || event.venue_description) && landingPageSettings?.venue?.visible !== false && (
         <section id="venue" className="py-5" style={getBackgroundStyle(venueColors.background)}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="grid md:grid-cols-2 gap-6 items-center">
