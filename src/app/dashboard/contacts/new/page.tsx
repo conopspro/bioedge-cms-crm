@@ -1,3 +1,4 @@
+import { Suspense } from "react"
 import { createClient } from "@/lib/supabase/server"
 import { ContactForm } from "@/components/contacts/contact-form"
 
@@ -27,7 +28,9 @@ export default async function NewContactPage() {
 
       {/* Form */}
       <div className="max-w-2xl">
-        <ContactForm companies={companies || []} mode="create" />
+        <Suspense fallback={<div>Loading...</div>}>
+          <ContactForm companies={companies || []} mode="create" />
+        </Suspense>
       </div>
     </div>
   )
