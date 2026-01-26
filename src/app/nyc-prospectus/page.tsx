@@ -46,7 +46,7 @@ export default function NYCProspectusPage() {
           </div>
 
           <a href="mailto:peter@bioedgelongevity.com" className="prospectus-hero-cta">
-            Reserve Your Booth <span>→</span>
+            Reserve Your Spot <span>→</span>
           </a>
         </div>
       </section>
@@ -538,7 +538,7 @@ export default function NYCProspectusPage() {
           </p>
           <div className="prospectus-cta-buttons">
             <a href="mailto:peter@bioedgelongevity.com" className="prospectus-cta-button primary">
-              Reserve Your Booth →
+              Reserve Your Spot →
             </a>
           </div>
         </div>
