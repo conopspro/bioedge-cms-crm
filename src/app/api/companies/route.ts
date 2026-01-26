@@ -117,11 +117,22 @@ export async function POST(request: NextRequest) {
 
     // Auto-generate slug from company name
     const slug = generateSlug(body.name)
-    ;(body as Record<string, unknown>).slug = slug
+
+    // Build insert data with only the fields we want to set
+    const insertData: Record<string, unknown> = {
+      name: body.name,
+      slug,
+      website: body.website || null,
+      domain: (body as Record<string, unknown>).domain || null,
+      description: body.description || null,
+      status: body.status || "lead",
+      category: body.category || null,
+      is_draft: true,
+    }
 
     const { data, error } = await supabase
       .from("companies")
-      .insert(body)
+      .insert(insertData)
       .select()
       .single()
 
