@@ -1,0 +1,451 @@
+/* RFP Page Styles */
+
+.rfp-page {
+  font-family: "Source Sans 3", sans-serif;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+.rfp-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Hero Section */
+.rfp-hero {
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 50%, #017ab2 100%);
+  padding: 80px 0 60px;
+  text-align: center;
+  color: white;
+}
+
+.rfp-hero-badge {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 8px 24px;
+  border-radius: 20px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.rfp-logo {
+  margin-bottom: 32px;
+}
+
+.rfp-logo-text {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+
+.rfp-logo-text .bio {
+  font-size: 28px;
+  color: white;
+}
+
+.rfp-logo-text .edge {
+  font-size: 48px;
+  color: #ff914d;
+}
+
+.rfp-logo-subtitle {
+  display: block;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  color: white;
+  margin-top: -4px;
+}
+
+.rfp-hero-headline {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.rfp-hero-tagline {
+  font-size: 24px;
+  color: #ff914d;
+  margin-bottom: 48px;
+}
+
+.rfp-hero-details {
+  margin-top: 40px;
+}
+
+.rfp-hero-detail {
+  text-align: center;
+}
+
+.rfp-hero-detail-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+/* About Section */
+.rfp-about {
+  padding: 80px 0;
+  background: white;
+}
+
+.rfp-about-grid {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.rfp-about-text p {
+  font-size: 18px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.rfp-cme-card {
+  background: linear-gradient(135deg, #0d2840 0%, #0d598a 100%) !important;
+  padding: 32px;
+  border-radius: 12px;
+  margin-top: 32px;
+  color: white !important;
+}
+
+.rfp-cme-card * {
+  color: white !important;
+}
+
+.rfp-cme-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ff914d !important;
+  margin-bottom: 8px;
+}
+
+.rfp-cme-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: white !important;
+}
+
+.rfp-cme-desc {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin: 0;
+}
+
+/* Section Styles */
+.rfp-section {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.rfp-section-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #ff914d;
+  margin-bottom: 12px;
+}
+
+.rfp-section-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #0d2840;
+  margin-bottom: 16px;
+}
+
+.rfp-section-subtitle {
+  font-size: 18px;
+  color: #5a6a7a;
+  max-width: 700px;
+  margin-bottom: 40px;
+}
+
+/* Audience Grid */
+.rfp-audience-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.rfp-audience-card {
+  background: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.rfp-audience-card.optimizers {
+  border-top: 4px solid #ff914d;
+}
+
+.rfp-audience-card.practitioners {
+  border-top: 4px solid #017ab2;
+}
+
+.rfp-audience-percent {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 56px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 8px;
+}
+
+.rfp-audience-type {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 16px;
+}
+
+.rfp-audience-desc {
+  font-size: 16px;
+  color: #5a6a7a;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Opportunity Section */
+.rfp-opportunity {
+  padding: 80px 0;
+  background: white;
+}
+
+.rfp-market-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.rfp-market-stat {
+  text-align: center;
+  padding: 40px;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.rfp-market-stat-value {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 48px;
+  font-weight: 700;
+  color: #ff914d;
+  margin-bottom: 8px;
+}
+
+.rfp-market-stat-label {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 8px;
+}
+
+.rfp-market-stat-desc {
+  font-size: 14px;
+  color: #5a6a7a;
+  margin: 0;
+}
+
+/* Venue Requirements */
+.rfp-venue-requirements {
+  padding: 80px 0;
+  background: #f8f9fa;
+}
+
+.rfp-requirements-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
+}
+
+.rfp-requirement-card {
+  background: white;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.rfp-requirement-card.full-width {
+  grid-column: span 2;
+}
+
+.rfp-requirement-icon {
+  font-size: 32px;
+  margin-bottom: 16px;
+}
+
+.rfp-requirement-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 16px;
+}
+
+.rfp-requirement-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.rfp-requirement-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e8ecef;
+  color: #5a6a7a;
+}
+
+.rfp-requirement-list li:last-child {
+  border-bottom: none;
+}
+
+.rfp-requirement-list li strong {
+  color: #0d2840;
+}
+
+/* Hub Section */
+.rfp-hub-section {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.rfp-hub-diagram {
+  margin: 40px 0;
+}
+
+.rfp-hub-svg {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  display: block;
+}
+
+/* Leadership Section */
+.rfp-leadership {
+  padding: 80px 0;
+  background: white;
+}
+
+.rfp-leaders-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
+}
+
+.rfp-leader-card {
+  background: #f8f9fa;
+  padding: 32px;
+  border-radius: 12px;
+}
+
+.rfp-leader-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.rfp-leader-info {
+  flex: 1;
+}
+
+.rfp-leader-name {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2840;
+  margin: 0 0 4px;
+}
+
+.rfp-leader-role {
+  font-size: 14px;
+  color: #ff914d;
+  font-weight: 600;
+  margin: 0;
+}
+
+.rfp-leader-bio p {
+  font-size: 15px;
+  color: #5a6a7a;
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+
+.rfp-leader-bio p:last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .rfp-hero-headline {
+    font-size: 28px;
+  }
+
+  .rfp-logo-text .bio {
+    font-size: 22px;
+  }
+
+  .rfp-logo-text .edge {
+    font-size: 36px;
+  }
+
+  .rfp-logo-subtitle {
+    font-size: 14px;
+    letter-spacing: 4px;
+  }
+
+  .rfp-hero-details {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .rfp-section-title {
+    font-size: 28px;
+  }
+
+  .rfp-audience-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rfp-market-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .rfp-requirements-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rfp-requirement-card.full-width {
+    grid-column: span 1;
+  }
+
+  .rfp-leaders-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rfp-hub-svg {
+    max-width: 100%;
+  }
+}
