@@ -59,9 +59,10 @@ export function HomepageHero({ settings }: HomepageHeroProps) {
             {subtitle}
           </p>
 
-          <p className="mx-auto mb-10 max-w-[550px] text-lg leading-relaxed text-white lg:mx-0">
-            {description}
-          </p>
+          <div
+            className="mx-auto mb-10 max-w-[550px] text-lg leading-relaxed text-white lg:mx-0"
+            dangerouslySetInnerHTML={{ __html: description }}
+          />
 
           <div className="flex flex-wrap justify-center gap-4 lg:justify-start">
             <Link
