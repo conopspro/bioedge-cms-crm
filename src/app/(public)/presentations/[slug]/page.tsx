@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Building2, User, FileText, Play, ExternalLink, Users, Calendar, MapPin, Clock } from "lucide-react"
+import { ArrowLeft, Building2, User, FileText, Play, ExternalLink, Users, Calendar, MapPin } from "lucide-react"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
 
@@ -206,21 +206,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
                   })
                 }
 
-                // Format time (HH:MM:SS to 12-hour format)
-                const formatTime = (timeStr: string | null) => {
-                  if (!timeStr) return null
-                  const timePart = timeStr.includes("T") ? timeStr.split("T")[1]?.split(".")[0] : timeStr
-                  if (!timePart) return null
-                  const [hours, minutes] = timePart.split(":")
-                  const hour = parseInt(hours, 10)
-                  const ampm = hour >= 12 ? "PM" : "AM"
-                  const displayHour = hour % 12 || 12
-                  return `${displayHour}:${minutes} ${ampm}`
-                }
-
                 const location = [event.venue_name, event.city, event.state].filter(Boolean).join(", ")
-                const sessionTime = ep.start_time ? formatTime(ep.start_time) : null
-                const sessionEndTime = ep.end_time ? formatTime(ep.end_time) : null
 
                 return (
                   <Link
@@ -236,10 +222,10 @@ export default async function PresentationPage({ params }: PresentationPageProps
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-dark">
                           <span className="flex items-center gap-1.5">
                             <Calendar className="h-4 w-4" style={{ color: '#017ab2' }} />
-                            {ep.scheduled_date
-                              ? formatEventDate(ep.scheduled_date)
-                              : formatEventDate(event.start_date)
-                            }
+                            {formatEventDate(event.start_date)}
+                            {event.end_date && event.end_date !== event.start_date && (
+                              <> - {formatEventDate(event.end_date)}</>
+                            )}
                           </span>
                           {location && (
                             <span className="flex items-center gap-1.5">
@@ -248,22 +234,6 @@ export default async function PresentationPage({ params }: PresentationPageProps
                             </span>
                           )}
                         </div>
-                        {(sessionTime || ep.room || ep.track) && (
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-text-light mt-2">
-                            {sessionTime && (
-                              <span className="flex items-center gap-1.5">
-                                <Clock className="h-3.5 w-3.5" style={{ color: '#017ab2' }} />
-                                {sessionTime}{sessionEndTime ? ` - ${sessionEndTime}` : ""}
-                              </span>
-                            )}
-                            {ep.room && (
-                              <span>Room: {ep.room}</span>
-                            )}
-                            {ep.track && (
-                              <span>Track: {ep.track}</span>
-                            )}
-                          </div>
-                        )}
                       </div>
                       <div className="flex-shrink-0">
                         <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: '#017ab2' }}>
