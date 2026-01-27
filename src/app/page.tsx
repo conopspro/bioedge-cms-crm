@@ -131,7 +131,15 @@ export default async function HomePage() {
           />
         )
       case "edge_framework":
-        return <EdgeFramework key={section.id} />
+        return (
+          <EdgeFramework
+            key={section.id}
+            label={section.label}
+            title={section.title}
+            description={section.description}
+            settings={section.settings}
+          />
+        )
       case "slider":
         if (!section.settings?.slider_id) return null
         return (

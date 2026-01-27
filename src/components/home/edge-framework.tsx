@@ -29,8 +29,24 @@ const edgeItems = [
   },
 ]
 
-export function EdgeFramework() {
+interface EdgeFrameworkProps {
+  label?: string | null
+  title?: string | null
+  description?: string | null
+  settings?: Record<string, any> | null
+}
+
+export function EdgeFramework({ label, title, description, settings }: EdgeFrameworkProps) {
   const cardsRef = useRef<(HTMLDivElement | null)[]>([])
+
+  const bgColor = settings?.bg_color || "#ffffff"
+  const titleColor = settings?.title_color || undefined
+  const labelBgColor = settings?.label_bg_color || undefined
+  const textColor = settings?.text_color || undefined
+
+  const displayLabel = label ?? "THE EDGE FRAMEWORK"
+  const displayTitle = title ?? "ORDER MATTERS"
+  const displayDescription = description ?? "You cannot supplement your way out of bad habits."
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -53,15 +69,28 @@ export function EdgeFramework() {
   }, [])
 
   return (
-    <section id="edge" className="bg-white px-8 py-12">
+    <section id="edge" className="px-8 py-12" style={{ backgroundColor: bgColor }}>
       <div className="mx-auto max-w-[1200px]">
         <div className="mb-8 text-center">
-          <span className="mb-4 inline-block rounded bg-deep-blue px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
-            THE EDGE FRAMEWORK
-          </span>
-          <h2 className="mb-4 text-[30px] font-bold tracking-wide text-navy">ORDER MATTERS</h2>
-          <p className="mx-auto max-w-[700px] text-xl text-deep-blue">
-            You cannot supplement your way out of bad habits.
+          {displayLabel && (
+            <span
+              className="mb-4 inline-block rounded px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white"
+              style={{ backgroundColor: labelBgColor || undefined }}
+            >
+              {displayLabel}
+            </span>
+          )}
+          <h2
+            className="mb-4 text-[30px] font-bold tracking-wide"
+            style={{ color: titleColor || undefined }}
+          >
+            {displayTitle}
+          </h2>
+          <p
+            className="mx-auto max-w-[700px] text-xl"
+            style={{ color: textColor || undefined }}
+          >
+            {displayDescription}
           </p>
         </div>
 
