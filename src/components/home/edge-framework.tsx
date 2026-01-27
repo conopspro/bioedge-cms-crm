@@ -7,25 +7,25 @@ const edgeItems = [
     letter: "E",
     title: "ELIMINATE",
     description:
-      "Before you add anything, identify what's getting in the way. Chemical, digital, behavioral interference. This is where everything starts.",
+      "Before you add anything, remove what's interfering. Chemical, digital, and behavioral noise all distort signals. This is where change actually begins.",
   },
   {
     letter: "D",
     title: "DECODE",
     description:
-      "Your body sends signals, not symptoms. Learn to interpret what your fifteen systems are communicating before your brain mislabels them.",
+      "Your body speaks in signals, not symptoms. Learn to notice what your systems are communicating.",
   },
   {
     letter: "G",
     title: "GAIN",
     description:
-      "Once interference is eliminated and signals are decoded, you can start optimizing with supplements, devices, and practices.",
+      "Only after interference is removed and signals are clear does optimization make sense. Supplements, devices, and practices work best when they're added at the right time.",
   },
   {
     letter: "E",
     title: "EXECUTE",
     description:
-      "The best protocol requires implementation. Disciplined practice, tracked over time, sustained long enough for your body to respond.",
+      "The best protocol only works if you live it. Execution means consistency, feedback, and patience—long enough for the body to respond.",
   },
 ]
 
