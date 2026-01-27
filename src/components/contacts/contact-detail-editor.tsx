@@ -80,6 +80,62 @@ const statusLabels: Record<string, string> = {
   converted: "Converted",
 }
 
+function EditableCard({
+  title,
+  description,
+  section,
+  fields,
+  children,
+  editContent,
+  isEditing,
+  isSaving,
+  onStartEditing,
+  onCancelEditing,
+  onSave,
+}: {
+  title: string
+  description?: string
+  section: string
+  fields: string[]
+  children: React.ReactNode
+  editContent: React.ReactNode
+  isEditing: boolean
+  isSaving: boolean
+  onStartEditing: (section: string) => void
+  onCancelEditing: () => void
+  onSave: (fields: string[]) => void
+}) {
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="text-lg">{title}</CardTitle>
+            {description && <CardDescription>{description}</CardDescription>}
+          </div>
+          {isEditing ? (
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" onClick={onCancelEditing} disabled={isSaving}>
+                <X className="h-4 w-4" />
+              </Button>
+              <Button size="sm" onClick={() => onSave(fields)} disabled={isSaving}>
+                {isSaving ? "Saving..." : <Check className="h-4 w-4" />}
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" variant="ghost" onClick={() => onStartEditing(section)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isEditing ? editContent : children}
+      </CardContent>
+    </Card>
+  )
+}
+
 export function ContactDetailEditor({
   contact: initialContact,
   company: initialCompany,
@@ -169,53 +225,7 @@ export function ContactDetailEditor({
     setFormData({ ...formData, ai_expertise: expertise })
   }
 
-  const EditableCard = ({
-    title,
-    description,
-    section,
-    fields,
-    children,
-    editContent,
-  }: {
-    title: string
-    description?: string
-    section: string
-    fields: string[]
-    children: React.ReactNode
-    editContent: React.ReactNode
-  }) => {
-    const isEditing = editingSection === section
-
-    return (
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-lg">{title}</CardTitle>
-              {description && <CardDescription>{description}</CardDescription>}
-            </div>
-            {isEditing ? (
-              <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={cancelEditing} disabled={isSaving}>
-                  <X className="h-4 w-4" />
-                </Button>
-                <Button size="sm" onClick={() => saveSection(fields)} disabled={isSaving}>
-                  {isSaving ? "Saving..." : <Check className="h-4 w-4" />}
-                </Button>
-              </div>
-            ) : (
-              <Button size="sm" variant="ghost" onClick={() => startEditing(section)}>
-                <Pencil className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? editContent : children}
-        </CardContent>
-      </Card>
-    )
-  }
+  const isEditingSection = (section: string) => editingSection === section
 
   return (
     <div className="grid gap-6 lg:grid-cols-3">
@@ -227,6 +237,11 @@ export function ContactDetailEditor({
           description="Name, title, and contact details"
           section="basic"
           fields={["first_name", "last_name", "title", "email", "phone", "avatar_url"]}
+          isEditing={isEditingSection("basic")}
+          isSaving={isSaving}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-4">
               <div className="flex justify-center mb-4">
@@ -340,6 +355,11 @@ export function ContactDetailEditor({
           description="LinkedIn and other profiles"
           section="social"
           fields={["linkedin_url"]}
+          isEditing={isEditingSection("social")}
+          isSaving={isSaving}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-2">
               <Label>LinkedIn URL</Label>
@@ -373,6 +393,11 @@ export function ContactDetailEditor({
           description="Internal notes about this contact"
           section="notes"
           fields={["notes"]}
+          isEditing={isEditingSection("notes")}
+          isSaving={isSaving}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-2">
               <Textarea
@@ -398,6 +423,11 @@ export function ContactDetailEditor({
             description="Public bio and career highlights"
             section="profile"
             fields={["bio", "ai_highlights", "ai_expertise"]}
+            isEditing={isEditingSection("profile")}
+            isSaving={isSaving}
+            onStartEditing={startEditing}
+            onCancelEditing={cancelEditing}
+            onSave={saveSection}
             editContent={
               <div className="space-y-6">
                 <div className="space-y-2">
@@ -549,6 +579,11 @@ export function ContactDetailEditor({
           description="Associated company"
           section="company"
           fields={["company_id"]}
+          isEditing={isEditingSection("company")}
+          isSaving={isSaving}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-2">
               <Label>Company</Label>
@@ -593,6 +628,11 @@ export function ContactDetailEditor({
           description="Outreach status and visibility"
           section="status"
           fields={["outreach_status", "source", "show_on_articles"]}
+          isEditing={isEditingSection("status")}
+          isSaving={isSaving}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-4">
               <div className="space-y-2">
