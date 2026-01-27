@@ -1,6 +1,5 @@
 "use client"
 
-import { Book, Star, ShoppingCart } from "lucide-react"
 import type { BookEnhancementMetadata } from "@/types/database"
 import { DeleteEnhancementButton } from "./enhancement-actions"
 
@@ -19,8 +18,8 @@ interface BookCardProps {
 /**
  * Book Card
  *
- * Displays a book reference with author, thumbnail, and description.
- * Supports Amazon links (via Perplexity) and Google Books.
+ * Displays a book reference with author, thumbnail, and rating.
+ * Matches the leaders page card style.
  */
 export function BookCard({
   title,
@@ -36,86 +35,49 @@ export function BookCard({
     : metadata?.author
       ? [metadata.author]
       : []
-  const description = metadata?.description || metadata?.snippet
   const thumbnail = metadata?.thumbnail
   const rating = metadata?.rating
-  const publishedDate = metadata?.publishedDate
 
   return (
-    <div className="rounded-lg border bg-card p-4 hover:border-primary/50 transition-colors">
-      {/* Header with thumbnail or icon */}
-      <div className="flex items-start gap-3">
-        {thumbnail ? (
-          <img
-            src={thumbnail}
-            alt={title}
-            className="flex-shrink-0 w-16 h-20 object-cover rounded shadow-sm"
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="be-card hover:shadow-lg transition-shadow flex gap-4 relative"
+    >
+      {editable && enhancementId && (
+        <div className="absolute top-2 right-2" onClick={(e) => e.preventDefault()}>
+          <DeleteEnhancementButton
+            enhancementId={enhancementId}
+            enhancementTitle={title}
+            onDeleted={onDeleted}
           />
-        ) : (
-          <div className="flex-shrink-0 w-16 h-20 rounded bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-            <Book className="h-6 w-6 text-amber-600 dark:text-amber-400" />
-          </div>
-        )}
-
-        <div className="flex-1 min-w-0">
-          {/* Title with delete button */}
-          <div className="flex items-start justify-between gap-2">
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-sm hover:text-primary hover:underline line-clamp-2"
-            >
-              {title}
-            </a>
-            {editable && enhancementId && (
-              <DeleteEnhancementButton
-                enhancementId={enhancementId}
-                enhancementTitle={title}
-                onDeleted={onDeleted}
-              />
-            )}
-          </div>
-
-          {/* Authors */}
-          {authors.length > 0 && (
-            <p className="mt-1 text-xs text-muted-foreground">
-              by {authors.join(", ")}
-            </p>
-          )}
-
-          {/* Rating and year */}
-          <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-            {rating && (
-              <span className="flex items-center gap-0.5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                {rating.toFixed(1)}
-              </span>
-            )}
-            {publishedDate && (
-              <span>{publishedDate.split("-")[0]}</span>
-            )}
-          </div>
         </div>
-      </div>
-
-      {/* Description */}
-      {description && (
-        <p className="mt-3 text-xs text-muted-foreground line-clamp-3">
-          {description}
-        </p>
       )}
 
-      {/* External link - Amazon */}
-      <a
-        href={url}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-3 inline-flex items-center gap-1 text-xs text-orange-600 dark:text-orange-400 hover:underline"
-      >
-        <ShoppingCart className="h-3 w-3" />
-        View on Amazon
-      </a>
-    </div>
+      {thumbnail && (
+        <img
+          src={thumbnail}
+          alt={title}
+          className="w-16 h-24 object-cover rounded flex-shrink-0"
+        />
+      )}
+
+      <div className="min-w-0">
+        <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors line-clamp-2">
+          {title}
+        </h3>
+        {authors.length > 0 && (
+          <p className="text-sm text-text-light mt-1">
+            {authors.join(", ")}
+          </p>
+        )}
+        {rating && (
+          <p className="text-sm text-gold mt-1">
+            ★ {rating.toFixed(1)}
+          </p>
+        )}
+      </div>
+    </a>
   )
 }
