@@ -7,7 +7,7 @@ const edgeItems = [
     letter: "E",
     title: "ELIMINATE",
     description:
-      "Before you add anything, remove what's interfering. Chemical, digital, and behavioral noise all distort signals. This is where change actually begins.",
+      "Before you add anything, remove what's interfering. Chemical, digital, and behavioral noise all distort signals.",
   },
   {
     letter: "D",
@@ -19,13 +19,13 @@ const edgeItems = [
     letter: "G",
     title: "GAIN",
     description:
-      "Only after interference is removed and signals are clear does optimization make sense. Supplements, devices, and practices work best when they're added at the right time.",
+      "Optimization works after interference is eliminated and signals are decoded. The order matters.",
   },
   {
     letter: "E",
     title: "EXECUTE",
     description:
-      "The best protocol only works if you live it. Execution means consistency, feedback, and patience—long enough for the body to respond.",
+      "You're in it for the long term. Be patient and consistent, long enough for the body to respond.",
   },
 ]
 
