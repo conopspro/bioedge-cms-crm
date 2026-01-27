@@ -114,7 +114,7 @@ export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
             Presentations
           </Link>
           <a
-            href="https://www.bioedgecoach.com/"
+            href="https://bioedge.circle.so/"
             target="_blank"
             rel="noopener noreferrer"
             className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
