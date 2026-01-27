@@ -1159,8 +1159,8 @@ export default async function EventLandingPage({ params }: PageProps) {
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-5">
               <div>
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: leadersColors.subtitle }}>Who You&apos;ll Learn From</p>
-                <h2 className="font-heading text-2xl font-bold" style={{ color: leadersColors.title }}>Featured Leaders</h2>
+                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: leadersColors.subtitle }}>{landingPageSettings?.leaders?.subtitle || "Who You'll Learn From"}</p>
+                <h2 className="font-heading text-2xl font-bold" style={{ color: leadersColors.title }}>{landingPageSettings?.leaders?.title || "Featured Leaders"}</h2>
               </div>
               <Link
                 href={`/${event.slug}/leaders`}
@@ -1305,10 +1305,10 @@ export default async function EventLandingPage({ params }: PageProps) {
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="max-w-3xl mx-auto text-center mb-5">
               <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: ticketsColors.subtitle }}>
-                Reserve Your Spot
+                {landingPageSettings?.tickets?.subtitle || "Reserve Your Spot"}
               </p>
               <h2 className="font-heading text-2xl md:text-3xl font-bold" style={{ color: ticketsColors.title }}>
-                Choose Your Experience
+                {landingPageSettings?.tickets?.title || "Choose Your Experience"}
               </h2>
             </div>
 
@@ -1384,8 +1384,8 @@ export default async function EventLandingPage({ params }: PageProps) {
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="grid md:grid-cols-2 gap-6 items-center">
               <div>
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: venueColors.subtitle }}>The Venue</p>
-                <h2 className="font-heading text-2xl font-bold mb-4" style={{ color: venueColors.title }}>{event.venue_name || "Event Location"}</h2>
+                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: venueColors.subtitle }}>{landingPageSettings?.venue?.subtitle || "The Venue"}</p>
+                <h2 className="font-heading text-2xl font-bold mb-4" style={{ color: venueColors.title }}>{landingPageSettings?.venue?.title || event.venue_name || "Event Location"}</h2>
 
                 {event.venue_address && (
                   <p className="mb-3 text-sm" style={{ color: venueColors.text }}>
@@ -1489,8 +1489,8 @@ export default async function EventLandingPage({ params }: PageProps) {
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
             <div className="flex items-end justify-between mb-5">
               <div>
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: companiesColors.subtitle }}>Our Partners</p>
-                <h2 className="font-heading text-2xl font-bold" style={{ color: companiesColors.title }}>Companies &amp; Sponsors</h2>
+                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: companiesColors.subtitle }}>{landingPageSettings?.companies?.subtitle || "Our Partners"}</p>
+                <h2 className="font-heading text-2xl font-bold" style={{ color: companiesColors.title }}>{landingPageSettings?.companies?.title || "Companies & Sponsors"}</h2>
               </div>
               <Link
                 href={`/${event.slug}/companies`}
