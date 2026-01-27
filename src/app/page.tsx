@@ -255,7 +255,7 @@ export async function generateMetadata() {
     .single()
 
   return {
-    title: settings?.page_title || "bioEDGE Longevity Summit | National Tour 2026",
+    title: settings?.page_title || "bioEDGE Longevity Summit",
     description: settings?.meta_description || "A transformational live experience bringing the EDGE Framework to cities across America.",
     openGraph: settings?.og_image_url ? {
       images: [{ url: settings.og_image_url }],
