@@ -181,7 +181,6 @@ function formatDate(dateStr: string | null): string {
     weekday: "short",
     month: "short",
     day: "numeric",
-    timeZone: "America/New_York",
   })
 }
 

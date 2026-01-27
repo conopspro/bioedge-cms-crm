@@ -108,7 +108,6 @@ function formatDateLabel(dateStr: string): string {
     weekday: "long",
     month: "long",
     day: "numeric",
-    timeZone: "America/New_York",
   })
 }
 
@@ -392,7 +391,6 @@ export default async function EventAgendaPage({ params }: PageProps) {
                       month: "long",
                       day: "numeric",
                       year: "numeric",
-                      timeZone: "America/New_York",
                     })
                   })()}
                   {event.end_date && event.end_date !== event.start_date && (
@@ -404,7 +402,6 @@ export default async function EventAgendaPage({ params }: PageProps) {
                           month: "long",
                           day: "numeric",
                           year: "numeric",
-                          timeZone: "America/New_York",
                         })
                       })()}
                     </>

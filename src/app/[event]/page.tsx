@@ -91,7 +91,6 @@ function formatDateRange(start: string | null, end: string | null): string {
       month: "long",
       day: "numeric",
       year: "numeric",
-      timeZone: "America/New_York"
     })
   }
 
@@ -99,11 +98,11 @@ function formatDateRange(start: string | null, end: string | null): string {
 
   // Same month
   if (startDate.getMonth() === endDate.getMonth() && startDate.getFullYear() === endDate.getFullYear()) {
-    return `${startDate.toLocaleDateString("en-US", { month: "long", timeZone: "America/New_York" })} ${startDate.getDate()}–${endDate.getDate()}, ${startDate.getFullYear()}`
+    return `${startDate.toLocaleDateString("en-US", { month: "long" })} ${startDate.getDate()}–${endDate.getDate()}, ${startDate.getFullYear()}`
   }
 
   // Different months
-  return `${startDate.toLocaleDateString("en-US", { month: "long", day: "numeric", timeZone: "America/New_York" })} – ${endDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", timeZone: "America/New_York" })}`
+  return `${startDate.toLocaleDateString("en-US", { month: "long", day: "numeric" })} – ${endDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}`
 }
 
 /**

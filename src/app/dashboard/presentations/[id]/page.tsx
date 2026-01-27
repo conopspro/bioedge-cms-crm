@@ -150,7 +150,6 @@ export default async function PresentationDetailPage({ params }: PageProps) {
                     month: "short",
                     day: "numeric",
                     year: "numeric",
-                    timeZone: "America/New_York",
                   })
                 }
 

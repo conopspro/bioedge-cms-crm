@@ -42,7 +42,6 @@ function formatDate(dateStr: string | null): string {
     month: "long",
     day: "numeric",
     year: "numeric",
-    timeZone: "America/New_York",
   })
 }
 
