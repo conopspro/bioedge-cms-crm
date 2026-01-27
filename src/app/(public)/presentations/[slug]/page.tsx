@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Building2, User, FileText, Play, ExternalLink, Users, Calendar, MapPin } from "lucide-react"
+import { ArrowLeft, Building2, User, FileText, ExternalLink, Users, Calendar, MapPin } from "lucide-react"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
 
@@ -154,10 +154,6 @@ export default async function PresentationPage({ params }: PresentationPageProps
           {/* Recording */}
           {presentation.recording_embed && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Play className="h-5 w-5 text-gold" />
-                Watch Recording
-              </h2>
               <div className="aspect-video rounded-xl overflow-hidden bg-black shadow-lg">
                 <iframe
                   src={presentation.recording_embed}
