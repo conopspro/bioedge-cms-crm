@@ -136,7 +136,7 @@ export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
             Systems
           </Link>
           <a
-            href="https://www.bioedgecoach.com/"
+            href="https://longevitynewswire.com/"
             target="_blank"
             rel="noopener noreferrer"
             className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
