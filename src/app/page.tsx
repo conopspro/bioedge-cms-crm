@@ -257,8 +257,17 @@ export async function generateMetadata() {
   return {
     title: settings?.page_title || "bioEDGE Longevity Summit",
     description: settings?.meta_description || "A transformational live experience bringing the EDGE Framework to cities across America.",
-    openGraph: settings?.og_image_url ? {
-      images: [{ url: settings.og_image_url }],
-    } : undefined,
+    openGraph: {
+      title: settings?.page_title || "bioEDGE Longevity Summit",
+      description: settings?.meta_description || "A transformational live experience bringing the EDGE Framework to cities across America.",
+      type: "website",
+      ...(settings?.og_image_url ? { images: [{ url: settings.og_image_url }] } : {}),
+    },
+    twitter: {
+      card: settings?.og_image_url ? "summary_large_image" : "summary",
+      title: settings?.page_title || "bioEDGE Longevity Summit",
+      description: settings?.meta_description || "A transformational live experience bringing the EDGE Framework to cities across America.",
+      ...(settings?.og_image_url ? { images: [settings.og_image_url] } : {}),
+    },
   }
 }
