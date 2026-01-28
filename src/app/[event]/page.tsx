@@ -976,9 +976,6 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                     return (
                       <div className={`${getCardClass(true)} relative`}>
-                        {testShowQuoteIcon && (
-                          <Quote className="absolute top-4 right-4 h-8 w-8 text-gold/20" />
-                        )}
                         <p className="mb-6 italic text-lg" style={{ color: testimonialsColors.text }}>{featured.quote}</p>
                         <div className="flex items-center gap-3">
                           {testShowPhotos && (
@@ -1032,9 +1029,6 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                         return (
                           <div key={testimonial.id} className={`${getCardClass()} relative`}>
-                            {testShowQuoteIcon && (
-                              <Quote className="absolute top-3 right-3 h-6 w-6 text-gold/20" />
-                            )}
                             <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
                             <div className="flex items-center gap-2">
                               {testShowPhotos && (
@@ -1091,9 +1085,6 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                     return (
                       <div key={testimonial.id} className={`${getCardClass()} relative ${singleItemClass}`}>
-                        {testShowQuoteIcon && (
-                          <Quote className="absolute top-3 right-3 h-6 w-6 text-gold/20" />
-                        )}
                         <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
                         <div className="flex items-center gap-2">
                           {testShowPhotos && (
