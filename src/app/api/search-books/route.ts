@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { googleBooksService } from "@/lib/services/google-books"
+import { perplexityService } from "@/lib/services/perplexity"
 
 /**
  * Book Search API
  *
- * GET /api/search-books?q=xxx - Search for books via Google Books API
+ * GET /api/search-books?q=xxx - Search for books via Perplexity AI (returns Amazon links)
  */
 export async function GET(request: NextRequest) {
   try {
@@ -19,7 +19,14 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    const books = await googleBooksService.searchBooks(query, { limit })
+    if (!perplexityService.isConfigured()) {
+      return NextResponse.json(
+        { error: "Perplexity API not configured" },
+        { status: 503 }
+      )
+    }
+
+    const books = await perplexityService.searchBooks(query, { limit })
 
     return NextResponse.json({
       results: books.map((book) => ({
