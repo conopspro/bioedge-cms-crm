@@ -1556,13 +1556,13 @@ export default async function EventLandingPage({ params }: PageProps) {
             </div>
 
             <div className="mt-5 text-center">
-              <Link
-                href={`/${event.slug}/companies`}
+              <a
+                href="mailto:peter@bioedgelongevity.com"
                 className="inline-flex items-center justify-center px-4 py-2 rounded-full font-medium text-sm border hover:opacity-80"
                 style={{ color: '#017ab2', borderColor: '#017ab2' }}
               >
-                View All Companies
-              </Link>
+                Become a Partner
+              </a>
             </div>
           </div>
         </section>
