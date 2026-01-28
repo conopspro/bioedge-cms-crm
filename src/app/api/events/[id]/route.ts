@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { revalidatePath } from "next/cache"
 import { createClient } from "@/lib/supabase/server"
 
 interface RouteParams {
@@ -115,6 +116,11 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       }
       console.error("Error updating event:", error)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Revalidate the public event page so changes appear immediately
+    if (data.slug) {
+      revalidatePath(`/${data.slug}`)
     }
 
     return NextResponse.json(data)
