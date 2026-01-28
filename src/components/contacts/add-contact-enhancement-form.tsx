@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Plus, Loader2, Play, BookOpen, Book, Link as LinkIcon } from "lucide-react"
+import { Plus, Loader2, Play, BookOpen, Book, Link as LinkIcon, Search, ExternalLink } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -21,8 +21,33 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
+
+// Format view count (e.g., 1234567 -> "1.2M views")
+function formatViewCount(count: number | undefined): string | null {
+  if (!count) return null
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M views`
+  }
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(0)}K views`
+  }
+  return `${count} views`
+}
+
+// Format publish date (e.g., "2023-05-15T..." -> "May 2023")
+function formatPublishDate(dateStr: string | undefined): string | null {
+  if (!dateStr) return null
+  try {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+  } catch {
+    return null
+  }
+}
 
 interface AddContactEnhancementFormProps {
   contactId: string
@@ -58,8 +83,23 @@ const typeConfig = {
   },
 }
 
+interface SearchResult {
+  title: string
+  url: string
+  author?: string
+  channel?: string
+  publication?: string
+  year?: string | number | null
+  thumbnail?: string
+  snippet?: string
+  duration?: string
+  citedBy?: number | null
+  viewCount?: number
+  publishedAt?: string
+}
+
 /**
- * Form dialog for manually adding enhancements to a contact/leader
+ * Form dialog for manually adding enhancements to a contact/leader with built-in search
  */
 export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnhancementFormProps) {
   const [open, setOpen] = useState(false)
@@ -70,6 +110,14 @@ export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnha
   const [url, setUrl] = useState("")
   const [author, setAuthor] = useState("")
   const [publication, setPublication] = useState("")
+  const [mode, setMode] = useState<"manual" | "search">("search")
+
+  // Search state
+  const [searchQuery, setSearchQuery] = useState("")
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
+  const [searchError, setSearchError] = useState<string | null>(null)
+
   const router = useRouter()
 
   const config = typeConfig[type]
@@ -178,6 +226,87 @@ export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnha
     }
   }
 
+  // Search function
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) return
+
+    setIsSearching(true)
+    setSearchError(null)
+    setSearchResults([])
+
+    try {
+      let endpoint = ""
+      if (type === "youtube") {
+        endpoint = `/api/youtube-search?q=${encodeURIComponent(searchQuery)}&maxResults=5`
+      } else if (type === "book") {
+        endpoint = `/api/search-books?q=${encodeURIComponent(searchQuery)}&limit=5`
+      } else if (type === "scholar") {
+        endpoint = `/api/search-papers?q=${encodeURIComponent(searchQuery)}&limit=5`
+      }
+
+      if (!endpoint) {
+        setSearchError("Search not available for this type")
+        return
+      }
+
+      const response = await fetch(endpoint)
+      const data = await response.json()
+
+      if (!response.ok) {
+        setSearchError(data.error || "Search failed")
+        return
+      }
+
+      // Normalize results based on type
+      if (type === "youtube" && data.results) {
+        setSearchResults(data.results.map((r: { metadata: { title: string; videoId: string; viewCount?: number; publishedAt?: string }; video?: { channelTitle?: string; duration?: string } }) => ({
+          title: r.metadata.title,
+          url: `https://www.youtube.com/watch?v=${r.metadata.videoId}`,
+          channel: r.video?.channelTitle,
+          duration: r.video?.duration,
+          thumbnail: `https://img.youtube.com/vi/${r.metadata.videoId}/mqdefault.jpg`,
+          viewCount: r.metadata.viewCount,
+          publishedAt: r.metadata.publishedAt,
+        })))
+      } else if (type === "book" && data.results) {
+        setSearchResults(data.results.map((r: { title: string; url: string; author: string; year: string | number | null; thumbnail: string }) => ({
+          title: r.title,
+          url: r.url,
+          author: r.author,
+          year: r.year,
+          thumbnail: r.thumbnail,
+        })))
+      } else if (type === "scholar" && data.results) {
+        setSearchResults(data.results.map((r: { title: string; url: string; publication: string; year: string | null; citedBy: number | null; snippet: string }) => ({
+          title: r.title,
+          url: r.url,
+          publication: r.publication,
+          year: r.year,
+          citedBy: r.citedBy,
+          snippet: r.snippet,
+        })))
+      }
+    } catch (error) {
+      console.error("Search error:", error)
+      setSearchError("Failed to search. Please try again.")
+    } finally {
+      setIsSearching(false)
+    }
+  }
+
+  // Select a search result
+  const selectResult = (result: SearchResult) => {
+    setTitle(result.title)
+    setUrl(result.url)
+    if (type === "book" && result.author) {
+      setAuthor(result.author)
+    }
+    if (type === "scholar" && result.publication) {
+      setPublication(result.publication)
+    }
+    setMode("manual") // Switch to manual mode to show the form
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
@@ -246,7 +375,27 @@ export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnha
     setUrl("")
     setAuthor("")
     setPublication("")
+    setMode("search")
+    setSearchQuery("")
+    setSearchResults([])
+    setSearchError(null)
   }
+
+  const handleTypeChange = (newType: EnhancementType) => {
+    setType(newType)
+    // Reset search when changing type
+    setSearchQuery("")
+    setSearchResults([])
+    setSearchError(null)
+    // Switch back to search mode when changing type
+    if (newType !== "link") {
+      setMode("search")
+    } else {
+      setMode("manual")
+    }
+  }
+
+  const canSearch = type === "youtube" || type === "book" || type === "scholar"
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -256,12 +405,12 @@ export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnha
           Add
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[550px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Add Enhancement</DialogTitle>
             <DialogDescription>
-              Manually add a video, paper, book, or link for this leader.
+              Search for or manually add a video, paper, book, or link for this leader.
             </DialogDescription>
           </DialogHeader>
 
@@ -269,7 +418,7 @@ export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnha
             {/* Type Selection */}
             <div className="grid gap-2">
               <Label htmlFor="type">Type</Label>
-              <Select value={type} onValueChange={(v) => setType(v as EnhancementType)}>
+              <Select value={type} onValueChange={(v) => handleTypeChange(v as EnhancementType)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -286,75 +435,228 @@ export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnha
               </Select>
             </div>
 
-            {/* URL */}
-            <div className="grid gap-2">
-              <Label htmlFor="url">{config.urlLabel}</Label>
-              <Input
-                id="url"
-                type="url"
-                value={url}
-                onChange={(e) => handleUrlChange(e.target.value)}
-                placeholder={config.urlPlaceholder}
-                required
-              />
-              {type === "youtube" && (
-                <p className="text-xs text-muted-foreground">
-                  Paste a YouTube URL and the title will be fetched automatically
-                </p>
-              )}
-              {type === "book" && (
-                <p className="text-xs text-muted-foreground">
-                  Paste an Amazon URL and the title/author will be fetched automatically
-                </p>
-              )}
-            </div>
+            {/* Mode Tabs for searchable types */}
+            {canSearch ? (
+              <Tabs value={mode} onValueChange={(v) => setMode(v as "manual" | "search")} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="search" className="flex items-center gap-2">
+                    <Search className="h-4 w-4" />
+                    Search
+                  </TabsTrigger>
+                  <TabsTrigger value="manual" className="flex items-center gap-2">
+                    <LinkIcon className="h-4 w-4" />
+                    Enter URL
+                  </TabsTrigger>
+                </TabsList>
 
-            {/* Title */}
-            <div className="grid gap-2">
-              <Label htmlFor="title" className="flex items-center gap-2">
-                Title
-                {isFetchingTitle && (
-                  <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    Fetching...
-                  </span>
-                )}
-              </Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={isFetchingTitle ? "Fetching title..." : "Enter title..."}
-                required
-                disabled={isFetchingTitle}
-              />
-            </div>
+                <TabsContent value="search" className="mt-4 space-y-4">
+                  {/* Search Input */}
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder={`Search for ${type === "youtube" ? "videos" : type === "book" ? "books" : "papers"}...`}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          handleSearch()
+                        }
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleSearch}
+                      disabled={isSearching || !searchQuery.trim()}
+                    >
+                      {isSearching ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Search className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
 
-            {/* Author (for books) */}
-            {type === "book" && (
-              <div className="grid gap-2">
-                <Label htmlFor="author">Author (optional)</Label>
-                <Input
-                  id="author"
-                  value={author}
-                  onChange={(e) => setAuthor(e.target.value)}
-                  placeholder="Author name..."
-                  disabled={isFetchingTitle}
-                />
-              </div>
-            )}
+                  {/* Search Results */}
+                  {searchError && (
+                    <p className="text-sm text-destructive">{searchError}</p>
+                  )}
 
-            {/* Publication (for scholar) */}
-            {type === "scholar" && (
-              <div className="grid gap-2">
-                <Label htmlFor="publication">Publication (optional)</Label>
-                <Input
-                  id="publication"
-                  value={publication}
-                  onChange={(e) => setPublication(e.target.value)}
-                  placeholder="Journal or conference name..."
-                  disabled={isFetchingTitle}
-                />
+                  {searchResults.length > 0 && (
+                    <div className="max-h-[300px] overflow-y-auto space-y-2 border rounded-md p-2">
+                      {searchResults.map((result, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => selectResult(result)}
+                          className={cn(
+                            "w-full text-left p-2 rounded-md hover:bg-muted transition-colors",
+                            "flex gap-3 items-start"
+                          )}
+                        >
+                          {result.thumbnail && (
+                            <img
+                              src={result.thumbnail}
+                              alt=""
+                              className="w-16 h-12 object-cover rounded flex-shrink-0"
+                            />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm line-clamp-2">{result.title}</p>
+                            <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-xs text-muted-foreground">
+                              {result.author && <span>{result.author}</span>}
+                              {result.channel && <span>{result.channel}</span>}
+                              {result.publication && <span className="truncate max-w-[200px]">{result.publication}</span>}
+                              {result.year && <span>{result.year}</span>}
+                              {result.duration && <span>{result.duration}</span>}
+                              {formatViewCount(result.viewCount) && <span>{formatViewCount(result.viewCount)}</span>}
+                              {formatPublishDate(result.publishedAt) && <span>{formatPublishDate(result.publishedAt)}</span>}
+                              {result.citedBy !== null && result.citedBy !== undefined && (
+                                <span>Cited by {result.citedBy}</span>
+                              )}
+                            </div>
+                            {result.snippet && (
+                              <p className="text-xs text-muted-foreground mt-1 line-clamp-2">{result.snippet}</p>
+                            )}
+                          </div>
+                          <ExternalLink className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {isSearching && (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                    </div>
+                  )}
+
+                  {!isSearching && searchResults.length === 0 && searchQuery && !searchError && (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      Press Enter or click Search to find results
+                    </p>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="manual" className="mt-4 space-y-4">
+                  {/* URL - moved before Title so auto-fetch works naturally */}
+                  <div className="grid gap-2">
+                    <Label htmlFor="url">{config.urlLabel}</Label>
+                    <Input
+                      id="url"
+                      type="url"
+                      value={url}
+                      onChange={(e) => handleUrlChange(e.target.value)}
+                      placeholder={config.urlPlaceholder}
+                      required
+                    />
+                    {type === "youtube" && (
+                      <p className="text-xs text-muted-foreground">
+                        Paste a YouTube URL and the title will be fetched automatically
+                      </p>
+                    )}
+                    {type === "book" && (
+                      <p className="text-xs text-muted-foreground">
+                        Paste an Amazon URL and the title/author will be fetched automatically
+                      </p>
+                    )}
+                    {type === "scholar" && (
+                      <p className="text-xs text-muted-foreground">
+                        Paste a research paper URL and the title/publication will be fetched automatically
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Title */}
+                  <div className="grid gap-2">
+                    <Label htmlFor="title" className="flex items-center gap-2">
+                      Title
+                      {isFetchingTitle && (
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Fetching...
+                        </span>
+                      )}
+                    </Label>
+                    <Input
+                      id="title"
+                      value={title}
+                      onChange={(e) => setTitle(e.target.value)}
+                      placeholder={isFetchingTitle ? "Fetching title..." : "Enter title..."}
+                      required
+                      disabled={isFetchingTitle}
+                    />
+                  </div>
+
+                  {/* Author (for books) */}
+                  {type === "book" && (
+                    <div className="grid gap-2">
+                      <Label htmlFor="author" className="flex items-center gap-2">
+                        Author (optional)
+                        {isFetchingTitle && (
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Fetching...
+                          </span>
+                        )}
+                      </Label>
+                      <Input
+                        id="author"
+                        value={author}
+                        onChange={(e) => setAuthor(e.target.value)}
+                        placeholder={isFetchingTitle ? "Fetching author..." : "Author name..."}
+                        disabled={isFetchingTitle}
+                      />
+                    </div>
+                  )}
+
+                  {/* Publication (for scholar) */}
+                  {type === "scholar" && (
+                    <div className="grid gap-2">
+                      <Label htmlFor="publication" className="flex items-center gap-2">
+                        Publication (optional)
+                        {isFetchingTitle && (
+                          <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            Fetching...
+                          </span>
+                        )}
+                      </Label>
+                      <Input
+                        id="publication"
+                        value={publication}
+                        onChange={(e) => setPublication(e.target.value)}
+                        placeholder={isFetchingTitle ? "Fetching publication..." : "Journal or conference name..."}
+                        disabled={isFetchingTitle}
+                      />
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            ) : (
+              /* Manual-only mode for links */
+              <div className="space-y-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="url">{config.urlLabel}</Label>
+                  <Input
+                    id="url"
+                    type="url"
+                    value={url}
+                    onChange={(e) => handleUrlChange(e.target.value)}
+                    placeholder={config.urlPlaceholder}
+                    required
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter title..."
+                    required
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -368,7 +670,10 @@ export function AddContactEnhancementForm({ contactId, onAdded }: AddContactEnha
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              disabled={isSubmitting || !title || !url}
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
