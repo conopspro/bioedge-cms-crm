@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server"
-import { serperService } from "@/lib/services/serper"
+import { perplexityService } from "@/lib/services/perplexity"
 
 /**
  * Research Paper Search API
  *
- * GET /api/search-papers?q=xxx - Search for papers via Serper (Google Scholar)
+ * GET /api/search-papers?q=xxx - Search for papers via Perplexity AI
  */
 export async function GET(request: NextRequest) {
   try {
@@ -19,23 +19,24 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    if (!serperService.isConfigured()) {
+    if (!perplexityService.isConfigured()) {
       return NextResponse.json(
-        { error: "Serper API not configured" },
+        { error: "Perplexity API not configured" },
         { status: 503 }
       )
     }
 
-    const papers = await serperService.searchScholar(query, limit)
+    const papers = await perplexityService.searchPapers(query, { limit })
 
     return NextResponse.json({
       results: papers.map((paper) => ({
         title: paper.title,
         url: paper.url,
-        snippet: paper.snippet,
-        publication: paper.publication,
-        citedBy: paper.citedBy,
+        snippet: paper.abstract,
+        publication: paper.journal,
+        citedBy: paper.citationCount,
         year: paper.year,
+        authors: paper.authors,
       })),
     })
   } catch (error) {
