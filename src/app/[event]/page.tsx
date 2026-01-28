@@ -715,7 +715,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
@@ -883,7 +883,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
@@ -1141,7 +1141,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
@@ -1256,7 +1256,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
@@ -1287,7 +1287,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(photoSlider1Settings.title || photoSlider1Settings.subtitle) && (
               <div className="text-center mb-6">
                 {photoSlider1Settings.subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {photoSlider1Settings.subtitle}
                   </p>
                 )}
@@ -1366,7 +1366,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
@@ -1471,7 +1471,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
@@ -1571,7 +1571,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
@@ -1630,7 +1630,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(photoSlider2Settings.title || photoSlider2Settings.subtitle) && (
               <div className="text-center mb-6">
                 {photoSlider2Settings.subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {photoSlider2Settings.subtitle}
                   </p>
                 )}
@@ -1758,7 +1758,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             {(slider.section_title || slider.section_subtitle) && (
               <div className="text-center mb-6">
                 {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
                     {slider.section_subtitle}
                   </p>
                 )}
