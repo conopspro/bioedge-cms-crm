@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Trash2, Tag } from "lucide-react"
+import { Plus, Trash2, Tag, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -16,7 +16,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -40,6 +39,7 @@ export function EventTracksList({ eventId }: EventTracksListProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [editingTrack, setEditingTrack] = useState<EventTrack | null>(null)
 
   // Form state
   const [name, setName] = useState("")
@@ -60,30 +60,65 @@ export function EventTracksList({ eventId }: EventTracksListProps) {
       .finally(() => setIsLoading(false))
   }, [eventId])
 
-  const handleAddTrack = async () => {
+  const openAddDialog = () => {
+    setEditingTrack(null)
+    resetForm()
+    setIsDialogOpen(true)
+  }
+
+  const openEditDialog = (track: EventTrack) => {
+    setEditingTrack(track)
+    setName(track.name)
+    setDescription(track.description || "")
+    setColor(track.color || "#6366f1")
+    setIsDialogOpen(true)
+  }
+
+  const handleSave = async () => {
     if (!name.trim()) return
 
     setIsSubmitting(true)
     try {
-      const response = await fetch(`/api/events/${eventId}/tracks`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          description: description.trim() || null,
-          color: color || null,
-          position: tracks.length,
-        }),
-      })
+      if (editingTrack) {
+        // Update existing track
+        const response = await fetch(`/api/events/${eventId}/tracks/${editingTrack.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            description: description.trim() || null,
+            color: color || null,
+          }),
+        })
 
-      if (response.ok) {
-        const newTrack = await response.json()
-        setTracks([...tracks, newTrack])
-        resetForm()
-        setIsDialogOpen(false)
+        if (response.ok) {
+          const updatedTrack = await response.json()
+          setTracks(tracks.map((t) => (t.id === updatedTrack.id ? updatedTrack : t)))
+          setIsDialogOpen(false)
+          resetForm()
+        }
+      } else {
+        // Add new track
+        const response = await fetch(`/api/events/${eventId}/tracks`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            description: description.trim() || null,
+            color: color || null,
+            position: tracks.length,
+          }),
+        })
+
+        if (response.ok) {
+          const newTrack = await response.json()
+          setTracks([...tracks, newTrack])
+          setIsDialogOpen(false)
+          resetForm()
+        }
       }
     } catch (error) {
-      console.error("Error adding track:", error)
+      console.error("Error saving track:", error)
     } finally {
       setIsSubmitting(false)
     }
@@ -109,6 +144,7 @@ export function EventTracksList({ eventId }: EventTracksListProps) {
     setName("")
     setDescription("")
     setColor("#6366f1")
+    setEditingTrack(null)
   }
 
   return (
@@ -125,72 +161,10 @@ export function EventTracksList({ eventId }: EventTracksListProps) {
               {tracks.length > 0 && ` • ${tracks.length} track${tracks.length !== 1 ? "s" : ""}`}
             </CardDescription>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Track
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Track</DialogTitle>
-                <DialogDescription>
-                  Create a track or category for organizing presentations.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="trackName">Name *</Label>
-                  <Input
-                    id="trackName"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Business Track"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="color">Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="color"
-                      type="color"
-                      value={color}
-                      onChange={(e) => setColor(e.target.value)}
-                      className="w-14 h-9 p-1 cursor-pointer"
-                    />
-                    <Input
-                      value={color}
-                      onChange={(e) => setColor(e.target.value)}
-                      placeholder="#6366f1"
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Optional notes about this track..."
-                    rows={2}
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddTrack} disabled={isSubmitting || !name.trim()}>
-                    {isSubmitting ? "Adding..." : "Add Track"}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button size="sm" onClick={openAddDialog}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Track
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -207,7 +181,7 @@ export function EventTracksList({ eventId }: EventTracksListProps) {
                 key={track.id}
                 className="flex items-start justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-3 cursor-pointer flex-1" onClick={() => openEditDialog(track)}>
                   {track.color && (
                     <div
                       className="w-4 h-4 rounded-full mt-0.5 flex-shrink-0"
@@ -223,18 +197,89 @@ export function EventTracksList({ eventId }: EventTracksListProps) {
                     )}
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteTrack(track.id)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => openEditDialog(track)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteTrack(track.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
+
+      {/* Add/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingTrack ? "Edit Track" : "Add Track"}</DialogTitle>
+            <DialogDescription>
+              {editingTrack ? "Update the details for this track." : "Create a track or category for organizing presentations."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="trackName">Name *</Label>
+              <Input
+                id="trackName"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Business Track"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="color">Color</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="color"
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-14 h-9 p-1 cursor-pointer"
+                />
+                <Input
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  placeholder="#6366f1"
+                  className="flex-1"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Optional notes about this track..."
+                rows={2}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave} disabled={isSubmitting || !name.trim()}>
+                {isSubmitting ? "Saving..." : editingTrack ? "Update" : "Add Track"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }

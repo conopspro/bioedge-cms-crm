@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Plus, Trash2, MapPin, Users } from "lucide-react"
+import { Plus, Trash2, MapPin, Users, Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -16,7 +16,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -40,6 +39,7 @@ export function EventRoomsList({ eventId }: EventRoomsListProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [editingRoom, setEditingRoom] = useState<EventRoom | null>(null)
 
   // Form state
   const [name, setName] = useState("")
@@ -60,30 +60,65 @@ export function EventRoomsList({ eventId }: EventRoomsListProps) {
       .finally(() => setIsLoading(false))
   }, [eventId])
 
-  const handleAddRoom = async () => {
+  const openAddDialog = () => {
+    setEditingRoom(null)
+    resetForm()
+    setIsDialogOpen(true)
+  }
+
+  const openEditDialog = (room: EventRoom) => {
+    setEditingRoom(room)
+    setName(room.name)
+    setDescription(room.description || "")
+    setCapacity(room.capacity?.toString() || "")
+    setIsDialogOpen(true)
+  }
+
+  const handleSave = async () => {
     if (!name.trim()) return
 
     setIsSubmitting(true)
     try {
-      const response = await fetch(`/api/events/${eventId}/rooms`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: name.trim(),
-          description: description.trim() || null,
-          capacity: capacity ? parseInt(capacity) : null,
-          position: rooms.length,
-        }),
-      })
+      if (editingRoom) {
+        // Update existing room
+        const response = await fetch(`/api/events/${eventId}/rooms/${editingRoom.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            description: description.trim() || null,
+            capacity: capacity ? parseInt(capacity) : null,
+          }),
+        })
 
-      if (response.ok) {
-        const newRoom = await response.json()
-        setRooms([...rooms, newRoom])
-        resetForm()
-        setIsDialogOpen(false)
+        if (response.ok) {
+          const updatedRoom = await response.json()
+          setRooms(rooms.map((r) => (r.id === updatedRoom.id ? updatedRoom : r)))
+          setIsDialogOpen(false)
+          resetForm()
+        }
+      } else {
+        // Add new room
+        const response = await fetch(`/api/events/${eventId}/rooms`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: name.trim(),
+            description: description.trim() || null,
+            capacity: capacity ? parseInt(capacity) : null,
+            position: rooms.length,
+          }),
+        })
+
+        if (response.ok) {
+          const newRoom = await response.json()
+          setRooms([...rooms, newRoom])
+          setIsDialogOpen(false)
+          resetForm()
+        }
       }
     } catch (error) {
-      console.error("Error adding room:", error)
+      console.error("Error saving room:", error)
     } finally {
       setIsSubmitting(false)
     }
@@ -109,6 +144,7 @@ export function EventRoomsList({ eventId }: EventRoomsListProps) {
     setName("")
     setDescription("")
     setCapacity("")
+    setEditingRoom(null)
   }
 
   return (
@@ -125,64 +161,10 @@ export function EventRoomsList({ eventId }: EventRoomsListProps) {
               {rooms.length > 0 && ` • ${rooms.length} room${rooms.length !== 1 ? "s" : ""}`}
             </CardDescription>
           </div>
-          <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
-            <DialogTrigger asChild>
-              <Button size="sm">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Room
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Add Room / Stage</DialogTitle>
-                <DialogDescription>
-                  Create a named room or stage for scheduling presentations.
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 pt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="roomName">Name *</Label>
-                  <Input
-                    id="roomName"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="Main Stage"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="capacity">Capacity</Label>
-                  <Input
-                    id="capacity"
-                    type="number"
-                    value={capacity}
-                    onChange={(e) => setCapacity(e.target.value)}
-                    placeholder="100"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Optional notes about this room..."
-                    rows={2}
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button onClick={handleAddRoom} disabled={isSubmitting || !name.trim()}>
-                    {isSubmitting ? "Adding..." : "Add Room"}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button size="sm" onClick={openAddDialog}>
+            <Plus className="mr-2 h-4 w-4" />
+            Add Room
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -199,7 +181,7 @@ export function EventRoomsList({ eventId }: EventRoomsListProps) {
                 key={room.id}
                 className="flex items-start justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
               >
-                <div className="space-y-1">
+                <div className="space-y-1 cursor-pointer flex-1" onClick={() => openEditDialog(room)}>
                   <span className="font-medium">{room.name}</span>
                   <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     {room.capacity && (
@@ -213,18 +195,81 @@ export function EventRoomsList({ eventId }: EventRoomsListProps) {
                     )}
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDeleteRoom(room.id)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => openEditDialog(room)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDeleteRoom(room.id)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
+
+      {/* Add/Edit Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={(open) => { setIsDialogOpen(open); if (!open) resetForm(); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{editingRoom ? "Edit Room / Stage" : "Add Room / Stage"}</DialogTitle>
+            <DialogDescription>
+              {editingRoom ? "Update the details for this room or stage." : "Create a named room or stage for scheduling presentations."}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="roomName">Name *</Label>
+              <Input
+                id="roomName"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Main Stage"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="capacity">Capacity</Label>
+              <Input
+                id="capacity"
+                type="number"
+                value={capacity}
+                onChange={(e) => setCapacity(e.target.value)}
+                placeholder="100"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Optional notes about this room..."
+                rows={2}
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave} disabled={isSubmitting || !name.trim()}>
+                {isSubmitting ? "Saving..." : editingRoom ? "Update" : "Add Room"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   )
 }
