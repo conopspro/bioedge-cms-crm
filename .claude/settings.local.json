@@ -8,7 +8,11 @@
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
       "Bash(npx supabase:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npx vercel:*)"
     ]
   }
 }
