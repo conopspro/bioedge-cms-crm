@@ -180,7 +180,7 @@ export default async function EventLandingPage({ params }: PageProps) {
       .from("event_testimonials")
       .select(`
         *,
-        contact:contacts(first_name, last_name, title, avatar_url, company:companies(name))
+        contact:contacts(first_name, last_name, title, avatar_url, slug, company:companies(name))
       `)
       .eq("event_id", event.id)
       .eq("is_visible", true)
@@ -912,7 +912,7 @@ export default async function EventLandingPage({ params }: PageProps) {
         const testSubtitle = testSettings?.subtitle || "What Attendees Say"
         const testDescription = testSettings?.description
         const testLayout = testSettings?.layout || 'grid'
-        const testColumns = testSettings?.columns || 3
+        const testColumns = testSettings?.columns || 2
         const testMaxItems = testSettings?.max_testimonials || 6
         const testShowPhotos = testSettings?.show_photos !== false
         const testShowQuoteIcon = testSettings?.show_quote_icon !== false
@@ -969,6 +969,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                     const title = featured.contact?.title || featured.author_title
                     const company = featured.contact?.company?.name || featured.author_company
                     const image = featured.contact?.avatar_url || featured.author_image_url
+                    const leaderSlug = featured.contact?.slug
 
                     return (
                       <div className={`${getCardClass(true)} relative`}>
@@ -987,7 +988,11 @@ export default async function EventLandingPage({ params }: PageProps) {
                             )
                           )}
                           <div>
-                            <p className="font-heading font-semibold text-navy">{name}</p>
+                            {leaderSlug ? (
+                              <a href={`/leaders/${leaderSlug}`} className="font-heading font-semibold text-navy hover:text-gold transition-colors">{name}</a>
+                            ) : (
+                              <p className="font-heading font-semibold text-navy">{name}</p>
+                            )}
                             {(testShowTitle || testShowCompany) && (title || company) && (
                               <p className="text-sm text-text-light">
                                 {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
@@ -1012,7 +1017,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                   {/* Rest of testimonials in grid */}
                   {displayTestimonials.length > 1 && (
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2">
                       {displayTestimonials.slice(1).map((testimonial) => {
                         const name = testimonial.contact
                           ? `${testimonial.contact.first_name} ${testimonial.contact.last_name}`
@@ -1020,6 +1025,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         const title = testimonial.contact?.title || testimonial.author_title
                         const company = testimonial.contact?.company?.name || testimonial.author_company
                         const image = testimonial.contact?.avatar_url || testimonial.author_image_url
+                        const leaderSlug = testimonial.contact?.slug
 
                         return (
                           <div key={testimonial.id} className={`${getCardClass()} relative`}>
@@ -1038,7 +1044,11 @@ export default async function EventLandingPage({ params }: PageProps) {
                                 )
                               )}
                               <div>
-                                <p className="font-heading font-semibold text-navy text-sm">{name}</p>
+                                {leaderSlug ? (
+                                  <a href={`/leaders/${leaderSlug}`} className="font-heading font-semibold text-navy text-sm hover:text-gold transition-colors">{name}</a>
+                                ) : (
+                                  <p className="font-heading font-semibold text-navy text-sm">{name}</p>
+                                )}
                                 {(testShowTitle || testShowCompany) && (title || company) && (
                                   <p className="text-xs text-text-light">
                                     {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
@@ -1073,6 +1083,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                     const title = testimonial.contact?.title || testimonial.author_title
                     const company = testimonial.contact?.company?.name || testimonial.author_company
                     const image = testimonial.contact?.avatar_url || testimonial.author_image_url
+                    const leaderSlug = testimonial.contact?.slug
 
                     return (
                       <div key={testimonial.id} className={`${getCardClass()} relative`}>
@@ -1091,7 +1102,11 @@ export default async function EventLandingPage({ params }: PageProps) {
                             )
                           )}
                           <div>
-                            <p className="font-heading font-semibold text-navy text-sm">{name}</p>
+                            {leaderSlug ? (
+                              <a href={`/leaders/${leaderSlug}`} className="font-heading font-semibold text-navy text-sm hover:text-gold transition-colors">{name}</a>
+                            ) : (
+                              <p className="font-heading font-semibold text-navy text-sm">{name}</p>
+                            )}
                             {(testShowTitle || testShowCompany) && (title || company) && (
                               <p className="text-xs text-text-light">
                                 {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
