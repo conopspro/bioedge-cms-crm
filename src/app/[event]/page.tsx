@@ -521,7 +521,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                 {/* CTA Buttons */}
                 <div className="flex flex-wrap gap-3">
-                  {heroCtaUrl && (
+                  {heroCtaUrl ? (
                     <a
                       href={heroCtaUrl}
                       target="_blank"
@@ -534,6 +534,10 @@ export default async function EventLandingPage({ params }: PageProps) {
                     >
                       {heroCtaText}
                     </a>
+                  ) : (
+                    <p className="font-heading font-semibold uppercase tracking-wider text-sm" style={{ color: heroColors.button_bg || '#c9a227' }}>
+                      Tickets Go On Sale Soon
+                    </p>
                   )}
                   {heroSecondaryCtaUrl && heroSecondaryCtaText && (
                     <a
@@ -661,7 +665,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-3">
-                {heroCtaUrl && (
+                {heroCtaUrl ? (
                   <a
                     href={heroCtaUrl}
                     target="_blank"
@@ -674,6 +678,10 @@ export default async function EventLandingPage({ params }: PageProps) {
                   >
                     {heroCtaText}
                   </a>
+                ) : (
+                  <p className="font-heading font-semibold uppercase tracking-wider text-sm" style={{ color: heroColors.button_bg || '#c9a227' }}>
+                    Tickets Go On Sale Soon
+                  </p>
                 )}
                 {heroSecondaryCtaUrl && heroSecondaryCtaText && (
                   <a
