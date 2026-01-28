@@ -927,11 +927,14 @@ export default async function EventLandingPage({ params }: PageProps) {
         const displayTestimonials = testimonials?.slice(0, testMaxItems) || []
 
         // Grid column classes based on settings (default to 2 columns)
+        // Single testimonial: center it with max width
         const gridColsClass = testLayout === 'featured'
           ? 'space-y-4'
-          : testColumns === 3
-            ? 'grid gap-4 md:grid-cols-2 lg:grid-cols-3'
-            : 'grid gap-4 md:grid-cols-2'
+          : displayTestimonials.length === 1
+            ? 'flex justify-center'
+            : testColumns === 3
+              ? 'grid gap-4 md:grid-cols-2 lg:grid-cols-3'
+              : 'grid gap-4 md:grid-cols-2'
 
         // Card style classes
         const getCardClass = (isFeatured = false) => {
@@ -1084,9 +1087,10 @@ export default async function EventLandingPage({ params }: PageProps) {
                     const company = testimonial.contact?.company?.name || testimonial.author_company
                     const image = testimonial.contact?.avatar_url || testimonial.author_image_url
                     const leaderSlug = testimonial.contact?.slug
+                    const singleItemClass = displayTestimonials.length === 1 ? 'max-w-lg w-full' : ''
 
                     return (
-                      <div key={testimonial.id} className={`${getCardClass()} relative`}>
+                      <div key={testimonial.id} className={`${getCardClass()} relative ${singleItemClass}`}>
                         {testShowQuoteIcon && (
                           <Quote className="absolute top-3 right-3 h-6 w-6 text-gold/20" />
                         )}
