@@ -915,7 +915,7 @@ export default async function EventLandingPage({ params }: PageProps) {
         const testColumns = testSettings?.columns || 2
         const testMaxItems = testSettings?.max_testimonials || 6
         const testShowPhotos = testSettings?.show_photos !== false
-        const testShowQuoteIcon = testSettings?.show_quote_icon !== false
+        const testShowQuoteIcon = testSettings?.show_quote_icon === true
         const testShowTitle = testSettings?.show_title !== false
         const testShowCompany = testSettings?.show_company !== false
         const testShowVideoLink = testSettings?.show_video_link !== false
