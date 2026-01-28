@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate bucket name
-    const allowedBuckets = ["article-images", "company-logos", "contact-avatars"]
+    const allowedBuckets = ["article-images", "company-logos", "contact-avatars", "event-images"]
     if (!allowedBuckets.includes(bucket)) {
       return NextResponse.json(
         { error: `Invalid bucket. Allowed: ${allowedBuckets.join(", ")}` },

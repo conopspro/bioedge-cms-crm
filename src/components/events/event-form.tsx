@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Sparkles, Loader2, ChevronDown, ChevronUp } from "lucide-react"
+import { Sparkles, Loader2, ChevronDown, ChevronUp, Share2 } from "lucide-react"
 import type { Event, EventStatus } from "@/types/database"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { ImageUpload } from "@/components/ui/image-upload"
 
 interface EventFormProps {
   event?: Event
@@ -516,17 +517,34 @@ export function EventForm({ event }: EventFormProps) {
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ogImageUrl">Open Graph Image URL</Label>
-              <Input
-                id="ogImageUrl"
-                type="url"
-                value={ogImageUrl}
-                onChange={(e) => setOgImageUrl(e.target.value)}
-                placeholder="https://..."
-              />
-              <p className="text-xs text-muted-foreground">
-                Image for social sharing (1200x630 recommended).
-              </p>
+              <Label className="flex items-center gap-2">
+                <Share2 className="h-4 w-4" />
+                Social Share Image
+              </Label>
+              {isEditing && event?.id ? (
+                <ImageUpload
+                  imageType="article"
+                  entityType="event"
+                  entityId={event.id}
+                  value={ogImageUrl || null}
+                  onUpload={(url) => setOgImageUrl(url)}
+                  onRemove={() => setOgImageUrl("")}
+                  cropToFit
+                />
+              ) : (
+                <>
+                  <Input
+                    id="ogImageUrl"
+                    type="url"
+                    value={ogImageUrl}
+                    onChange={(e) => setOgImageUrl(e.target.value)}
+                    placeholder="https://..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Save the event first to enable image upload.
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </CardContent>

@@ -24,7 +24,7 @@ interface ImageUploadProps {
   /** Called when image is removed */
   onRemove?: () => void
   /** Entity type for storage path */
-  entityType: "article" | "company" | "contact"
+  entityType: "article" | "company" | "contact" | "event"
   /** Entity ID for storage path */
   entityId: string
   /** Whether to crop to exact dimensions (true) or resize to fit (false) */
@@ -63,6 +63,7 @@ export function ImageUpload({
     article: "article-images",
     company: "company-logos",
     contact: "contact-avatars",
+    event: "event-images",
   }
 
   const handleFileSelect = useCallback(
