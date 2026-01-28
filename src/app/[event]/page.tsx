@@ -926,12 +926,12 @@ export default async function EventLandingPage({ params }: PageProps) {
         // Limit testimonials displayed
         const displayTestimonials = testimonials?.slice(0, testMaxItems) || []
 
-        // Grid column classes based on settings
+        // Grid column classes based on settings (default to 2 columns)
         const gridColsClass = testLayout === 'featured'
           ? 'space-y-4'
-          : testColumns === 2
-            ? 'grid gap-4 md:grid-cols-2'
-            : 'grid gap-4 md:grid-cols-2 lg:grid-cols-3'
+          : testColumns === 3
+            ? 'grid gap-4 md:grid-cols-2 lg:grid-cols-3'
+            : 'grid gap-4 md:grid-cols-2'
 
         // Card style classes
         const getCardClass = (isFeatured = false) => {
