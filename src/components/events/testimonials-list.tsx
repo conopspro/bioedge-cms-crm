@@ -60,7 +60,6 @@ interface Testimonial {
   author_image_url?: string | null
   quote: string
   video_url?: string | null
-  rating?: number | null
   display_order: number
   is_visible: boolean
   is_featured: boolean
@@ -89,7 +88,6 @@ export function TestimonialsList({ eventId }: TestimonialsListProps) {
   const [authorImageUrl, setAuthorImageUrl] = useState("")
   const [quote, setQuote] = useState("")
   const [videoUrl, setVideoUrl] = useState("")
-  const [rating, setRating] = useState<number | null>(null)
   const [isVisible, setIsVisible] = useState(true)
   const [isFeatured, setIsFeatured] = useState(false)
 
@@ -145,7 +143,6 @@ export function TestimonialsList({ eventId }: TestimonialsListProps) {
     setAuthorImageUrl("")
     setQuote("")
     setVideoUrl("")
-    setRating(null)
     setIsVisible(true)
     setIsFeatured(false)
     setDialogOpen(true)
@@ -160,7 +157,6 @@ export function TestimonialsList({ eventId }: TestimonialsListProps) {
     setAuthorImageUrl(testimonial.author_image_url || "")
     setQuote(testimonial.quote)
     setVideoUrl(testimonial.video_url || "")
-    setRating(testimonial.rating ?? null)
     setIsVisible(testimonial.is_visible)
     setIsFeatured(testimonial.is_featured)
     setDialogOpen(true)
@@ -188,7 +184,6 @@ export function TestimonialsList({ eventId }: TestimonialsListProps) {
       author_image_url: contactId === "manual" ? authorImageUrl.trim() || null : null,
       quote: quote.trim(),
       video_url: videoUrl.trim() || null,
-      rating: rating,
       is_visible: isVisible,
       is_featured: isFeatured,
     }
