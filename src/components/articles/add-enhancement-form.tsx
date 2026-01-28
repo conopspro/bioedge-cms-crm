@@ -25,6 +25,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 
+// Format view count (e.g., 1234567 -> "1.2M views")
+function formatViewCount(count: number | undefined): string | null {
+  if (!count) return null
+  if (count >= 1000000) {
+    return `${(count / 1000000).toFixed(1)}M views`
+  }
+  if (count >= 1000) {
+    return `${(count / 1000).toFixed(0)}K views`
+  }
+  return `${count} views`
+}
+
+// Format publish date (e.g., "2023-05-15T..." -> "May 2023")
+function formatPublishDate(dateStr: string | undefined): string | null {
+  if (!dateStr) return null
+  try {
+    const date = new Date(dateStr)
+    return date.toLocaleDateString("en-US", { month: "short", year: "numeric" })
+  } catch {
+    return null
+  }
+}
+
 interface AddEnhancementFormProps {
   articleId: string
   onAdded?: () => void
@@ -70,6 +93,8 @@ interface SearchResult {
   snippet?: string
   duration?: string
   citedBy?: number | null
+  viewCount?: number
+  publishedAt?: string
 }
 
 /**
@@ -234,12 +259,14 @@ export function AddEnhancementForm({ articleId, onAdded }: AddEnhancementFormPro
 
       // Normalize results based on type
       if (type === "youtube" && data.results) {
-        setSearchResults(data.results.map((r: { metadata: { title: string; videoId: string }; video?: { channelTitle?: string; duration?: string } }) => ({
+        setSearchResults(data.results.map((r: { metadata: { title: string; videoId: string; viewCount?: number; publishedAt?: string }; video?: { channelTitle?: string; duration?: string } }) => ({
           title: r.metadata.title,
           url: `https://www.youtube.com/watch?v=${r.metadata.videoId}`,
           channel: r.video?.channelTitle,
           duration: r.video?.duration,
           thumbnail: `https://img.youtube.com/vi/${r.metadata.videoId}/mqdefault.jpg`,
+          viewCount: r.metadata.viewCount,
+          publishedAt: r.metadata.publishedAt,
         })))
       } else if (type === "book" && data.results) {
         setSearchResults(data.results.map((r: { title: string; url: string; author: string; year: string | number | null; thumbnail: string }) => ({
@@ -465,6 +492,8 @@ export function AddEnhancementForm({ articleId, onAdded }: AddEnhancementFormPro
                               {result.publication && <span className="truncate max-w-[200px]">{result.publication}</span>}
                               {result.year && <span>{result.year}</span>}
                               {result.duration && <span>{result.duration}</span>}
+                              {formatViewCount(result.viewCount) && <span>{formatViewCount(result.viewCount)}</span>}
+                              {formatPublishDate(result.publishedAt) && <span>{formatPublishDate(result.publishedAt)}</span>}
                               {result.citedBy !== null && result.citedBy !== undefined && (
                                 <span>Cited by {result.citedBy}</span>
                               )}

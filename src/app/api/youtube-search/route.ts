@@ -65,6 +65,7 @@ export async function GET(request: NextRequest) {
             duration: video.duration,
             thumbnail: video.thumbnails.high || video.thumbnails.medium || video.thumbnails.default,
             viewCount: video.viewCount,
+            publishedAt: video.publishedAt,
           },
           video,
         })),
