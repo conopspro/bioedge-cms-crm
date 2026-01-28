@@ -979,7 +979,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         {testShowQuoteIcon && (
                           <Quote className="absolute top-4 right-4 h-8 w-8 text-gold/20" />
                         )}
-                        <p className="mb-6 italic text-lg" style={{ color: testimonialsColors.text }}>&ldquo;{featured.quote}&rdquo;</p>
+                        <p className="mb-6 italic text-lg" style={{ color: testimonialsColors.text }}>{featured.quote}</p>
                         <div className="flex items-center gap-3">
                           {testShowPhotos && (
                             image ? (
@@ -1035,7 +1035,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                             {testShowQuoteIcon && (
                               <Quote className="absolute top-3 right-3 h-6 w-6 text-gold/20" />
                             )}
-                            <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>&ldquo;{testimonial.quote}&rdquo;</p>
+                            <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
                             <div className="flex items-center gap-2">
                               {testShowPhotos && (
                                 image ? (
@@ -1094,7 +1094,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         {testShowQuoteIcon && (
                           <Quote className="absolute top-3 right-3 h-6 w-6 text-gold/20" />
                         )}
-                        <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>&ldquo;{testimonial.quote}&rdquo;</p>
+                        <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
                         <div className="flex items-center gap-2">
                           {testShowPhotos && (
                             image ? (
