@@ -1,3 +1,5 @@
+import { LazyYouTube } from "@/components/ui/lazy-youtube"
+
 interface HomepageVideoProps {
   label?: string | null
   title?: string | null
@@ -86,12 +88,10 @@ export function HomepageVideo({
 
         <div className="max-w-4xl mx-auto">
           <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl">
-            <iframe
-              src={videoUrl}
-              title="Video"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="absolute inset-0 w-full h-full border-0"
+            <LazyYouTube
+              url={videoUrl}
+              title={title || "Video"}
+              thumbnailQuality="sddefault"
             />
           </div>
         </div>

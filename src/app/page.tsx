@@ -1,4 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
+
+export const revalidate = 60
+
 import { PublicHeader } from "@/components/brand/public-header"
 import { PublicFooter } from "@/components/brand/public-footer"
 import { HomepageHero } from "@/components/home/homepage-hero"
@@ -21,99 +24,128 @@ import { HomepageFeaturedArticles } from "@/components/home/homepage-featured-ar
  */
 export default async function HomePage() {
   const supabase = await createClient()
-
-  // Fetch homepage settings
-  const { data: settings } = await supabase
-    .from("homepage_settings")
-    .select("*")
-    .single()
-
-  // Fetch upcoming events for header (all "live" statuses)
   const today = new Date().toISOString().split('T')[0]
-  const { data: headerEvents } = await supabase
-    .from("events")
-    .select("name, slug, city, start_date, end_date")
-    .in("status", ["published", "registration_open", "announced", "sold_out"])
-    .gte("end_date", today)
-    .order("start_date", { ascending: true })
-    .limit(3)
 
-  // Fetch visible sections ordered by display_order
-  const { data: sections } = await supabase
-    .from("homepage_sections")
-    .select("*")
-    .eq("is_visible", true)
-    .order("display_order", { ascending: true })
+  // Fetch all homepage data in parallel
+  const [
+    { data: settings },
+    { data: headerEvents },
+    { data: sections },
+    { data: featuredEvents },
+    { data: featuredLeaders },
+    { data: featuredCompanies },
+    { data: featuredPresentations },
+    { data: featuredArticles },
+  ] = await Promise.all([
+    // Homepage settings
+    supabase
+      .from("homepage_settings")
+      .select("*")
+      .single(),
 
-  // Fetch featured events with venue photo from section photos
-  const { data: featuredEvents } = await supabase
-    .from("homepage_events")
-    .select(`
-      *,
-      event:events(
-        id, name, slug, tagline, start_date, end_date,
-        city, state, venue_name, featured_image_url, status,
-        venue:venues(photo_url),
-        section_photos:event_section_photos(image_url, section)
-      )
-    `)
-    .eq("is_visible", true)
-    .order("display_order", { ascending: true })
+    // Upcoming events for header (all "live" statuses)
+    supabase
+      .from("events")
+      .select("name, slug, city, start_date, end_date")
+      .in("status", ["published", "registration_open", "announced", "sold_out"])
+      .gte("end_date", today)
+      .order("start_date", { ascending: true })
+      .limit(3),
+
+    // Visible sections ordered by display_order
+    supabase
+      .from("homepage_sections")
+      .select("*")
+      .eq("is_visible", true)
+      .order("display_order", { ascending: true }),
+
+    // Featured events with venue photo from section photos
+    supabase
+      .from("homepage_events")
+      .select(`
+        *,
+        event:events(
+          id, name, slug, tagline, start_date, end_date,
+          city, state, venue_name, featured_image_url, status,
+          venue:venues(photo_url),
+          section_photos:event_section_photos(image_url, section)
+        )
+      `)
+      .eq("is_visible", true)
+      .order("display_order", { ascending: true }),
+
+    // Featured leaders (contacts with is_featured = true)
+    supabase
+      .from("contacts")
+      .select(`
+        id, slug, first_name, last_name, title, avatar_url, linkedin_url,
+        company:companies(name)
+      `)
+      .eq("is_featured", true)
+      .eq("show_on_articles", true)
+      .order("last_name")
+      .limit(4),
+
+    // Featured companies (exclude drafts - include NULL and false)
+    supabase
+      .from("companies")
+      .select("id, name, slug, domain, logo_url")
+      .eq("is_featured", true)
+      .or("is_draft.is.null,is_draft.eq.false")
+      .order("name")
+      .limit(4),
+
+    // Featured presentations
+    supabase
+      .from("presentations")
+      .select(`
+        id, title, slug, short_description, youtube_url,
+        contact:contacts(id, first_name, last_name, avatar_url),
+        company:companies(name)
+      `)
+      .eq("is_featured", true)
+      .eq("status", "published")
+      .order("title")
+      .limit(4),
+
+    // Featured articles
+    supabase
+      .from("articles")
+      .select(`
+        id, title, slug, excerpt, featured_image_url, youtube_url,
+        company:companies(name)
+      `)
+      .eq("is_featured", true)
+      .eq("status", "published")
+      .order("title")
+      .limit(4),
+  ])
+
+  // Prefetch slider data for any slider sections (avoids per-component DB queries)
+  const sliderIds = (sections || [])
+    .filter((s: any) => s.section_type === "slider" && s.settings?.slider_id)
+    .map((s: any) => s.settings.slider_id)
+
+  let slidersMap: Record<string, any> = {}
+  if (sliderIds.length > 0) {
+    const { data: sliders } = await supabase
+      .from("shared_photo_sliders")
+      .select(`*, images:shared_slider_images(*)`)
+      .eq("is_active", true)
+      .in("id", sliderIds)
+
+    for (const slider of sliders || []) {
+      slidersMap[slider.id] = slider
+    }
+  }
 
   // Filter to only published/live events
-  // Note: "announced", "registration_open", "sold_out" are legacy statuses that map to "published"
   const publishedEvents = (featuredEvents || []).filter(
     (fe) => fe.event?.status === "published" ||
             fe.event?.status === "announced" ||
             fe.event?.status === "registration_open" ||
             fe.event?.status === "sold_out"
   )
-
-  // Fetch featured leaders (contacts with is_featured = true)
-  const { data: featuredLeaders } = await supabase
-    .from("contacts")
-    .select(`
-      id, slug, first_name, last_name, title, avatar_url, linkedin_url,
-      company:companies(name)
-    `)
-    .eq("is_featured", true)
-    .eq("show_on_articles", true)
-    .order("last_name")
-    .limit(4)
-
-  // Fetch featured companies (exclude drafts - include NULL and false)
-  const { data: featuredCompanies } = await supabase
-    .from("companies")
-    .select("id, name, slug, domain, logo_url")
-    .eq("is_featured", true)
-    .or("is_draft.is.null,is_draft.eq.false")
-    .order("name")
-    .limit(4)
-
-  // Fetch featured presentations
-  const { data: featuredPresentations } = await supabase
-    .from("presentations")
-    .select(`
-      id, title, slug, short_description, youtube_url,
-      contact:contacts(id, first_name, last_name, avatar_url),
-      company:companies(name)
-    `)
-    .eq("is_featured", true)
-    .eq("status", "published")
-    .order("title")
-    .limit(4)
-
-  // Fetch featured articles
-  const { data: featuredArticles } = await supabase
-    .from("articles")
-    .select(`
-      id, title, slug, excerpt, featured_image_url, youtube_url,
-      company:companies(name)
-    `)
-    .eq("is_featured", true)
-    .eq("status", "published")
-    .order("title")
-    .limit(4)
 
   // Render section based on type
   const renderSection = (section: any) => {
@@ -149,6 +181,7 @@ export default async function HomePage() {
             label={section.label}
             title={section.title}
             settings={section.settings}
+            prefetchedSlider={slidersMap[section.settings.slider_id]}
           />
         )
       case "video":

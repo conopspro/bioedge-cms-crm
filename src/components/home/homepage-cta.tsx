@@ -91,12 +91,14 @@ export function HomepageCta({
           </h2>
         )}
         {description && (
-          <p
-            className="text-lg mb-8 max-w-2xl mx-auto"
+          <div
+            className="text-lg mb-8 max-w-2xl mx-auto space-y-4"
             style={{ color: textColor || (isDarkBg ? "rgba(255,255,255,0.9)" : "#374151") }}
           >
-            {description}
-          </p>
+            {description.split(/\n+/).map((paragraph, i) => (
+              <p key={i}>{paragraph}</p>
+            ))}
+          </div>
         )}
 
         {buttonUrl && buttonText && (

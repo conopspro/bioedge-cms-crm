@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { getYouTubeEmbedUrl } from "@/lib/youtube"
+import { LazyYouTube } from "@/components/ui/lazy-youtube"
 
 interface HomepageSettings {
   hero_label?: string | null
@@ -34,9 +34,7 @@ export function HomepageHero({ settings }: HomepageHeroProps) {
   const secondaryCtaText = settings?.hero_secondary_cta_text || "Get the Book"
   const secondaryCtaUrl = settings?.hero_secondary_cta_url || "https://biohackingstartswithno.com"
 
-  // Convert any YouTube URL format (including Shorts) to embed URL
-  const rawVideoUrl = settings?.hero_video_url || "https://www.youtube.com/shorts/4GIOlpIdr80"
-  const videoUrl = getYouTubeEmbedUrl(rawVideoUrl)
+  const videoUrl = settings?.hero_video_url || "https://www.youtube.com/shorts/4GIOlpIdr80"
 
   return (
     <section className="relative flex items-center overflow-hidden bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
@@ -95,12 +93,10 @@ export function HomepageHero({ settings }: HomepageHeroProps) {
                 boxShadow: "0 0 30px rgba(255, 145, 77, 0.2), 0 25px 50px -12px rgba(0,0,0,0.4)"
               }}
             >
-              <iframe
-                src={videoUrl}
+              <LazyYouTube
+                url={videoUrl}
                 title="bioEDGE Longevity Summit"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                className="absolute inset-0 h-full w-full border-0"
+                className="absolute inset-0 h-full w-full border-0 p-0 cursor-pointer group"
               />
             </div>
           </div>

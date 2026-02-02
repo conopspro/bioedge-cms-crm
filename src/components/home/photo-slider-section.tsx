@@ -39,6 +39,7 @@ interface PhotoSliderSectionProps {
     label_bg_color?: string | null
     text_color?: string | null
   }
+  prefetchedSlider?: SharedSlider | null
 }
 
 /**
@@ -56,35 +57,35 @@ export async function PhotoSliderSection({
   cardHeight = 300,
   className,
   settings,
+  prefetchedSlider,
 }: PhotoSliderSectionProps) {
-  const supabase = await createClient()
+  let slider: SharedSlider | null = prefetchedSlider || null
 
-  // Determine whether to search by ID or slug
-  const identifier = sliderId || sliderSlug
-  if (!identifier) return null
+  // Only fetch from DB if no prefetched data was provided
+  if (!slider) {
+    const identifier = sliderId || sliderSlug
+    if (!identifier) return null
 
-  // Check if the identifier looks like a UUID (for ID lookup)
-  const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier)
+    const supabase = await createClient()
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier)
 
-  // Fetch the shared slider by ID or slug
-  let query = supabase
-    .from("shared_photo_sliders")
-    .select(`
-      *,
-      images:shared_slider_images(*)
-    `)
-    .eq("is_active", true)
+    let query = supabase
+      .from("shared_photo_sliders")
+      .select(`
+        *,
+        images:shared_slider_images(*)
+      `)
+      .eq("is_active", true)
 
-  if (isUUID) {
-    query = query.eq("id", identifier)
-  } else {
-    query = query.eq("slug", identifier)
-  }
+    if (isUUID) {
+      query = query.eq("id", identifier)
+    } else {
+      query = query.eq("slug", identifier)
+    }
 
-  const { data: slider, error } = await query.single()
-
-  if (error || !slider) {
-    return null
+    const { data, error } = await query.single()
+    if (error || !data) return null
+    slider = data as SharedSlider
   }
 
   // Filter visible images and sort by display_order
