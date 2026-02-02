@@ -42,7 +42,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const supabase = await createClient()
     const body = await request.json()
 
-    const { feature_text, dollar_value, is_highlighted = false, tooltip } = body
+    const { feature_text, dollar_value, is_highlighted = false, is_included = true, tooltip } = body
 
     if (!feature_text) {
       return NextResponse.json(
@@ -66,6 +66,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .insert({
         tier_id: tierId,
         feature_text,
+        is_included,
         dollar_value,
         is_highlighted,
         tooltip,

@@ -95,7 +95,7 @@ export function TicketTierCard({
   }
 
   const totalValue = features
-    .filter((f) => f.is_included && f.dollar_value)
+    .filter((f) => f.is_included !== false && f.dollar_value)
     .reduce((sum, f) => sum + (f.dollar_value || 0), 0)
 
   // Default colors
@@ -178,7 +178,7 @@ export function TicketTierCard({
       {/* Features */}
       <ul className="space-y-3 mb-8 flex-grow">
         {features
-          .filter((f) => f.is_included)
+          .filter((f) => f.is_included !== false)
           .map((feature) => (
             <li key={feature.id} className="flex items-start gap-3">
               <Check className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: accent }} />
