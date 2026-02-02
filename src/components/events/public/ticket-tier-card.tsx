@@ -7,7 +7,8 @@ import { cn } from "@/lib/utils"
 
 interface TicketFeature {
   id: string
-  name: string
+  name?: string
+  feature_text?: string
   description?: string | null
   dollar_value?: number | null
   is_included: boolean
@@ -182,7 +183,7 @@ export function TicketTierCard({
             <li key={feature.id} className="flex items-start gap-3">
               <Check className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: accent }} />
               <div>
-                <span className="text-lg" style={{ color: text }}>{feature.name}</span>
+                <span className="text-lg" style={{ color: text }}>{feature.feature_text || feature.name}</span>
                 {feature.dollar_value && (
                   <span className="text-sm ml-2" style={{ color: text, opacity: 0.7 }}>
                     ({formatPrice(feature.dollar_value)} value)

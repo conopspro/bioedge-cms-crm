@@ -173,7 +173,8 @@ export default async function EventLandingPage({ params }: PageProps) {
       `)
       .eq("event_id", event.id)
       .eq("is_visible", true)
-      .order("display_order", { ascending: true }),
+      .order("display_order", { ascending: true })
+      .order("display_order", { ascending: true, referencedTable: "event_ticket_features" }),
 
     // Testimonials
     supabase
