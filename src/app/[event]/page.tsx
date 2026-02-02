@@ -817,7 +817,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: valuePropsColors.subtitle }}>{vpSubtitle}</p>
                 <h2 className="font-heading text-2xl font-bold" style={{ color: valuePropsColors.title }}>{vpTitle}</h2>
                 {vpDescription && (
-                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: valuePropsColors.text }}>{vpDescription}</p>
+                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: valuePropsColors.text }}><RichText>{vpDescription}</RichText></p>
                 )}
               </div>
 
@@ -966,7 +966,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: testimonialsColors.subtitle }}>{testSubtitle}</p>
                 <h2 className="font-heading text-2xl font-bold" style={{ color: testimonialsColors.title }}>{testTitle}</h2>
                 {testDescription && (
-                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: testimonialsColors.text }}>{testDescription}</p>
+                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: testimonialsColors.text }}><RichText>{testDescription}</RichText></p>
                 )}
               </div>
 
@@ -986,7 +986,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                     return (
                       <div className={`${getCardClass(true)} relative`}>
-                        <p className="mb-6 italic text-lg" style={{ color: testimonialsColors.text }}>{featured.quote}</p>
+                        <p className="mb-6 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{featured.quote}</RichText></p>
                         <div className="flex items-center gap-3">
                           {testShowPhotos && (
                             image ? (
@@ -1039,7 +1039,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                         return (
                           <div key={testimonial.id} className={`${getCardClass()} relative`}>
-                            <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
+                            <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{testimonial.quote}</RichText></p>
                             <div className="flex items-center gap-2">
                               {testShowPhotos && (
                                 image ? (
@@ -1095,7 +1095,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                     return (
                       <div key={testimonial.id} className={`${getCardClass()} relative ${singleItemClass}`}>
-                        <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
+                        <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{testimonial.quote}</RichText></p>
                         <div className="flex items-center gap-2">
                           {testShowPhotos && (
                             image ? (
@@ -1431,14 +1431,14 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                 {event.venue_description && (
                   <p className="mb-4 whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}>
-                    {event.venue_description}
+                    <RichText>{event.venue_description}</RichText>
                   </p>
                 )}
 
                 {event.transportation_info && (
                   <div className="mb-4">
                     <h3 className="font-heading font-semibold mb-1 text-lg" style={{ color: venueColors.title }}>Getting There</h3>
-                    <p className="whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}>{event.transportation_info}</p>
+                    <p className="whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}><RichText>{event.transportation_info}</RichText></p>
                   </div>
                 )}
 
@@ -1446,7 +1446,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                   <div className="p-3 bg-gold/10 rounded-lg border border-gold/20">
                     <h3 className="font-heading font-semibold text-navy mb-1 text-lg">Accommodations</h3>
                     {event.hotel_group_rate && (
-                      <p className="text-text-dark mb-2 text-lg">{event.hotel_group_rate}</p>
+                      <p className="text-text-dark mb-2 text-lg"><RichText>{event.hotel_group_rate}</RichText></p>
                     )}
                     {event.hotel_booking_url && (
                       <a
@@ -1705,7 +1705,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 </h2>
                 {faqDescription && (
                   <p className="mt-3 text-lg max-w-2xl mx-auto whitespace-pre-line" style={{ color: faqColors.text }}>
-                    {faqDescription}
+                    <RichText>{faqDescription}</RichText>
                   </p>
                 )}
               </div>

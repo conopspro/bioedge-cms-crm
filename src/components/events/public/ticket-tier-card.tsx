@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react"
 import { Check, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { RichText } from "@/components/ui/rich-text"
 
 interface TicketFeature {
   id: string
@@ -142,7 +143,7 @@ export function TicketTierCard({
       <div className="text-center mb-6">
         <h3 className="text-xl font-bold mb-2" style={{ color: title }}>{name}</h3>
         {description && (
-          <p className="text-lg" style={{ color: text }}>{description}</p>
+          <p className="text-lg" style={{ color: text }}><RichText>{description}</RichText></p>
         )}
       </div>
 
