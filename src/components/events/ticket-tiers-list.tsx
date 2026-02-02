@@ -304,6 +304,54 @@ export function TicketTiersList({ eventId }: TicketTiersListProps) {
     }
   }
 
+  const updateFeature = async (tierId: string, featureId: string, updates: Partial<TicketFeature>) => {
+    try {
+      const response = await fetch(
+        `/api/events/${eventId}/ticket-tiers/${tierId}/features/${featureId}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updates),
+        }
+      )
+
+      if (response.ok) {
+        const updated = await response.json()
+        setTiers((prev) =>
+          prev.map((t) =>
+            t.id === tierId
+              ? { ...t, features: t.features.map((f) => (f.id === featureId ? { ...f, ...updated } : f)) }
+              : t
+          )
+        )
+      }
+    } catch (error) {
+      console.error("Error updating feature:", error)
+    }
+  }
+
+  const reorderFeatures = async (tierId: string, fromIndex: number, toIndex: number) => {
+    const tier = tiers.find((t) => t.id === tierId)
+    if (!tier) return
+
+    const sorted = [...tier.features].sort((a, b) => a.display_order - b.display_order)
+    const [moved] = sorted.splice(fromIndex, 1)
+    sorted.splice(toIndex, 0, moved)
+
+    // Optimistically update local state
+    const updatedFeatures = sorted.map((f, i) => ({ ...f, display_order: i }))
+    setTiers((prev) =>
+      prev.map((t) => (t.id === tierId ? { ...t, features: updatedFeatures } : t))
+    )
+
+    // Persist each changed feature
+    for (const [i, feature] of updatedFeatures.entries()) {
+      if (feature.display_order !== tier.features.find((f) => f.id === feature.id)?.display_order) {
+        await updateFeature(tierId, feature.id, { display_order: i })
+      }
+    }
+  }
+
   const formatCurrency = (amount: number, currency: string = "USD") => {
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -650,31 +698,19 @@ export function TicketTiersList({ eventId }: TicketTiersListProps) {
                         <div className="pt-3">
                           <Label className="text-sm font-medium">Features</Label>
                           <div className="mt-2 space-y-2">
-                            {tier.features.map((feature) => (
-                              <div
+                            {[...tier.features]
+                              .sort((a, b) => a.display_order - b.display_order)
+                              .map((feature, index) => (
+                              <FeatureRow
                                 key={feature.id}
-                                className="flex items-center gap-2 text-sm"
-                              >
-                                {feature.is_included ? (
-                                  <Check className="h-4 w-4 text-green-600" />
-                                ) : (
-                                  <X className="h-4 w-4 text-muted-foreground" />
-                                )}
-                                <span className={cn(!feature.is_included && "text-muted-foreground")}>
-                                  {feature.feature_text}
-                                </span>
-                                {feature.dollar_value && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    ${feature.dollar_value} value
-                                  </Badge>
-                                )}
-                                <button
-                                  onClick={() => deleteFeature(tier.id, feature.id)}
-                                  className="ml-auto text-muted-foreground hover:text-destructive"
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </button>
-                              </div>
+                                feature={feature}
+                                index={index}
+                                totalCount={tier.features.length}
+                                onUpdate={(updates) => updateFeature(tier.id, feature.id, updates)}
+                                onDelete={() => deleteFeature(tier.id, feature.id)}
+                                onMoveUp={() => reorderFeatures(tier.id, index, index - 1)}
+                                onMoveDown={() => reorderFeatures(tier.id, index, index + 1)}
+                              />
                             ))}
                             <AddFeatureInput
                               onAdd={(text) => addFeature(tier.id, text)}
@@ -691,6 +727,126 @@ export function TicketTiersList({ eventId }: TicketTiersListProps) {
         )}
       </CardContent>
     </Card>
+  )
+}
+
+interface FeatureRowProps {
+  feature: TicketFeature
+  index: number
+  totalCount: number
+  onUpdate: (updates: Partial<TicketFeature>) => void
+  onDelete: () => void
+  onMoveUp: () => void
+  onMoveDown: () => void
+}
+
+function FeatureRow({ feature, index, totalCount, onUpdate, onDelete, onMoveUp, onMoveDown }: FeatureRowProps) {
+  const [editing, setEditing] = useState(false)
+  const [editText, setEditText] = useState(feature.feature_text)
+  const [editDollarValue, setEditDollarValue] = useState(feature.dollar_value?.toString() || "")
+
+  const handleSave = () => {
+    const updates: Partial<TicketFeature> = {}
+    if (editText.trim() !== feature.feature_text) {
+      updates.feature_text = editText.trim()
+    }
+    const newDollarValue = editDollarValue ? parseFloat(editDollarValue) : null
+    if (newDollarValue !== (feature.dollar_value || null)) {
+      updates.dollar_value = newDollarValue
+    }
+    if (Object.keys(updates).length > 0) {
+      onUpdate(updates)
+    }
+    setEditing(false)
+  }
+
+  const handleCancel = () => {
+    setEditText(feature.feature_text)
+    setEditDollarValue(feature.dollar_value?.toString() || "")
+    setEditing(false)
+  }
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2 text-sm">
+        <Input
+          value={editText}
+          onChange={(e) => setEditText(e.target.value)}
+          className="text-sm h-8 flex-1"
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleSave()
+            if (e.key === "Escape") handleCancel()
+          }}
+        />
+        <div className="relative w-24">
+          <DollarSign className="absolute left-2 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground" />
+          <Input
+            type="number"
+            value={editDollarValue}
+            onChange={(e) => setEditDollarValue(e.target.value)}
+            placeholder="Value"
+            className="text-sm h-8 pl-6"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSave()
+              if (e.key === "Escape") handleCancel()
+            }}
+          />
+        </div>
+        <button onClick={handleSave} className="text-green-600 hover:text-green-700">
+          <Check className="h-4 w-4" />
+        </button>
+        <button onClick={handleCancel} className="text-muted-foreground hover:text-foreground">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2 text-sm group">
+      <div className="flex flex-col">
+        <button
+          onClick={onMoveUp}
+          disabled={index === 0}
+          className={cn("text-muted-foreground hover:text-foreground", index === 0 && "opacity-30 cursor-not-allowed")}
+        >
+          <ChevronUp className="h-3 w-3" />
+        </button>
+        <button
+          onClick={onMoveDown}
+          disabled={index === totalCount - 1}
+          className={cn("text-muted-foreground hover:text-foreground", index === totalCount - 1 && "opacity-30 cursor-not-allowed")}
+        >
+          <ChevronDown className="h-3 w-3" />
+        </button>
+      </div>
+      {feature.is_included ? (
+        <Check className="h-4 w-4 text-green-600" />
+      ) : (
+        <X className="h-4 w-4 text-muted-foreground" />
+      )}
+      <span className={cn("flex-1", !feature.is_included && "text-muted-foreground")}>
+        {feature.feature_text}
+      </span>
+      {feature.dollar_value && (
+        <Badge variant="secondary" className="text-xs">
+          ${feature.dollar_value} value
+        </Badge>
+      )}
+      <button
+        onClick={() => setEditing(true)}
+        className="ml-auto text-muted-foreground hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <Pencil className="h-3 w-3" />
+      </button>
+      <button
+        onClick={onDelete}
+        className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+      >
+        <Trash2 className="h-3 w-3" />
+      </button>
+    </div>
   )
 }
 
