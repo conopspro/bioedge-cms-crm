@@ -16,32 +16,47 @@ export interface HeaderEvent {
  * Clean layout for public-facing pages (articles, etc.)
  * Includes BioEdge branded header and footer.
  * Fetches upcoming published events to display in header.
+ * Fetches database-driven navigation items for header and footer.
  */
 export default async function PublicLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Fetch upcoming published/live events for the header
-  // Include all "live" statuses: published, registration_open, announced, sold_out
   const supabase = await createClient()
   const today = new Date().toISOString().split('T')[0]
 
-  const { data: events } = await supabase
-    .from("events")
-    .select("name, slug, city, start_date, end_date")
-    .in("status", ["published", "registration_open", "announced", "sold_out"])
-    .gte("end_date", today)
-    .order("start_date", { ascending: true })
-    .limit(3)
+  const [{ data: events }, { data: headerNavItems }, { data: footerNavItems }] = await Promise.all([
+    supabase
+      .from("events")
+      .select("name, slug, city, start_date, end_date")
+      .in("status", ["published", "registration_open", "announced", "sold_out"])
+      .gte("end_date", today)
+      .order("start_date", { ascending: true })
+      .limit(3),
+    supabase
+      .from("navigation_items")
+      .select("id, label, href, is_external, display_order")
+      .eq("location", "main_header")
+      .is("event_id", null)
+      .eq("is_visible", true)
+      .order("display_order", { ascending: true }),
+    supabase
+      .from("navigation_items")
+      .select("id, label, href, is_external, display_order")
+      .eq("location", "main_footer")
+      .is("event_id", null)
+      .eq("is_visible", true)
+      .order("display_order", { ascending: true }),
+  ])
 
   const headerEvents: HeaderEvent[] = events || []
 
   return (
     <div className="min-h-screen flex flex-col bg-off-white">
-      <PublicHeader events={headerEvents} />
+      <PublicHeader events={headerEvents} navItems={headerNavItems || undefined} />
       <main className="flex-1">{children}</main>
-      <PublicFooter />
+      <PublicFooter navItems={footerNavItems || undefined} />
     </div>
   )
 }

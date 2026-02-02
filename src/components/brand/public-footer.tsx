@@ -1,8 +1,17 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
+interface NavItem {
+  id: string
+  label: string
+  href: string
+  is_external: boolean
+  display_order: number
+}
+
 interface PublicFooterProps {
   className?: string
+  navItems?: NavItem[]
 }
 
 /**
@@ -10,8 +19,9 @@ interface PublicFooterProps {
  *
  * Footer component for public-facing pages with BioEdge branding.
  * Uses solid Deep Blue (#0d598a) background.
+ * Navigation is database-driven when navItems are provided.
  */
-export function PublicFooter({ className }: PublicFooterProps) {
+export function PublicFooter({ className, navItems }: PublicFooterProps) {
   const currentYear = new Date().getFullYear()
 
   return (
@@ -41,45 +51,46 @@ export function PublicFooter({ className }: PublicFooterProps) {
             </div>
 
             {/* Links */}
-            <div>
+            <div className="md:col-span-2">
               <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-gold mb-4">
                 Explore
               </h3>
               <ul className="space-y-1">
-                <li>
-                  <Link href="/articles" className="text-white hover:text-gold transition-colors">
-                    Articles
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/presentations" className="text-white hover:text-gold transition-colors">
-                    Presentations
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/companies" className="text-white hover:text-gold transition-colors">
-                    Companies
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/leaders" className="text-white hover:text-gold transition-colors">
-                    Leaders
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Events */}
-            <div>
-              <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-gold mb-4">
-                Events
-              </h3>
-              <ul className="space-y-1">
-                <li>
-                  <Link href="/nyc26" className="text-gold hover:text-white transition-colors font-heading font-semibold text-xs">
-                    New York July 10-11
-                  </Link>
-                </li>
+                {navItems && navItems.length > 0 ? (
+                  navItems.map((item) => (
+                    <li key={item.id}>
+                      {item.is_external ? (
+                        <a
+                          href={item.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-white hover:text-gold transition-colors"
+                        >
+                          {item.label}
+                        </a>
+                      ) : (
+                        <Link href={item.href} className="text-white hover:text-gold transition-colors">
+                          {item.label}
+                        </Link>
+                      )}
+                    </li>
+                  ))
+                ) : (
+                  <>
+                    <li>
+                      <Link href="/articles" className="text-white hover:text-gold transition-colors">Articles</Link>
+                    </li>
+                    <li>
+                      <Link href="/presentations" className="text-white hover:text-gold transition-colors">Presentations</Link>
+                    </li>
+                    <li>
+                      <Link href="/companies" className="text-white hover:text-gold transition-colors">Companies</Link>
+                    </li>
+                    <li>
+                      <Link href="/leaders" className="text-white hover:text-gold transition-colors">Leaders</Link>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
           </div>

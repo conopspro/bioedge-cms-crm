@@ -87,20 +87,32 @@ export default async function EventLayout({ children, params }: LayoutProps) {
 
   const allEvents: OtherEvent[] = allEventsData || []
 
+  // Fetch custom nav items for this event from DB
+  const { data: customNavItems } = await supabase
+    .from("navigation_items")
+    .select("id, label, href, is_external, display_order")
+    .eq("location", "event_header")
+    .eq("event_id", event.id)
+    .eq("is_visible", true)
+    .order("display_order", { ascending: true })
+
   // Extract counts from the joined data
   const leadersCount = event.event_contacts?.length || 0
   const companiesCount = event.event_companies?.length || 0
   const presentationsCount = event.event_presentations?.length || 0
   const faqCount = event.event_faqs?.length || 0
 
-  const navItems = [
-    { label: "Overview", href: `/${event.slug}` },
-    leadersCount > 0 && { label: "Leaders", href: `/${event.slug}/leaders` },
-    presentationsCount > 0 && { label: "Agenda", href: `/${event.slug}/agenda` },
-    { label: "Venue", href: `/${event.slug}#venue` },
-    companiesCount > 0 && { label: "Companies", href: `/${event.slug}/companies` },
-    faqCount > 0 && { label: "FAQ", href: `/${event.slug}#faq` },
-  ].filter(Boolean) as { label: string; href: string }[]
+  // Use custom nav if configured, otherwise fall back to content-based logic
+  const navItems = customNavItems && customNavItems.length > 0
+    ? customNavItems.map((item) => ({ label: item.label, href: item.href, is_external: item.is_external }))
+    : ([
+        { label: "Overview", href: `/${event.slug}` },
+        leadersCount > 0 && { label: "Leaders", href: `/${event.slug}/leaders` },
+        presentationsCount > 0 && { label: "Agenda", href: `/${event.slug}/agenda` },
+        { label: "Venue", href: `/${event.slug}#venue` },
+        companiesCount > 0 && { label: "Companies", href: `/${event.slug}/companies` },
+        faqCount > 0 && { label: "FAQ", href: `/${event.slug}#faq` },
+      ].filter(Boolean) as { label: string; href: string; is_external?: boolean }[])
 
   const showTicketButton = event.registration_url && event.status === "registration_open"
 
@@ -155,15 +167,27 @@ export default async function EventLayout({ children, params }: LayoutProps) {
           {/* Navigation row with CTA */}
           <nav className="py-2.5 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap gap-1 sm:gap-2 justify-center sm:justify-start">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="font-heading px-3 py-1.5 text-sm font-bold text-white hover:text-white hover:bg-white/10 rounded-md transition-colors whitespace-nowrap"
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {navItems.map((item) =>
+                item.is_external ? (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-heading px-3 py-1.5 text-sm font-bold text-white hover:text-white hover:bg-white/10 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    {item.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="font-heading px-3 py-1.5 text-sm font-bold text-white hover:text-white hover:bg-white/10 rounded-md transition-colors whitespace-nowrap"
+                  >
+                    {item.label}
+                  </Link>
+                )
+              )}
               {/* Ticket button in nav on mobile */}
               {showTicketButton && (
                 <a

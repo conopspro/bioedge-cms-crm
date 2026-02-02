@@ -12,9 +12,18 @@ interface HeaderEvent {
   end_date: string | null
 }
 
+interface NavItem {
+  id: string
+  label: string
+  href: string
+  is_external: boolean
+  display_order: number
+}
+
 interface PublicHeaderProps {
   className?: string
   events?: HeaderEvent[]
+  navItems?: NavItem[]
 }
 
 /**
@@ -48,9 +57,9 @@ function formatDateRange(startDate: string | null, endDate: string | null): stri
  * Header component for public-facing pages with BioEdge branding.
  * Uses solid Deep Blue (#0d598a) background.
  * Shows upcoming events with city and dates on the top line.
- * Navigation wraps on mobile.
+ * Navigation is database-driven when navItems are provided.
  */
-export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
+export function PublicHeader({ className, events = [], navItems }: PublicHeaderProps) {
   return (
     <header className={cn("bg-[#0d598a]", className)}>
       <div className="be-container py-4">
@@ -89,60 +98,42 @@ export function PublicHeader({ className, events = [] }: PublicHeaderProps) {
 
         {/* Navigation - centered under logo */}
         <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 lg:gap-6">
-          <Link
-            href="/articles"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            Articles
-          </Link>
-          <Link
-            href="/companies"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            Companies
-          </Link>
-          <Link
-            href="/leaders"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            Leaders
-          </Link>
-          <Link
-            href="/presentations"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            Presentations
-          </Link>
-          <a
-            href="https://bioedge.circle.so/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            Coach
-          </a>
-          <a
-            href="https://www.bioedgedecoder.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            Decoder
-          </a>
-          <Link
-            href="/systems"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            Systems
-          </Link>
-          <a
-            href="https://longevitynewswire.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
-          >
-            News
-          </a>
+          {navItems && navItems.length > 0 ? (
+            // Database-driven navigation
+            navItems.map((item) =>
+              item.is_external ? (
+                <a
+                  key={item.id}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <Link
+                  key={item.id}
+                  href={item.href}
+                  className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
+                >
+                  {item.label}
+                </Link>
+              )
+            )
+          ) : (
+            // Fallback hardcoded navigation
+            <>
+              <Link href="/articles" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Articles</Link>
+              <Link href="/companies" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Companies</Link>
+              <Link href="/leaders" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Leaders</Link>
+              <Link href="/presentations" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Presentations</Link>
+              <a href="https://bioedge.circle.so/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Coach</a>
+              <a href="https://www.bioedgedecoder.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Decoder</a>
+              <Link href="/systems" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Systems</Link>
+              <a href="https://longevitynewswire.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">News</a>
+            </>
+          )}
           <Link
             href="/search"
             className="flex items-center justify-center text-white transition-colors hover:text-gold"

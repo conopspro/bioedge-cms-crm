@@ -16,6 +16,7 @@ import {
   Presentation,
   Image,
   Home,
+  Navigation,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -88,6 +89,11 @@ const toolsNavItems = [
     label: "Review Contacts",
     href: "/dashboard/contacts/review",
     icon: UserCheck,
+  },
+  {
+    label: "Navigation",
+    href: "/dashboard/settings/navigation",
+    icon: Navigation,
   },
   {
     label: "Settings",
