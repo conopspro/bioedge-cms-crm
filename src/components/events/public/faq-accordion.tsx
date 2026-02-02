@@ -3,6 +3,7 @@
 import { useState } from "react"
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { RichText } from "@/components/ui/rich-text"
 
 interface FAQItem {
   id: string
@@ -167,7 +168,7 @@ function FAQItemComponent({ item, isOpen, onToggle }: FAQItemComponentProps) {
         )}
       >
         <div className="p-4 pt-0 text-muted-foreground whitespace-pre-wrap">
-          {item.answer}
+          <RichText>{item.answer}</RichText>
         </div>
       </div>
     </div>

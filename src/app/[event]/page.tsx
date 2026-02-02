@@ -8,6 +8,7 @@ import { FAQAccordion } from "@/components/events/public/faq-accordion"
 import { PhotoSlider } from "@/components/events/public/photo-slider"
 import { VideoPlaylist } from "@/components/events/public/video-playlist"
 import { FinalCtaSection } from "@/components/events/final-cta-section"
+import { RichText } from "@/components/ui/rich-text"
 
 // TODO: Re-enable caching for production
 export const revalidate = 60
@@ -1717,7 +1718,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         {faq.question}
                       </h3>
                       <p className="text-lg whitespace-pre-wrap" style={{ color: faqColors.text }}>
-                        {faq.answer}
+                        <RichText>{faq.answer}</RichText>
                       </p>
                     </div>
                   ))}
