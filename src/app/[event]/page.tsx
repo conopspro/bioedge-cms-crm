@@ -1360,6 +1360,22 @@ export default async function EventLandingPage({ params }: PageProps) {
                 />
               ))}
             </div>
+
+            {/* Single CTA button below all tiers */}
+            <div className="mt-8 text-center">
+              <a
+                href={ticketTiers![0].registration_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-md font-bold h-12 px-10 transition-colors hover:opacity-90 text-lg"
+                style={{
+                  backgroundColor: ticketsColors.button_bg || '#0a2540',
+                  color: ticketsColors.button_text || '#ffffff',
+                }}
+              >
+                Join Us in {event.city || 'Person'}
+              </a>
+            </div>
           </div>
         </section>
       )}

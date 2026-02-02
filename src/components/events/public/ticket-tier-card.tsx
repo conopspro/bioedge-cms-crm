@@ -194,36 +194,8 @@ export function TicketTierCard({
           ))}
       </ul>
 
-      {/* CTA */}
-      {isSoldOut ? (
-        <div className="space-y-2">
-          <Button disabled className="w-full" size="lg">
-            Sold Out
-          </Button>
-          {waitlistUrl && (
-            <Button
-              variant="outline"
-              className="w-full"
-              size="lg"
-              asChild
-            >
-              <a href={waitlistUrl} target="_blank" rel="noopener noreferrer">
-                Join Waitlist
-              </a>
-            </Button>
-          )}
-        </div>
-      ) : (
-        <a
-          href={registrationUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full inline-flex items-center justify-center rounded-md font-bold h-11 px-8 transition-colors hover:opacity-90"
-          style={{ backgroundColor: btnBg, color: btnText, fontSize: '1rem' }}
-        >
-          Register Now
-        </a>
-      )}
+      {/* Spacer to push content up evenly across cards */}
+      <div className="flex-grow" />
     </div>
   )
 }
