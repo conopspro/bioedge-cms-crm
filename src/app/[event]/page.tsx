@@ -815,7 +815,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: valuePropsColors.subtitle }}>{vpSubtitle}</p>
                 <h2 className="font-heading text-2xl font-bold" style={{ color: valuePropsColors.title }}>{vpTitle}</h2>
                 {vpDescription && (
-                  <p className="mt-3 text-sm whitespace-pre-line" style={{ color: valuePropsColors.text }}>{vpDescription}</p>
+                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: valuePropsColors.text }}>{vpDescription}</p>
                 )}
               </div>
 
@@ -834,7 +834,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         >
                           <div className="flex items-start gap-3">
                             {renderIcon(index, isHighlight)}
-                            <p className="text-sm font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
+                            <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
                           </div>
                         </div>
                       )
@@ -849,7 +849,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                           }`}
                         >
                           {renderIcon(index, isHighlight)}
-                          <p className="text-sm font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
+                          <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
                         </div>
                       )
                     }
@@ -863,7 +863,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         }`}
                       >
                         {renderIcon(index, isHighlight)}
-                        <p className="text-sm font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
+                        <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
                       </div>
                     )
                   })}
@@ -964,7 +964,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: testimonialsColors.subtitle }}>{testSubtitle}</p>
                 <h2 className="font-heading text-2xl font-bold" style={{ color: testimonialsColors.title }}>{testTitle}</h2>
                 {testDescription && (
-                  <p className="mt-3 text-sm whitespace-pre-line" style={{ color: testimonialsColors.text }}>{testDescription}</p>
+                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: testimonialsColors.text }}>{testDescription}</p>
                 )}
               </div>
 
@@ -1037,7 +1037,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                         return (
                           <div key={testimonial.id} className={`${getCardClass()} relative`}>
-                            <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
+                            <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
                             <div className="flex items-center gap-2">
                               {testShowPhotos && (
                                 image ? (
@@ -1093,7 +1093,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
                     return (
                       <div key={testimonial.id} className={`${getCardClass()} relative ${singleItemClass}`}>
-                        <p className="mb-4 italic text-sm" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
+                        <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}>{testimonial.quote}</p>
                         <div className="flex items-center gap-2">
                           {testShowPhotos && (
                             image ? (
@@ -1226,12 +1226,12 @@ export default async function EventLandingPage({ params }: PageProps) {
                       {name}
                     </h3>
                     {title && (
-                      <p className="text-sm mt-1" style={{ color: '#0d2840' }}>
+                      <p className="text-lg mt-1" style={{ color: '#0d2840' }}>
                         {title}
                       </p>
                     )}
                     {contact.company && (
-                      <p className="text-xs font-medium mt-1" style={{ color: '#017ab2' }}>
+                      <p className="text-sm font-medium mt-1" style={{ color: '#017ab2' }}>
                         {contact.company.name}
                       </p>
                     )}
@@ -1405,30 +1405,30 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <h2 className="font-heading text-2xl font-bold mb-4" style={{ color: venueColors.title }}>{landingPageSettings?.venue?.title || event.venue_name || "Event Location"}</h2>
 
                 {event.venue_address && (
-                  <p className="mb-3 text-sm" style={{ color: venueColors.text }}>
+                  <p className="mb-3 text-lg" style={{ color: venueColors.text }}>
                     {event.venue_address}<br />
                     {event.city}{event.state && `, ${event.state}`} {event.country}
                   </p>
                 )}
 
                 {event.venue_description && (
-                  <p className="mb-4 whitespace-pre-wrap text-sm" style={{ color: venueColors.text }}>
+                  <p className="mb-4 whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}>
                     {event.venue_description}
                   </p>
                 )}
 
                 {event.transportation_info && (
                   <div className="mb-4">
-                    <h3 className="font-heading font-semibold mb-1 text-sm" style={{ color: venueColors.title }}>Getting There</h3>
-                    <p className="whitespace-pre-wrap text-sm" style={{ color: venueColors.text }}>{event.transportation_info}</p>
+                    <h3 className="font-heading font-semibold mb-1 text-lg" style={{ color: venueColors.title }}>Getting There</h3>
+                    <p className="whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}>{event.transportation_info}</p>
                   </div>
                 )}
 
                 {(event.hotel_booking_url || event.hotel_group_rate) && (
                   <div className="p-3 bg-gold/10 rounded-lg border border-gold/20">
-                    <h3 className="font-heading font-semibold text-navy mb-1 text-sm">Accommodations</h3>
+                    <h3 className="font-heading font-semibold text-navy mb-1 text-lg">Accommodations</h3>
                     {event.hotel_group_rate && (
-                      <p className="text-text-dark mb-2 text-sm">{event.hotel_group_rate}</p>
+                      <p className="text-text-dark mb-2 text-lg">{event.hotel_group_rate}</p>
                     )}
                     {event.hotel_booking_url && (
                       <a
@@ -1686,7 +1686,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                   {faqTitle}
                 </h2>
                 {faqDescription && (
-                  <p className="mt-3 text-sm max-w-2xl mx-auto whitespace-pre-line" style={{ color: faqColors.text }}>
+                  <p className="mt-3 text-lg max-w-2xl mx-auto whitespace-pre-line" style={{ color: faqColors.text }}>
                     {faqDescription}
                   </p>
                 )}
@@ -1699,7 +1699,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                       <h3 className="font-heading font-semibold mb-2" style={{ color: faqColors.title }}>
                         {faq.question}
                       </h3>
-                      <p className="text-sm whitespace-pre-wrap" style={{ color: faqColors.text }}>
+                      <p className="text-lg whitespace-pre-wrap" style={{ color: faqColors.text }}>
                         {faq.answer}
                       </p>
                     </div>
@@ -1713,7 +1713,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
               {faqShowContact && faqContactEmail && (
                 <div className="mt-5 text-center">
-                  <p className="mb-2 text-sm" style={{ color: faqColors.text }}>{faqContactText}</p>
+                  <p className="mb-2 text-lg" style={{ color: faqColors.text }}>{faqContactText}</p>
                   <a
                     href={`mailto:${faqContactEmail}`}
                     className="text-gold hover:text-gold/80 font-medium text-sm"

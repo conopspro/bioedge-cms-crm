@@ -151,7 +151,7 @@
 
   .body-text {
     @apply font-body text-text-dark leading-relaxed;
-    font-size: 17px;
+    font-size: 21px;
   }
 
   .be-container {

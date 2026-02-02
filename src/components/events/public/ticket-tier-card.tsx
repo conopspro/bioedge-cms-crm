@@ -141,7 +141,7 @@ export function TicketTierCard({
       <div className="text-center mb-6">
         <h3 className="text-xl font-bold mb-2" style={{ color: title }}>{name}</h3>
         {description && (
-          <p className="text-sm" style={{ color: text }}>{description}</p>
+          <p className="text-lg" style={{ color: text }}>{description}</p>
         )}
       </div>
 
@@ -168,7 +168,7 @@ export function TicketTierCard({
         )}
 
         {totalValue > 0 && totalValue > price && (
-          <p className="text-sm mt-2" style={{ color: text }}>
+          <p className="text-lg mt-2" style={{ color: text }}>
             {formatPrice(totalValue)} total value
           </p>
         )}
@@ -182,9 +182,9 @@ export function TicketTierCard({
             <li key={feature.id} className="flex items-start gap-3">
               <Check className="h-5 w-5 flex-shrink-0 mt-0.5" style={{ color: accent }} />
               <div>
-                <span className="text-sm" style={{ color: text }}>{feature.name}</span>
+                <span className="text-lg" style={{ color: text }}>{feature.name}</span>
                 {feature.dollar_value && (
-                  <span className="text-xs ml-2" style={{ color: text, opacity: 0.7 }}>
+                  <span className="text-sm ml-2" style={{ color: text, opacity: 0.7 }}>
                     ({formatPrice(feature.dollar_value)} value)
                   </span>
                 )}
