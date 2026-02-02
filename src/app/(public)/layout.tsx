@@ -2,6 +2,9 @@ import { PublicHeader } from "@/components/brand/public-header"
 import { PublicFooter } from "@/components/brand/public-footer"
 import { createClient } from "@/lib/supabase/server"
 
+// Revalidate pages every 60 seconds to reflect database changes
+export const revalidate = 60
+
 export interface HeaderEvent {
   name: string
   slug: string
