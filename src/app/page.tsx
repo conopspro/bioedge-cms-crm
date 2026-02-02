@@ -30,6 +30,8 @@ export default async function HomePage() {
   const [
     { data: settings },
     { data: headerEvents },
+    { data: headerNavItems },
+    { data: footerNavItems },
     { data: sections },
     { data: featuredEvents },
     { data: featuredLeaders },
@@ -51,6 +53,24 @@ export default async function HomePage() {
       .gte("end_date", today)
       .order("start_date", { ascending: true })
       .limit(3),
+
+    // Navigation items for header
+    supabase
+      .from("navigation_items")
+      .select("id, label, href, is_external, display_order")
+      .eq("location", "main_header")
+      .is("event_id", null)
+      .eq("is_visible", true)
+      .order("display_order", { ascending: true }),
+
+    // Navigation items for footer
+    supabase
+      .from("navigation_items")
+      .select("id, label, href, is_external, display_order")
+      .eq("location", "main_footer")
+      .is("event_id", null)
+      .eq("is_visible", true)
+      .order("display_order", { ascending: true }),
 
     // Visible sections ordered by display_order
     supabase
@@ -266,7 +286,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-off-white">
-      <PublicHeader events={headerEvents || []} />
+      <PublicHeader events={headerEvents || []} navItems={headerNavItems || undefined} />
       <main className="flex-1">
         {/* Hero is always first */}
         <HomepageHero settings={settings} />
@@ -274,7 +294,7 @@ export default async function HomePage() {
         {/* Dynamic sections */}
         {(sections || []).map(renderSection)}
       </main>
-      <PublicFooter />
+      <PublicFooter navItems={footerNavItems || undefined} />
     </div>
   )
 }
