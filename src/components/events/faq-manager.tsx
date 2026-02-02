@@ -334,6 +334,81 @@ export function FaqManager({ eventId }: FaqManagerProps) {
     }
   }
 
+  // Update custom FAQ
+  const updateCustomFaq = async (faqId: string, updates: Partial<EventFaq>) => {
+    try {
+      const response = await fetch(`/api/events/${eventId}/faqs/${faqId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      })
+      if (response.ok) {
+        const updated = await response.json()
+        setCustomFaqs((prev) => prev.map((f) => (f.id === faqId ? { ...f, ...updated } : f)))
+      }
+    } catch (error) {
+      console.error("Error updating FAQ:", error)
+    }
+  }
+
+  // Update linked FAQ (overrides)
+  const updateLinkedFaq = async (linkId: string, updates: Record<string, unknown>) => {
+    try {
+      const response = await fetch(`/api/events/${eventId}/faq-links/${linkId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      })
+      if (response.ok) {
+        const updated = await response.json()
+        setLinkedFaqs((prev) => prev.map((l) => (l.id === linkId ? { ...l, ...updated } : l)))
+      }
+    } catch (error) {
+      console.error("Error updating linked FAQ:", error)
+    }
+  }
+
+  // Reorder all FAQs (linked + custom combined)
+  const getAllFaqsOrdered = () => {
+    const all: { type: "linked" | "custom"; id: string; display_order: number }[] = [
+      ...linkedFaqs.map((l) => ({ type: "linked" as const, id: l.id, display_order: l.display_order })),
+      ...customFaqs.map((f) => ({ type: "custom" as const, id: f.id, display_order: f.display_order })),
+    ]
+    return all.sort((a, b) => a.display_order - b.display_order)
+  }
+
+  const reorderFaq = async (faqType: "linked" | "custom", faqId: string, direction: "up" | "down") => {
+    const ordered = getAllFaqsOrdered()
+    const currentIndex = ordered.findIndex((f) => f.id === faqId && f.type === faqType)
+    if (currentIndex < 0) return
+    const targetIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1
+    if (targetIndex < 0 || targetIndex >= ordered.length) return
+
+    // Swap display_order values
+    const current = ordered[currentIndex]
+    const target = ordered[targetIndex]
+    const currentOrder = current.display_order
+    const targetOrder = target.display_order
+
+    // If they happen to have the same display_order, offset them
+    const newCurrentOrder = targetOrder
+    const newTargetOrder = currentOrder === targetOrder ? currentOrder + (direction === "up" ? 1 : -1) : currentOrder
+
+    // Update both items
+    const updateItem = async (item: typeof current, newOrder: number) => {
+      if (item.type === "linked") {
+        await updateLinkedFaq(item.id, { display_order: newOrder })
+      } else {
+        await updateCustomFaq(item.id, { display_order: newOrder })
+      }
+    }
+
+    await Promise.all([
+      updateItem(current, newCurrentOrder),
+      updateItem(target, newTargetOrder),
+    ])
+  }
+
   // Group templates by category
   const templatesByCategory = templates.reduce((acc, template) => {
     const cat = template.category || "General"
@@ -676,41 +751,64 @@ export function FaqManager({ eventId }: FaqManagerProps) {
             </TabsList>
 
             <TabsContent value="all" className="space-y-2">
-              {/* Linked FAQs */}
-              {linkedFaqs.map((link) => (
-                <FaqItem
-                  key={`link-${link.id}`}
-                  id={link.id}
-                  question={link.question_override || link.template.question}
-                  answer={link.answer_override || link.template.answer}
-                  category={link.template.category}
-                  isTemplate={true}
-                  isExpanded={expandedFaqs.has(`link-${link.id}`)}
-                  onToggle={() => toggleFaq(`link-${link.id}`)}
-                  onDelete={() => unlinkTemplate(link.id)}
-                />
-              ))}
-              {/* Custom FAQs */}
-              {customFaqs.map((faq) => (
-                <FaqItem
-                  key={`custom-${faq.id}`}
-                  id={faq.id}
-                  question={faq.question}
-                  answer={faq.answer}
-                  category={faq.category}
-                  isTemplate={false}
-                  isExpanded={expandedFaqs.has(`custom-${faq.id}`)}
-                  onToggle={() => toggleFaq(`custom-${faq.id}`)}
-                  onDelete={() => deleteCustomFaq(faq.id)}
-                />
-              ))}
+              {(() => {
+                const allItems = [
+                  ...linkedFaqs.map((link) => ({ type: "linked" as const, link, faq: null as EventFaq | null, order: link.display_order })),
+                  ...customFaqs.map((faq) => ({ type: "custom" as const, link: null as EventFaqLink | null, faq, order: faq.display_order })),
+                ].sort((a, b) => a.order - b.order)
+
+                return allItems.map((item, index) => {
+                  if (item.type === "linked" && item.link) {
+                    const link = item.link
+                    return (
+                      <FaqItem
+                        key={`link-${link.id}`}
+                        id={link.id}
+                        question={link.question_override || link.template.question}
+                        answer={link.answer_override || link.template.answer}
+                        category={link.template.category}
+                        isTemplate={true}
+                        isExpanded={expandedFaqs.has(`link-${link.id}`)}
+                        onToggle={() => toggleFaq(`link-${link.id}`)}
+                        onDelete={() => unlinkTemplate(link.id)}
+                        onEdit={({ question, answer }) => updateLinkedFaq(link.id, { question_override: question, answer_override: answer })}
+                        onMoveUp={() => reorderFaq("linked", link.id, "up")}
+                        onMoveDown={() => reorderFaq("linked", link.id, "down")}
+                        isFirst={index === 0}
+                        isLast={index === allItems.length - 1}
+                      />
+                    )
+                  } else if (item.faq) {
+                    const faq = item.faq
+                    return (
+                      <FaqItem
+                        key={`custom-${faq.id}`}
+                        id={faq.id}
+                        question={faq.question}
+                        answer={faq.answer}
+                        category={faq.category}
+                        isTemplate={false}
+                        isExpanded={expandedFaqs.has(`custom-${faq.id}`)}
+                        onToggle={() => toggleFaq(`custom-${faq.id}`)}
+                        onDelete={() => deleteCustomFaq(faq.id)}
+                        onEdit={({ question, answer }) => updateCustomFaq(faq.id, { question, answer })}
+                        onMoveUp={() => reorderFaq("custom", faq.id, "up")}
+                        onMoveDown={() => reorderFaq("custom", faq.id, "down")}
+                        isFirst={index === 0}
+                        isLast={index === allItems.length - 1}
+                      />
+                    )
+                  }
+                  return null
+                })
+              })()}
             </TabsContent>
 
             <TabsContent value="linked" className="space-y-2">
               {linkedFaqs.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">No linked templates</p>
               ) : (
-                linkedFaqs.map((link) => (
+                [...linkedFaqs].sort((a, b) => a.display_order - b.display_order).map((link, index) => (
                   <FaqItem
                     key={`link-${link.id}`}
                     id={link.id}
@@ -721,6 +819,11 @@ export function FaqManager({ eventId }: FaqManagerProps) {
                     isExpanded={expandedFaqs.has(`link-${link.id}`)}
                     onToggle={() => toggleFaq(`link-${link.id}`)}
                     onDelete={() => unlinkTemplate(link.id)}
+                    onEdit={({ question, answer }) => updateLinkedFaq(link.id, { question_override: question, answer_override: answer })}
+                    onMoveUp={() => reorderFaq("linked", link.id, "up")}
+                    onMoveDown={() => reorderFaq("linked", link.id, "down")}
+                    isFirst={index === 0}
+                    isLast={index === linkedFaqs.length - 1}
                   />
                 ))
               )}
@@ -730,7 +833,7 @@ export function FaqManager({ eventId }: FaqManagerProps) {
               {customFaqs.length === 0 ? (
                 <p className="text-sm text-muted-foreground text-center py-4">No custom FAQs</p>
               ) : (
-                customFaqs.map((faq) => (
+                [...customFaqs].sort((a, b) => a.display_order - b.display_order).map((faq, index) => (
                   <FaqItem
                     key={`custom-${faq.id}`}
                     id={faq.id}
@@ -741,6 +844,11 @@ export function FaqManager({ eventId }: FaqManagerProps) {
                     isExpanded={expandedFaqs.has(`custom-${faq.id}`)}
                     onToggle={() => toggleFaq(`custom-${faq.id}`)}
                     onDelete={() => deleteCustomFaq(faq.id)}
+                    onEdit={({ question, answer }) => updateCustomFaq(faq.id, { question, answer })}
+                    onMoveUp={() => reorderFaq("custom", faq.id, "up")}
+                    onMoveDown={() => reorderFaq("custom", faq.id, "down")}
+                    isFirst={index === 0}
+                    isLast={index === customFaqs.length - 1}
                   />
                 ))
               )}
@@ -761,6 +869,11 @@ interface FaqItemProps {
   isExpanded: boolean
   onToggle: () => void
   onDelete: () => void
+  onEdit: (updates: { question: string; answer: string }) => void
+  onMoveUp: () => void
+  onMoveDown: () => void
+  isFirst: boolean
+  isLast: boolean
 }
 
 function FaqItem({
@@ -772,11 +885,49 @@ function FaqItem({
   isExpanded,
   onToggle,
   onDelete,
+  onEdit,
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast,
 }: FaqItemProps) {
+  const [editing, setEditing] = useState(false)
+  const [editQuestion, setEditQuestion] = useState(question)
+  const [editAnswer, setEditAnswer] = useState(answer)
+
+  const handleSave = () => {
+    if (editQuestion.trim() && editAnswer.trim()) {
+      onEdit({ question: editQuestion.trim(), answer: editAnswer.trim() })
+      setEditing(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setEditQuestion(question)
+    setEditAnswer(answer)
+    setEditing(false)
+  }
+
   return (
-    <Collapsible open={isExpanded} onOpenChange={onToggle}>
+    <Collapsible open={isExpanded || editing} onOpenChange={editing ? undefined : onToggle}>
       <div className="border rounded-lg">
         <div className="flex items-center gap-3 p-3">
+          <div className="flex flex-col">
+            <button
+              onClick={onMoveUp}
+              disabled={isFirst}
+              className={cn("text-muted-foreground hover:text-foreground", isFirst && "opacity-30 cursor-not-allowed")}
+            >
+              <ChevronUp className="h-3 w-3" />
+            </button>
+            <button
+              onClick={onMoveDown}
+              disabled={isLast}
+              className={cn("text-muted-foreground hover:text-foreground", isLast && "opacity-30 cursor-not-allowed")}
+            >
+              <ChevronDown className="h-3 w-3" />
+            </button>
+          </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className="font-medium text-sm">{question}</span>
@@ -792,6 +943,15 @@ function FaqItem({
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={() => {
+              if (!editing) {
+                setEditQuestion(question)
+                setEditAnswer(answer)
+                setEditing(true)
+              }
+            }}>
+              <Pencil className="h-4 w-4" />
+            </Button>
             <Button variant="ghost" size="sm" onClick={onDelete}>
               <Trash2 className="h-4 w-4 text-destructive" />
             </Button>
@@ -808,9 +968,36 @@ function FaqItem({
         </div>
         <CollapsibleContent>
           <div className="px-3 pb-3 pt-0 border-t">
-            <p className="text-sm text-muted-foreground pt-3 whitespace-pre-wrap">
-              {answer}
-            </p>
+            {editing ? (
+              <div className="space-y-3 pt-3">
+                <div>
+                  <Label className="text-xs">Question</Label>
+                  <Input
+                    value={editQuestion}
+                    onChange={(e) => setEditQuestion(e.target.value)}
+                    className="mt-1 text-sm"
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs">Answer</Label>
+                  <Textarea
+                    value={editAnswer}
+                    onChange={(e) => setEditAnswer(e.target.value)}
+                    className="mt-1 text-sm"
+                    rows={4}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button size="sm" onClick={handleSave}>Save</Button>
+                  <Button size="sm" variant="outline" onClick={handleCancel}>Cancel</Button>
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground pt-3 whitespace-pre-wrap">
+                {answer}
+              </p>
+            )}
           </div>
         </CollapsibleContent>
       </div>
