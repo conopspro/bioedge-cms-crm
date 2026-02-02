@@ -815,7 +815,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: valuePropsColors.subtitle }}>{vpSubtitle}</p>
                 <h2 className="font-heading text-2xl font-bold" style={{ color: valuePropsColors.title }}>{vpTitle}</h2>
                 {vpDescription && (
-                  <p className="mt-3 text-sm" style={{ color: valuePropsColors.text }}>{vpDescription}</p>
+                  <p className="mt-3 text-sm whitespace-pre-line" style={{ color: valuePropsColors.text }}>{vpDescription}</p>
                 )}
               </div>
 
@@ -964,7 +964,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: testimonialsColors.subtitle }}>{testSubtitle}</p>
                 <h2 className="font-heading text-2xl font-bold" style={{ color: testimonialsColors.title }}>{testTitle}</h2>
                 {testDescription && (
-                  <p className="mt-3 text-sm" style={{ color: testimonialsColors.text }}>{testDescription}</p>
+                  <p className="mt-3 text-sm whitespace-pre-line" style={{ color: testimonialsColors.text }}>{testDescription}</p>
                 )}
               </div>
 
@@ -1686,7 +1686,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                   {faqTitle}
                 </h2>
                 {faqDescription && (
-                  <p className="mt-3 text-sm max-w-2xl mx-auto" style={{ color: faqColors.text }}>
+                  <p className="mt-3 text-sm max-w-2xl mx-auto whitespace-pre-line" style={{ color: faqColors.text }}>
                     {faqDescription}
                   </p>
                 )}
