@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Trash2,
   Plus,
+  RefreshCw,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -721,6 +722,54 @@ export function ContactDetailEditor({
                   </div>
                 </>
               )}
+              <Separator />
+              <div>
+                <div className="flex justify-between items-center">
+                  <span className="text-muted-foreground">Slug</span>
+                  {editingSection !== "slug" && (
+                    <Button variant="ghost" size="sm" className="h-6 w-6 p-0" onClick={() => startEditing("slug")}>
+                      <Pencil className="h-3 w-3" />
+                    </Button>
+                  )}
+                </div>
+                {editingSection === "slug" ? (
+                  <div className="mt-1 space-y-2">
+                    <div className="flex gap-1">
+                      <Input
+                        value={formData.slug || ""}
+                        onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                        className="font-mono text-xs h-8"
+                        placeholder="e.g., john-doe"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 px-2"
+                        onClick={() => {
+                          const slug = `${contact.first_name}-${contact.last_name}`
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, "-")
+                            .replace(/(^-|-$)/g, "")
+                          setFormData({ ...formData, slug })
+                        }}
+                        title="Generate from name"
+                      >
+                        <RefreshCw className="h-3 w-3" />
+                      </Button>
+                    </div>
+                    <div className="flex gap-1 justify-end">
+                      <Button variant="ghost" size="sm" className="h-7 w-7 p-0" onClick={cancelEditing}>
+                        <X className="h-3.5 w-3.5" />
+                      </Button>
+                      <Button variant="default" size="sm" className="h-7 w-7 p-0" onClick={() => saveSection(["slug"])} disabled={isSaving}>
+                        <Check className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <span className="font-mono text-xs break-all">{contact.slug || <span className="text-muted-foreground italic">Not set</span>}</span>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
