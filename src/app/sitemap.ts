@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bioedge-cms-crm.vercel.app"
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bioedgelongevity.com"
 
 // Static system pages
 const SYSTEMS = [
