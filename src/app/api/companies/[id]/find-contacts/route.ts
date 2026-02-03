@@ -110,7 +110,7 @@ export async function POST(
           last_name: lastName,
           title: email.position || null,
           linkedin_url: email.linkedin || null,
-          phone: email.phoneNumber || null,
+          phone: email.phone || null,
           source: "hunter",
           outreach_status: "not_contacted",
           show_on_articles: false,
