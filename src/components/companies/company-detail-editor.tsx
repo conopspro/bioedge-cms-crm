@@ -29,6 +29,7 @@ import { ImageUpload } from "@/components/ui/image-upload"
 import { Switch } from "@/components/ui/switch"
 import { AIEnhanceButton } from "@/components/companies/ai-enhance-button"
 import { ResearchCompanyButton } from "@/components/companies/research-company-button"
+import { FindContactsButton } from "@/components/companies/find-contacts-button"
 import { ContactsEnhanceButton } from "@/components/contacts/contacts-enhance-button"
 import { ArticlesEnhanceButton } from "@/components/articles/articles-enhance-button"
 import type { BiologicalSystem, CompanyCategory } from "@/types/database"
@@ -979,7 +980,12 @@ export function CompanyDetailEditor({
                     +{contacts.length - 5} more contacts
                   </p>
                 )}
-                <div className="pt-2">
+                <div className="pt-2 space-y-2">
+                  <FindContactsButton
+                    companyId={company.id}
+                    hasDomain={!!(company.domain || company.website)}
+                    className="w-full"
+                  />
                   <Button variant="outline" size="sm" asChild className="w-full">
                     <Link href={`/dashboard/contacts/new?company=${company.id}`}>
                       <Plus className="h-4 w-4 mr-2" />
@@ -992,11 +998,19 @@ export function CompanyDetailEditor({
               <div className="text-center py-4">
                 <Users className="h-6 w-6 mx-auto text-muted-foreground/50 mb-2" />
                 <p className="text-sm text-muted-foreground mb-2">No contacts yet</p>
-                <Button variant="outline" size="sm" asChild>
-                  <Link href={`/dashboard/contacts/new?company=${company.id}`}>
-                    Add Contact
-                  </Link>
-                </Button>
+                <div className="space-y-2">
+                  <FindContactsButton
+                    companyId={company.id}
+                    hasDomain={!!(company.domain || company.website)}
+                    className="w-full"
+                  />
+                  <Button variant="outline" size="sm" asChild className="w-full">
+                    <Link href={`/dashboard/contacts/new?company=${company.id}`}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Contact
+                    </Link>
+                  </Button>
+                </div>
               </div>
             )}
           </CardContent>
