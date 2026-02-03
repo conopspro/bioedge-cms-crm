@@ -171,13 +171,19 @@ interface FaqSectionSettings extends SectionSettings {
   expand_first?: boolean
 }
 
+interface VenueSectionSettings extends SectionSettings {
+  description?: string | null  // Short intro text at top of venue section
+  button_text?: string | null  // Optional CTA button label
+  button_url?: string | null   // Optional CTA button URL
+}
+
 interface LandingPageSettings {
   hero: HeroSectionSettings
   value_props: ValuePropsSectionSettings
   testimonials: TestimonialsSectionSettings
   leaders: SectionSettings
   tickets: SectionSettings
-  venue: SectionSettings
+  venue: VenueSectionSettings
   companies: SectionSettings
   faq: FaqSectionSettings
   final_cta: FinalCtaSettings
@@ -417,6 +423,8 @@ const defaultSectionColors: SectionColorsSettings = {
     subtitle: "#c9a227",
     text: "#374151",
     accent: "#c9a227",
+    button_bg: "#c9a227",
+    button_text: "#ffffff",
   },
   companies: {
     background: "#f8f9fa",
@@ -2099,6 +2107,68 @@ export function LandingPageEditor({
                                 </div>
                               </div>
                             )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Venue Section specific fields */}
+                      {section === "venue" && (
+                        <div className="pt-3 border-t mt-3 space-y-3">
+                          <div>
+                            <Label htmlFor="venue-description">Section Description</Label>
+                            <Input
+                              id="venue-description"
+                              value={(settings.venue as VenueSectionSettings).description || ""}
+                              onChange={(e) => {
+                                setSettings((prev) => ({
+                                  ...prev,
+                                  venue: { ...prev.venue, description: e.target.value || null },
+                                }))
+                              }}
+                              placeholder="e.g., Join us at this stunning venue in the heart of the city"
+                              className="mt-1"
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Short intro text shown at the top of the venue section
+                            </p>
+                          </div>
+                          <div className="space-y-3 p-3 bg-muted/30 rounded-lg">
+                            <h4 className="text-sm font-medium border-b pb-2">Optional Button</h4>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <Label htmlFor="venue-button-text">Button Text</Label>
+                                <Input
+                                  id="venue-button-text"
+                                  value={(settings.venue as VenueSectionSettings).button_text || ""}
+                                  onChange={(e) => {
+                                    setSettings((prev) => ({
+                                      ...prev,
+                                      venue: { ...prev.venue, button_text: e.target.value || null },
+                                    }))
+                                  }}
+                                  placeholder="e.g., View on Map"
+                                  className="mt-1"
+                                />
+                              </div>
+                              <div>
+                                <Label htmlFor="venue-button-url">Button URL</Label>
+                                <Input
+                                  id="venue-button-url"
+                                  value={(settings.venue as VenueSectionSettings).button_url || ""}
+                                  onChange={(e) => {
+                                    setSettings((prev) => ({
+                                      ...prev,
+                                      venue: { ...prev.venue, button_url: e.target.value || null },
+                                    }))
+                                  }}
+                                  placeholder="https://..."
+                                  className="mt-1"
+                                />
+                              </div>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              Leave blank to hide the button. Button color can be customized in the Colors tab.
+                            </p>
                           </div>
                         </div>
                       )}

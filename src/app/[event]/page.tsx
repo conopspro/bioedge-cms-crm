@@ -49,7 +49,7 @@ const defaultSectionColors: SectionColorsSettings = {
   testimonials: { background: "#f8f9fa", title: "#0a2540", subtitle: "#c9a227", text: "#374151", accent: "#c9a227", card_bg: "#ffffff" },
   leaders: { background: "#ffffff", title: "#0a2540", subtitle: "#c9a227", text: "#374151", accent: "#c9a227", card_bg: "#ffffff" },
   tickets: { background: "#0a2540", title: "#ffffff", subtitle: "#c9a227", text: "#cccccc", accent: "#c9a227", button_bg: "#c9a227", button_text: "#ffffff", card_bg: "#ffffff", card_title: "#0a2540", card_text: "#374151" },
-  venue: { background: "#ffffff", title: "#0a2540", subtitle: "#c9a227", text: "#374151", accent: "#c9a227" },
+  venue: { background: "#ffffff", title: "#0a2540", subtitle: "#c9a227", text: "#374151", accent: "#c9a227", button_bg: "#c9a227", button_text: "#ffffff" },
   companies: { background: "#f8f9fa", title: "#0a2540", subtitle: "#c9a227", text: "#374151", accent: "#c9a227", card_bg: "#ffffff" },
   faq: { background: "#ffffff", title: "#0a2540", subtitle: "#c9a227", text: "#374151", accent: "#c9a227" },
   cta: { background: null, title: "#ffffff", subtitle: "#cccccc", text: "#cccccc", accent: "#c9a227", button_bg: "#c9a227", button_text: "#ffffff" },
@@ -310,7 +310,7 @@ export default async function EventLandingPage({ params }: PageProps) {
     tickets?: { visible?: boolean; title?: string; subtitle?: string }
     leaders?: { visible?: boolean; title?: string; subtitle?: string }
     companies?: { visible?: boolean; title?: string; subtitle?: string }
-    venue?: { visible?: boolean; title?: string; subtitle?: string }
+    venue?: { visible?: boolean; title?: string; subtitle?: string; description?: string | null; button_text?: string | null; button_url?: string | null }
     section_order?: string[]
   } | null
 
@@ -1422,6 +1422,12 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: venueColors.subtitle }}>{landingPageSettings?.venue?.subtitle || "The Venue"}</p>
                 <h2 className="font-heading text-2xl font-bold mb-4" style={{ color: venueColors.title }}>{landingPageSettings?.venue?.title || event.venue_name || "Event Location"}</h2>
 
+                {landingPageSettings?.venue?.description && (
+                  <p className="mb-4 text-lg" style={{ color: venueColors.text }}>
+                    <RichText>{landingPageSettings.venue.description}</RichText>
+                  </p>
+                )}
+
                 {event.venue_address && (
                   <p className="mb-3 text-lg" style={{ color: venueColors.text }}>
                     {event.venue_address}<br />
@@ -1458,6 +1464,20 @@ export default async function EventLandingPage({ params }: PageProps) {
                         Book Hotel <ChevronRight className="h-4 w-4" />
                       </a>
                     )}
+                  </div>
+                )}
+
+                {landingPageSettings?.venue?.button_text && landingPageSettings?.venue?.button_url && (
+                  <div className="mt-4">
+                    <a
+                      href={landingPageSettings.venue.button_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center rounded-md font-bold px-6 py-2.5 transition-colors hover:opacity-90"
+                      style={{ backgroundColor: venueColors.button_bg || '#c9a227', color: venueColors.button_text || '#ffffff' }}
+                    >
+                      {landingPageSettings.venue.button_text}
+                    </a>
                   </div>
                 )}
               </div>
