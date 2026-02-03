@@ -2474,7 +2474,7 @@ export function LandingPageEditor({
                             />
                           </div>
                         </div>
-                        {(section === 'hero' || section === 'tickets' || section === 'cta') && (
+                        {(section === 'hero' || section === 'tickets' || section === 'venue' || section === 'cta') && (
                           <>
                             <div>
                               <Label htmlFor={`${section}-button-bg`} className="text-xs">Button Background</Label>
