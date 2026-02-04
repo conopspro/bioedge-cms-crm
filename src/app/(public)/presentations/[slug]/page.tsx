@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Building2, User, FileText, ExternalLink, Users, Calendar, MapPin } from "lucide-react"
+import { ArrowLeft, ExternalLink, Calendar, MapPin } from "lucide-react"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
 
@@ -182,8 +182,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
           {/* Upcoming Events */}
           {upcomingEvents.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 {upcomingEvents.length === 1 ? "Upcoming Event" : "Upcoming Events"}
               </h2>
               <div className="space-y-4">
@@ -266,18 +265,8 @@ export default async function PresentationPage({ params }: PresentationPageProps
           {/* Leaders Section - New multi-leader support */}
           {hasPanelists && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                {isPanel ? (
-                  <>
-                    <Users className="h-5 w-5 text-gold" />
-                    Panel Leaders
-                  </>
-                ) : (
-                  <>
-                    <User className="h-5 w-5 text-gold" />
-                    Featured Leader
-                  </>
-                )}
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
+                {isPanel ? "Panel Leaders" : "Featured Leader"}
               </h2>
               <LeaderCardGrid>
                 {sortedPanelists.map((panelist: any) => (
@@ -301,8 +290,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
           {/* Legacy single leader section - fallback if no panelists */}
           {!hasPanelists && presentation.contact && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <User className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Featured Leader
               </h2>
               <LeaderCard
@@ -322,8 +310,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
           {/* Company Section - Show if no panelists have companies */}
           {presentation.company && !hasPanelists && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 About {presentation.company.name}
               </h2>
               <CompanyCard
@@ -341,13 +328,13 @@ export default async function PresentationPage({ params }: PresentationPageProps
           {/* Related Article - Show if presentation has one and no panelists have articles */}
           {presentation.article && !hasPanelists && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Related Article
               </h2>
               <Link
                 href={`/articles/${presentation.article.slug}`}
-                className="be-card be-card-accent block hover:shadow-lg transition-shadow"
+                className="be-card block hover:shadow-lg transition-shadow"
+                style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
               >
                 <h3 className="font-heading font-semibold text-navy text-lg mb-2">
                   {presentation.article.title}

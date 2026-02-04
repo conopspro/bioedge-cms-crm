@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
-import { Building2, ExternalLink, ArrowLeft, FileText, Users, Calendar, MapPin, Info, Sparkles, Award } from "lucide-react"
+import { Building2, ExternalLink, ArrowLeft, Calendar, MapPin } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { ArticleCard, ArticleCardGrid } from "@/components/ui/article-card"
@@ -210,11 +210,10 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Description */}
           {company.description && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Info className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 About
               </h2>
-              <div className="be-card">
+              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
                 <p className="body-text whitespace-pre-wrap">{company.description}</p>
                 {/* Show sources if available */}
                 {company.description_sources && Array.isArray(company.description_sources) && company.description_sources.length > 0 && (
@@ -243,11 +242,10 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Key Differentiators */}
           {company.differentiators && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 What Sets Them Apart
               </h2>
-              <div className="be-card">
+              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
                 {(() => {
                   const items = company.differentiators
                     .split(/\n/)
@@ -259,7 +257,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                       <ul className="space-y-2.5">
                         {items.map((item: string, idx: number) => (
                           <li key={idx} className="flex gap-3 body-text">
-                            <span className="h-2 w-2 rounded-full bg-gold flex-shrink-0 mt-2" />
+                            <span className="h-2 w-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: "#017ab2" }} />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -272,14 +270,10 @@ export default async function CompanyDetailPage({ params }: PageProps) {
             </section>
           )}
 
-          {/* Evidence/Credibility */}
+          {/* Evidence/Credibility - no title, just content */}
           {company.evidence && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Award className="h-5 w-5 text-gold" />
-                Evidence &amp; Credibility
-              </h2>
-              <div className="be-card">
+              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
                 {(() => {
                   const items = company.evidence
                     .split(/\n/)
@@ -291,7 +285,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                       <ul className="space-y-2.5">
                         {items.map((item: string, idx: number) => (
                           <li key={idx} className="flex gap-3 body-text">
-                            <span className="h-2 w-2 rounded-full bg-gold flex-shrink-0 mt-2" />
+                            <span className="h-2 w-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: "#017ab2" }} />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -307,8 +301,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Upcoming Events */}
           {upcomingEvents.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 {upcomingEvents.length === 1 ? "Upcoming Event" : "Upcoming Events"}
               </h2>
               <div className="space-y-4">
@@ -386,8 +379,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Articles */}
           {articles && articles.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Related Articles
               </h2>
               <ArticleCardGrid>
@@ -409,8 +401,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Company Leaders (legacy company_leaders table) */}
           {leaders && leaders.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Users className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Leadership
               </h2>
               <LeaderCardGrid>
@@ -439,8 +430,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Published Contacts */}
           {contacts && contacts.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Users className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Leaders
               </h2>
               <LeaderCardGrid>

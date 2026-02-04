@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { ArrowLeft, Users, Building2, BookOpen } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 import { MarkdownContent } from "@/components/articles/markdown-content"
 import { ArticleEnhancements } from "@/components/articles/article-enhancements"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
@@ -148,8 +148,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Article Enhancements */}
           {enhancements.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Learn More
               </h2>
               <ArticleEnhancements
@@ -162,8 +161,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Company Section */}
           {article.company && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 About {article.company.name}
               </h2>
               <CompanyCard
@@ -181,8 +179,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Leaders Section */}
           {contacts.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Users className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Leaders
               </h2>
               <LeaderCardGrid>

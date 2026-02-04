@@ -4,14 +4,8 @@ import {
   ArrowLeft,
   Linkedin,
   Building2,
-  Sparkles,
-  BookOpen,
-  Youtube,
-  GraduationCap,
-  FileText,
   Calendar,
   MapPin,
-  Info,
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { CompanyCard } from "@/components/ui/company-card"
@@ -237,11 +231,10 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Bio */}
           {contact.bio && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Info className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 About
               </h2>
-              <div className="be-card">
+              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
                 <div className="space-y-4">
                   {(() => {
                     const cleanBio = contact.bio.replace(/\[\d+\]/g, "").trim()
@@ -297,15 +290,14 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Career Highlights */}
           {highlights.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Sparkles className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Career Highlights
               </h2>
-              <div className="be-card">
+              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
                 <ul className="space-y-2.5">
                   {highlights.map((highlight: string, i: number) => (
                     <li key={i} className="flex items-start gap-3">
-                      <span className="h-2 w-2 rounded-full bg-gold flex-shrink-0 mt-2" />
+                      <span className="h-2 w-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: "#017ab2" }} />
                       <span className="body-text">{highlight.replace(/\[\d+\]/g, "").trim()}</span>
                     </li>
                   ))}
@@ -317,8 +309,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Upcoming Events */}
           {upcomingEvents.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 {upcomingEvents.length === 1 ? "Upcoming Event" : "Upcoming Events"}
               </h2>
               <div className="space-y-4">
@@ -391,8 +382,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Company */}
           {company && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Building2 className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 About {company.name}
               </h2>
               <CompanyCard
@@ -410,8 +400,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* YouTube Videos */}
           {youtubeVideos.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <Youtube className="h-5 w-5 text-red-500" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Videos
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -455,8 +444,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Academic Papers */}
           {papers.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <GraduationCap className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Research & Publications
               </h2>
               <div className="space-y-4">
@@ -466,7 +454,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                     href={paper.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="be-card be-card-accent block hover:shadow-lg transition-shadow"
+                    className="be-card block hover:shadow-lg transition-shadow"
                   >
                     <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors">
                       {paper.title}
@@ -480,7 +468,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                       {paper.metadata?.journal && <span>{paper.metadata.journal}</span>}
                       {paper.metadata?.year && <span>{paper.metadata.year}</span>}
                       {paper.metadata?.citedBy && (
-                        <span className="text-gold">{paper.metadata.citedBy} citations</span>
+                        <span style={{ color: "#017ab2" }}>{paper.metadata.citedBy} citations</span>
                       )}
                     </div>
                   </a>
@@ -492,8 +480,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Books */}
           {books.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <BookOpen className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Books
               </h2>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -522,7 +509,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                         </p>
                       )}
                       {book.metadata?.rating && (
-                        <p className="text-sm text-gold mt-1">
+                        <p className="text-sm mt-1" style={{ color: "#017ab2" }}>
                           ★ {book.metadata.rating}
                         </p>
                       )}
@@ -536,8 +523,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Related Articles */}
           {articles.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-gold" />
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Related Articles
               </h2>
               <div className="space-y-4">
@@ -545,7 +531,8 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                   <Link
                     key={article.id}
                     href={`/articles/${article.slug}`}
-                    className="be-card be-card-accent block hover:shadow-lg transition-shadow"
+                    className="be-card block hover:shadow-lg transition-shadow"
+                    style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
                   >
                     <h3 className="font-heading font-semibold text-navy text-lg mb-2">
                       {article.title}
