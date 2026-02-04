@@ -204,12 +204,22 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
                   </TableCell>
                   <TableCell>
                     {contact.company ? (
-                      <Link
-                        href={`/dashboard/companies/${contact.company.id}`}
-                        className="text-sm hover:underline"
-                      >
-                        {contact.company.name}
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`h-2 w-2 rounded-full flex-shrink-0 ${
+                            contact.company.is_draft === false
+                              ? "bg-green-500"
+                              : "bg-amber-400"
+                          }`}
+                          title={contact.company.is_draft === false ? "Company published" : "Company in draft"}
+                        />
+                        <Link
+                          href={`/dashboard/companies/${contact.company.id}`}
+                          className="text-sm hover:underline"
+                        >
+                          {contact.company.name}
+                        </Link>
+                      </div>
                     ) : (
                       <span className="text-muted-foreground">—</span>
                     )}
