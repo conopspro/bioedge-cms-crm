@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { Badge } from "@/components/ui/badge"
 import { CompanyDetailEditor } from "@/components/companies/company-detail-editor"
+import { VisibilityToggle } from "@/components/companies/visibility-toggle"
 
 /**
  * Status badge color mapping
@@ -73,9 +74,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
         <div>
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-3xl font-bold tracking-tight">{company.name}</h1>
-            <Badge variant={company.is_draft === false ? "success" : "outline"}>
-              {company.is_draft === false ? "Published" : "Draft"}
-            </Badge>
+            <VisibilityToggle companyId={company.id} isDraft={company.is_draft} />
             <Badge variant={statusColors[company.status]}>
               {statusLabels[company.status]}
             </Badge>
