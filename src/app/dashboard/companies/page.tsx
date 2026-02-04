@@ -11,11 +11,11 @@ import { CompaniesPageTabs } from "@/components/companies/companies-page-tabs"
 export default async function CompaniesPage() {
   const supabase = await createClient()
 
-  // Fetch all companies
+  // Fetch all companies (sorted alphabetically by name)
   const { data: companies, error } = await supabase
     .from("companies")
     .select("*")
-    .order("created_at", { ascending: false })
+    .order("name", { ascending: true })
 
   if (error) {
     console.error("Error fetching companies:", error)

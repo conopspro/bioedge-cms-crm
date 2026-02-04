@@ -12,11 +12,12 @@ import { ContactsTable } from "@/components/contacts/contacts-table"
 export default async function ContactsPage() {
   const supabase = await createClient()
 
-  // Fetch all contacts
+  // Fetch all contacts (sorted alphabetically by last name, then first name)
   const { data: contactsData, error } = await supabase
     .from("contacts")
     .select("*")
-    .order("created_at", { ascending: false })
+    .order("last_name", { ascending: true })
+    .order("first_name", { ascending: true })
 
   if (error) {
     console.error("Error fetching contacts:", error)
