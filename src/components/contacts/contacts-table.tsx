@@ -3,7 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { MoreHorizontal, Pencil, Trash2, Eye, Mail, Linkedin, Star } from "lucide-react"
+import { Pencil, Trash2, Eye, EyeOff, Mail, Linkedin, Star, Building2, User, AlertTriangle } from "lucide-react"
 import { FeaturedToggle } from "@/components/ui/featured-toggle"
 import type { Contact, Company } from "@/types/database"
 import {
@@ -36,7 +36,7 @@ const statusLabels: Record<string, string> = {
 }
 
 interface ContactWithCompany extends Contact {
-  company?: { id: string; name: string } | null
+  company?: { id: string; name: string; is_draft?: boolean | null } | null
 }
 
 interface ContactsTableProps {
@@ -50,6 +50,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
   const router = useRouter()
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [visibilityFilter, setVisibilityFilter] = useState<string>("all")
 
   // Filter contacts
   const filteredContacts = contacts.filter((contact) => {
@@ -63,7 +64,22 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
       contact.company?.name?.toLowerCase().includes(searchLower)
     const matchesStatus =
       statusFilter === "all" || contact.outreach_status === statusFilter
-    return matchesSearch && matchesStatus
+
+    // Visibility filter logic
+    const isKeyPerson = contact.show_on_articles === true
+    const companyPublished = contact.company?.is_draft === false
+    const hasCompany = !!contact.company
+
+    let matchesVisibility = true
+    if (visibilityFilter === "published") {
+      matchesVisibility = isKeyPerson && companyPublished
+    } else if (visibilityFilter === "warning") {
+      matchesVisibility = isKeyPerson && (!companyPublished || !hasCompany)
+    } else if (visibilityFilter === "hidden") {
+      matchesVisibility = !isKeyPerson
+    }
+
+    return matchesSearch && matchesStatus && matchesVisibility
   })
 
   // Handle delete
@@ -109,6 +125,16 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
           <option value="responded">Responded</option>
           <option value="converted">Converted</option>
         </select>
+        <select
+          value={visibilityFilter}
+          onChange={(e) => setVisibilityFilter(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">All Visibility</option>
+          <option value="published">Published</option>
+          <option value="warning">Needs Attention</option>
+          <option value="hidden">Hidden</option>
+        </select>
       </div>
 
       {/* Results count */}
@@ -127,6 +153,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
               <TableHead className="w-[250px]">Name</TableHead>
               <TableHead>Company</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Visibility</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
@@ -134,7 +161,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
           <TableBody>
             {filteredContacts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="h-24 text-center">
+                <TableCell colSpan={7} className="h-24 text-center">
                   {contacts.length === 0 ? (
                     <div className="text-muted-foreground">
                       No contacts yet.{" "}
@@ -195,6 +222,51 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
                       <Mail className="h-3 w-3" />
                       {contact.email}
                     </a>
+                  </TableCell>
+                  <TableCell>
+                    {(() => {
+                      const isKeyPerson = contact.show_on_articles === true
+                      const companyPublished = contact.company?.is_draft === false
+                      const hasCompany = !!contact.company
+
+                      // Warning: Key person but company is draft
+                      if (isKeyPerson && hasCompany && !companyPublished) {
+                        return (
+                          <div className="flex items-center gap-1.5" title="Key Person but company is in draft mode">
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            <span className="text-xs text-amber-600">Company Draft</span>
+                          </div>
+                        )
+                      }
+
+                      // Published: Key person with published company
+                      if (isKeyPerson && companyPublished) {
+                        return (
+                          <div className="flex items-center gap-1.5 text-green-600" title="Visible on public site">
+                            <Eye className="h-4 w-4" />
+                            <span className="text-xs">Published</span>
+                          </div>
+                        )
+                      }
+
+                      // Key person but no company
+                      if (isKeyPerson && !hasCompany) {
+                        return (
+                          <div className="flex items-center gap-1.5" title="Key Person but no company assigned">
+                            <AlertTriangle className="h-4 w-4 text-amber-500" />
+                            <span className="text-xs text-amber-600">No Company</span>
+                          </div>
+                        )
+                      }
+
+                      // Not a key person
+                      return (
+                        <div className="flex items-center gap-1.5 text-muted-foreground" title="Not a Key Person">
+                          <EyeOff className="h-4 w-4" />
+                          <span className="text-xs">Hidden</span>
+                        </div>
+                      )
+                    })()}
                   </TableCell>
                   <TableCell>
                     <Badge variant={statusColors[contact.outreach_status || "not_contacted"]}>

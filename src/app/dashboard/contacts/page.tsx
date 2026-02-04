@@ -23,20 +23,20 @@ export default async function ContactsPage() {
     console.error("Error fetching contacts:", error)
   }
 
-  // Fetch companies separately to avoid join issues
+  // Fetch companies separately to avoid join issues - include is_draft status
   const companyIds = [...new Set((contactsData || []).map(c => c.company_id).filter(Boolean))]
-  let companiesMap: Record<string, { id: string; name: string }> = {}
+  let companiesMap: Record<string, { id: string; name: string; is_draft: boolean | null }> = {}
 
   if (companyIds.length > 0) {
     const { data: companiesData } = await supabase
       .from("companies")
-      .select("id, name")
+      .select("id, name, is_draft")
       .in("id", companyIds)
 
     companiesMap = (companiesData || []).reduce((acc, c) => {
       acc[c.id] = c
       return acc
-    }, {} as Record<string, { id: string; name: string }>)
+    }, {} as Record<string, { id: string; name: string; is_draft: boolean | null }>)
   }
 
   // Combine contacts with company data
