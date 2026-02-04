@@ -96,7 +96,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
   if (contact.company_id) {
     const { data: articleData } = await supabase
       .from("articles")
-      .select("id, title, slug, excerpt, published_at, featured_image_url")
+      .select("id, title, slug, excerpt, published_at, featured_image_url, youtube_url")
       .eq("company_id", contact.company_id)
       .eq("status", "published")
       .order("published_at", { ascending: false })
@@ -599,6 +599,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                     excerpt={article.excerpt}
                     publishedAt={article.published_at}
                     featuredImage={article.featured_image_url}
+                    youtubeUrl={article.youtube_url}
                   />
                 ))}
               </ArticleCardGrid>

@@ -51,7 +51,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
       *,
       contact:contacts(id, first_name, last_name, title, avatar_url, bio, linkedin_url, slug, ai_highlights, ai_expertise),
       company:companies(id, name, logo_url, domain, description, slug),
-      article:articles(id, title, slug, excerpt, featured_image_url),
+      article:articles(id, title, slug, excerpt, featured_image_url, youtube_url),
       panelists:presentation_panelists(
         id,
         contact_id,
@@ -333,6 +333,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
                 slug={presentation.article.slug}
                 excerpt={presentation.article.excerpt}
                 featuredImage={presentation.article.featured_image_url}
+                youtubeUrl={presentation.article.youtube_url}
               />
             </section>
           )}

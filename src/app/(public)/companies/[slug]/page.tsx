@@ -71,10 +71,10 @@ export default async function CompanyDetailPage({ params }: PageProps) {
     redirect(`/companies/${company.slug}`)
   }
 
-  // Fetch related articles (published only)
+  // Fetch related articles (published only) with featured image and youtube_url for thumbnail fallback
   const { data: articles } = await supabase
     .from("articles")
-    .select("id, title, slug, excerpt, published_at, featured_image_url")
+    .select("id, title, slug, excerpt, published_at, featured_image_url, youtube_url")
     .eq("company_id", company.id)
     .eq("status", "published")
     .order("published_at", { ascending: false })
@@ -396,6 +396,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                     excerpt={article.excerpt}
                     publishedAt={article.published_at}
                     featuredImage={article.featured_image_url}
+                    youtubeUrl={article.youtube_url}
                   />
                 ))}
               </ArticleCardGrid>

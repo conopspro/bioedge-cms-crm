@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { getArticleImageUrl } from "@/lib/youtube"
+import { Play } from "lucide-react"
 
 export interface ArticleCardProps {
   id: string
@@ -8,6 +10,7 @@ export interface ArticleCardProps {
   excerpt?: string | null
   publishedAt?: string | null
   featuredImage?: string | null
+  youtubeUrl?: string | null
   className?: string
 }
 
@@ -16,6 +19,7 @@ export interface ArticleCardProps {
  *
  * Horizontal layout with:
  * - Thumbnail on left (33% width) when available
+ * - Falls back to YouTube thumbnail if no featured image
  * - Title and excerpt on the right
  * - Blue ring around card
  * - Hover shadow effect
@@ -27,9 +31,14 @@ export function ArticleCard({
   excerpt,
   publishedAt,
   featuredImage,
+  youtubeUrl,
   className,
 }: ArticleCardProps) {
   const linkHref = `/articles/${slug || id}`
+
+  // Use featured image, or fall back to YouTube thumbnail
+  const imageUrl = getArticleImageUrl(featuredImage, youtubeUrl)
+  const hasVideo = !featuredImage && youtubeUrl
 
   return (
     <Link
@@ -40,13 +49,28 @@ export function ArticleCard({
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
     >
-      {featuredImage && (
-        <div className="w-1/3 flex-shrink-0 aspect-video overflow-hidden rounded-lg bg-gray-100">
+      {imageUrl && (
+        <div className="w-1/3 flex-shrink-0 aspect-video overflow-hidden rounded-lg bg-gray-100 relative">
           <img
-            src={featuredImage}
+            src={imageUrl}
             alt={title}
             className="w-full h-full object-contain"
+            onError={(e) => {
+              // Fallback to hqdefault if maxresdefault doesn't exist
+              const target = e.target as HTMLImageElement
+              if (target.src.includes("maxresdefault")) {
+                target.src = target.src.replace("maxresdefault", "hqdefault")
+              }
+            }}
           />
+          {/* Play icon overlay for video thumbnails */}
+          {hasVideo && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center shadow-lg">
+                <Play className="h-4 w-4 text-white ml-0.5" fill="white" />
+              </div>
+            </div>
+          )}
         </div>
       )}
       <div className="flex-1 min-w-0">
