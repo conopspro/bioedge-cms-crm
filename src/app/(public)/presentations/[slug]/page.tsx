@@ -4,6 +4,7 @@ import Link from "next/link"
 import { ArrowLeft, ExternalLink, Calendar, MapPin } from "lucide-react"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
+import { ArticleCard } from "@/components/ui/article-card"
 
 interface PresentationPageProps {
   params: Promise<{ slug: string }>
@@ -50,7 +51,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
       *,
       contact:contacts(id, first_name, last_name, title, avatar_url, bio, linkedin_url, slug, ai_highlights, ai_expertise),
       company:companies(id, name, logo_url, domain, description, slug),
-      article:articles(id, title, slug, excerpt),
+      article:articles(id, title, slug, excerpt, featured_image_url),
       panelists:presentation_panelists(
         id,
         contact_id,
@@ -326,24 +327,13 @@ export default async function PresentationPage({ params }: PresentationPageProps
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Related Article
               </h2>
-              <Link
-                href={`/articles/${presentation.article.slug}`}
-                className="be-card block hover:shadow-lg transition-shadow"
-                style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
-              >
-                <h3 className="font-heading font-semibold text-navy text-lg mb-2">
-                  {presentation.article.title}
-                </h3>
-                {presentation.article.excerpt && (
-                  <p className="text-sm text-text-dark line-clamp-2">
-                    {presentation.article.excerpt}
-                  </p>
-                )}
-                <span className="inline-flex items-center gap-1 text-sm mt-3" style={{ color: '#017ab2' }}>
-                  Read Article
-                  <ArrowLeft className="h-3 w-3 rotate-180" />
-                </span>
-              </Link>
+              <ArticleCard
+                id={presentation.article.id}
+                title={presentation.article.title}
+                slug={presentation.article.slug}
+                excerpt={presentation.article.excerpt}
+                featuredImage={presentation.article.featured_image_url}
+              />
             </section>
           )}
         </article>

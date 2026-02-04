@@ -9,6 +9,8 @@ import {
 } from "lucide-react"
 import { createClient } from "@/lib/supabase/server"
 import { CompanyCard } from "@/components/ui/company-card"
+import { ArticleCard, ArticleCardGrid } from "@/components/ui/article-card"
+import { PresentationCard, PresentationCardGrid } from "@/components/ui/presentation-card"
 
 type PageProps = {
   params: Promise<{ slug: string }>
@@ -89,12 +91,12 @@ export default async function LeaderProfilePage({ params }: PageProps) {
   const papers = enhancements.filter(e => e.type === "scholar")
   const books = enhancements.filter(e => e.type === "book")
 
-  // Fetch related articles (where this contact's company is featured)
+  // Fetch related articles (where this contact's company is featured) with featured image
   let articles: any[] = []
   if (contact.company_id) {
     const { data: articleData } = await supabase
       .from("articles")
-      .select("id, title, slug, excerpt, published_at")
+      .select("id, title, slug, excerpt, published_at, featured_image_url")
       .eq("company_id", contact.company_id)
       .eq("status", "published")
       .order("published_at", { ascending: false })
@@ -105,18 +107,18 @@ export default async function LeaderProfilePage({ params }: PageProps) {
   // Fetch presentations where this contact is featured (via presentation_panelists or legacy contact_id)
   let presentations: any[] = []
 
-  // First check presentation_panelists table
+  // First check presentation_panelists table - include recording_metadata for thumbnail
   const { data: panelistPresentations } = await supabase
     .from("presentation_panelists")
     .select(`
-      presentation:presentations(id, title, slug, short_description, status)
+      presentation:presentations(id, title, slug, short_description, status, recording_metadata)
     `)
     .eq("contact_id", contact.id)
 
-  // Also check legacy presentations with direct contact_id
+  // Also check legacy presentations with direct contact_id - include recording_metadata
   const { data: legacyPresentations } = await supabase
     .from("presentations")
-    .select("id, title, slug, short_description, status")
+    .select("id, title, slug, short_description, status, recording_metadata")
     .eq("contact_id", contact.id)
     .eq("status", "published")
 
@@ -566,29 +568,18 @@ export default async function LeaderProfilePage({ params }: PageProps) {
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Presentations
               </h2>
-              <div className="space-y-4">
+              <PresentationCardGrid>
                 {presentations.map((presentation: any) => (
-                  <Link
+                  <PresentationCard
                     key={presentation.id}
-                    href={`/presentations/${presentation.slug}`}
-                    className="be-card block hover:shadow-lg transition-shadow"
-                    style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
-                  >
-                    <h3 className="font-heading font-semibold text-navy text-lg mb-2">
-                      {presentation.title}
-                    </h3>
-                    {presentation.short_description && (
-                      <p className="text-sm text-text-dark line-clamp-2">
-                        {presentation.short_description}
-                      </p>
-                    )}
-                    <span className="inline-flex items-center gap-1 text-sm mt-3" style={{ color: '#017ab2' }}>
-                      View Presentation
-                      <ArrowLeft className="h-3 w-3 rotate-180" />
-                    </span>
-                  </Link>
+                    id={presentation.id}
+                    title={presentation.title}
+                    slug={presentation.slug}
+                    shortDescription={presentation.short_description}
+                    thumbnailUrl={presentation.recording_metadata?.thumbnail}
+                  />
                 ))}
-              </div>
+              </PresentationCardGrid>
             </section>
           )}
 
@@ -598,29 +589,19 @@ export default async function LeaderProfilePage({ params }: PageProps) {
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Related Articles
               </h2>
-              <div className="space-y-4">
+              <ArticleCardGrid>
                 {articles.map((article: any) => (
-                  <Link
+                  <ArticleCard
                     key={article.id}
-                    href={`/articles/${article.slug}`}
-                    className="be-card block hover:shadow-lg transition-shadow"
-                    style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
-                  >
-                    <h3 className="font-heading font-semibold text-navy text-lg mb-2">
-                      {article.title}
-                    </h3>
-                    {article.excerpt && (
-                      <p className="text-sm text-text-dark line-clamp-2">
-                        {article.excerpt}
-                      </p>
-                    )}
-                    <span className="inline-flex items-center gap-1 text-sm mt-3" style={{ color: '#017ab2' }}>
-                      Read Article
-                      <ArrowLeft className="h-3 w-3 rotate-180" />
-                    </span>
-                  </Link>
+                    id={article.id}
+                    title={article.title}
+                    slug={article.slug}
+                    excerpt={article.excerpt}
+                    publishedAt={article.published_at}
+                    featuredImage={article.featured_image_url}
+                  />
                 ))}
-              </div>
+              </ArticleCardGrid>
             </section>
           )}
 
