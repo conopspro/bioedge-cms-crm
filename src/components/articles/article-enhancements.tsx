@@ -1,6 +1,6 @@
 "use client"
 
-import { Play, BookOpen, Book, Link as LinkIcon, Sparkles } from "lucide-react"
+// Icons removed for cleaner design
 import type {
   ArticleEnhancement,
   YouTubeEnhancementMetadata,
@@ -57,8 +57,7 @@ export function ArticleEnhancements({
     <div className={`space-y-8 ${className}`}>
       {/* Section title - only show if title provided */}
       {title && (
-        <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-gold" />
+        <h2 className="font-heading font-bold text-navy text-xl mb-4">
           {title}
         </h2>
       )}
@@ -67,8 +66,7 @@ export function ArticleEnhancements({
       {youtubeVideos.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-              <Play className="h-5 w-5 text-gold" />
+            <h2 className="font-heading font-bold text-navy text-xl mb-4">
               Videos
             </h2>
           )}
@@ -93,8 +91,7 @@ export function ArticleEnhancements({
       {scholarPapers.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-gold" />
+            <h2 className="font-heading font-bold text-navy text-xl mb-4">
               Research Papers
             </h2>
           )}
@@ -118,8 +115,7 @@ export function ArticleEnhancements({
       {books.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-              <Book className="h-5 w-5 text-gold" />
+            <h2 className="font-heading font-bold text-navy text-xl mb-4">
               Related Books
             </h2>
           )}
@@ -143,8 +139,7 @@ export function ArticleEnhancements({
       {links.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4 flex items-center gap-2">
-              <LinkIcon className="h-5 w-5 text-gold" />
+            <h2 className="font-heading font-bold text-navy text-xl mb-4">
               Additional Resources
             </h2>
           )}

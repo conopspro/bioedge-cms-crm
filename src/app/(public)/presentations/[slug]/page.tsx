@@ -244,20 +244,15 @@ export default async function PresentationPage({ params }: PresentationPageProps
             </section>
           )}
 
-          {/* Long Description */}
+          {/* Long Description - displayed directly like article content */}
           {presentation.long_description && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                About This Presentation
-              </h2>
-              <div className="be-card">
-                <div className="space-y-4">
-                  {presentation.long_description.split("\n\n").map((paragraph: string, idx: number) => (
-                    <p key={idx} className="body-text">
-                      {paragraph}
-                    </p>
-                  ))}
-                </div>
+              <div className="space-y-4">
+                {presentation.long_description.split("\n\n").map((paragraph: string, idx: number) => (
+                  <p key={idx} className="body-text">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
             </section>
           )}
