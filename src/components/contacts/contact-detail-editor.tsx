@@ -417,19 +417,18 @@ export function ContactDetailEditor({
           )}
         </EditableCard>
 
-        {/* Leader Profile (Bio, Highlights, Expertise) */}
-        {contact.show_on_articles && (
-          <EditableCard
-            title="Leader Profile"
-            description="Public bio and career highlights"
-            section="profile"
-            fields={["bio", "ai_highlights", "ai_expertise"]}
-            isEditing={isEditingSection("profile")}
-            isSaving={isSaving}
-            onStartEditing={startEditing}
-            onCancelEditing={cancelEditing}
-            onSave={saveSection}
-            editContent={
+        {/* Leader Profile (Bio, Highlights, Expertise) - Always visible for editing */}
+        <EditableCard
+          title="Leader Profile"
+          description={contact.show_on_articles ? "Public bio and career highlights (visible on public site)" : "Public bio and career highlights (enable 'Key Person' to show on public site)"}
+          section="profile"
+          fields={["bio", "ai_highlights", "ai_expertise"]}
+          isEditing={isEditingSection("profile")}
+          isSaving={isSaving}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
+          editContent={
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label>Bio</Label>
@@ -526,7 +525,6 @@ export function ContactDetailEditor({
               )}
             </div>
           </EditableCard>
-        )}
 
         {/* Leader Media (Videos, Papers, Books) */}
         <ContactEnhancementsEditor
