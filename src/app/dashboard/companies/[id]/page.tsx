@@ -58,6 +58,23 @@ export default async function CompanyDetailPage({ params }: PageProps) {
   const contacts = contactsResult.data || []
   const articles = articlesResult.data || []
 
+  // Compute derived status based on actual article data
+  const publishedArticles = articles.filter((a) => a.status === "published")
+  const draftArticles = articles.filter((a) => a.status === "draft")
+
+  let derivedStatus = company.status
+  if (publishedArticles.length > 0) {
+    derivedStatus = "published"
+  } else if (draftArticles.length > 0 || articles.length > 0) {
+    derivedStatus = "article_draft"
+  } else if (!company.status || company.status === "researching") {
+    derivedStatus = "researching"
+  }
+  // Keep manual outreach/engaged status if set
+  if (company.status === "outreach" || company.status === "engaged") {
+    derivedStatus = company.status
+  }
+
   return (
     <div className="space-y-6">
       {/* Back link */}
@@ -75,8 +92,8 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           <div className="flex items-center gap-3 flex-wrap">
             <h1 className="text-3xl font-bold tracking-tight">{company.name}</h1>
             <VisibilityToggle companyId={company.id} isDraft={company.is_draft} />
-            <Badge variant={statusColors[company.status]}>
-              {statusLabels[company.status]}
+            <Badge variant={statusColors[derivedStatus]}>
+              {statusLabels[derivedStatus]}
             </Badge>
           </div>
         </div>

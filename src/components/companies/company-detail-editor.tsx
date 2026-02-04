@@ -819,32 +819,22 @@ export function CompanyDetailEditor({
           hasContent={hasFieldContent(["status"])}
           onEdit={() => startEditing("status")}
           onCancel={cancelEditing}
-          onSave={() => saveSection(["status", "is_draft"])}
+          onSave={() => saveSection(["status"])}
           editContent={
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="is_draft">Draft Mode</Label>
-                  <p className="text-xs text-muted-foreground">
-                    Draft companies won&apos;t appear on public pages
-                  </p>
-                </div>
-                <Switch
-                  id="is_draft"
-                  checked={formData.is_draft ?? true}
-                  onCheckedChange={(checked) => setFormData({ ...formData, is_draft: checked })}
-                />
-              </div>
               <div className="space-y-2">
-                <Label>Status</Label>
+                <Label>Override Status</Label>
+                <p className="text-xs text-muted-foreground mb-2">
+                  Status is auto-computed from articles. Only override for Outreach or Engaged status.
+                </p>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 >
-                  <option value="researching">Researching</option>
-                  <option value="article_draft">Article Draft</option>
-                  <option value="published">Published</option>
+                  <option value="researching">Researching (auto)</option>
+                  <option value="article_draft">Article Draft (auto)</option>
+                  <option value="published">Published (auto)</option>
                   <option value="outreach">Outreach</option>
                   <option value="engaged">Engaged</option>
                 </select>
@@ -865,6 +855,9 @@ export function CompanyDetailEditor({
                 {statusLabels[company.status]}
               </Badge>
             </div>
+            <p className="text-xs text-muted-foreground">
+              Auto-updates based on article status
+            </p>
           </div>
         </EditableCard>
 

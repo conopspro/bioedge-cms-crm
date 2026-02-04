@@ -57,12 +57,14 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
   const [draftFilter, setDraftFilter] = useState<string>("all")
 
   // Filter companies based on search, status, and draft mode
+  // Use derivedStatus if available (computed from articles), otherwise fall back to status
   const filteredCompanies = companies.filter((company) => {
+    const effectiveStatus = (company as any).derivedStatus || company.status
     const matchesSearch = company.name
       .toLowerCase()
       .includes(search.toLowerCase())
     const matchesStatus =
-      statusFilter === "all" || company.status === statusFilter
+      statusFilter === "all" || effectiveStatus === statusFilter
     const matchesDraft =
       draftFilter === "all" ||
       (draftFilter === "draft" && company.is_draft !== false) ||
@@ -197,9 +199,14 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge variant={statusColors[company.status] || "default"}>
-                      {statusLabels[company.status] || company.status}
-                    </Badge>
+                    {(() => {
+                      const effectiveStatus = (company as any).derivedStatus || company.status
+                      return (
+                        <Badge variant={statusColors[effectiveStatus] || "default"}>
+                          {statusLabels[effectiveStatus] || effectiveStatus}
+                        </Badge>
+                      )
+                    })()}
                   </TableCell>
                   <TableCell>
                     {company.website ? (
