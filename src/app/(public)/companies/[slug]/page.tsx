@@ -270,33 +270,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
             </section>
           )}
 
-          {/* Evidence/Credibility - no title, just content */}
-          {company.evidence && (
-            <section>
-              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
-                {(() => {
-                  const items = company.evidence
-                    .split(/\n/)
-                    .map((item: string) => item.replace(/^\s*-\s*/, "").trim())
-                    .filter((item: string) => item.length > 0)
-
-                  if (items.length > 1) {
-                    return (
-                      <ul className="space-y-2.5">
-                        {items.map((item: string, idx: number) => (
-                          <li key={idx} className="flex gap-3 body-text">
-                            <span className="h-2 w-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: "#017ab2" }} />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )
-                  }
-                  return <p className="body-text whitespace-pre-wrap">{company.evidence}</p>
-                })()}
-              </div>
-            </section>
-          )}
+          {/* Evidence/Credibility - hidden from public display, only used internally */}
 
           {/* Upcoming Events */}
           {upcomingEvents.length > 0 && (
