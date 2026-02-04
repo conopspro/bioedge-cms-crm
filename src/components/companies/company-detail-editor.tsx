@@ -811,56 +811,6 @@ export function CompanyDetailEditor({
           </CardContent>
         </Card>
 
-        {/* Status */}
-        <EditableCard
-          title="Pipeline Status"
-          isEditing={editingSection === "status"}
-          isSaving={isSaving}
-          hasContent={hasFieldContent(["status"])}
-          onEdit={() => startEditing("status")}
-          onCancel={cancelEditing}
-          onSave={() => saveSection(["status"])}
-          editContent={
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label>Override Status</Label>
-                <p className="text-xs text-muted-foreground mb-2">
-                  Status is auto-computed from articles. Only override for Outreach or Engaged status.
-                </p>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <option value="researching">Researching (auto)</option>
-                  <option value="article_draft">Article Draft (auto)</option>
-                  <option value="published">Published (auto)</option>
-                  <option value="outreach">Outreach</option>
-                  <option value="engaged">Engaged</option>
-                </select>
-              </div>
-            </div>
-          }
-        >
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Visibility</span>
-              <Badge variant={company.is_draft === false ? "success" : "outline"}>
-                {company.is_draft === false ? "Published" : "Draft"}
-              </Badge>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">Pipeline Status</span>
-              <Badge variant={statusColors[company.status]}>
-                {statusLabels[company.status]}
-              </Badge>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Auto-updates based on article status
-            </p>
-          </div>
-        </EditableCard>
-
         {/* Systems Supported */}
         <EditableCard
           title="Systems Supported"
