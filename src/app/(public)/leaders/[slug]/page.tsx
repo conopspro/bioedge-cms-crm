@@ -102,6 +102,46 @@ export default async function LeaderProfilePage({ params }: PageProps) {
     articles = articleData || []
   }
 
+  // Fetch presentations where this contact is featured (via presentation_panelists or legacy contact_id)
+  let presentations: any[] = []
+
+  // First check presentation_panelists table
+  const { data: panelistPresentations } = await supabase
+    .from("presentation_panelists")
+    .select(`
+      presentation:presentations(id, title, slug, short_description, status)
+    `)
+    .eq("contact_id", contact.id)
+
+  // Also check legacy presentations with direct contact_id
+  const { data: legacyPresentations } = await supabase
+    .from("presentations")
+    .select("id, title, slug, short_description, status")
+    .eq("contact_id", contact.id)
+    .eq("status", "published")
+
+  // Combine and dedupe presentations
+  const presentationMap = new Map()
+
+  // Add from panelists
+  if (panelistPresentations) {
+    for (const pp of panelistPresentations) {
+      const pres = Array.isArray(pp.presentation) ? pp.presentation[0] : pp.presentation
+      if (pres && pres.status === "published") {
+        presentationMap.set(pres.id, pres)
+      }
+    }
+  }
+
+  // Add legacy presentations
+  if (legacyPresentations) {
+    for (const pres of legacyPresentations) {
+      presentationMap.set(pres.id, pres)
+    }
+  }
+
+  presentations = Array.from(presentationMap.values())
+
   // Fetch upcoming events where this contact is participating
   const today = new Date().toISOString().split('T')[0]
   const { data: eventContacts } = await supabase
@@ -515,6 +555,38 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                       )}
                     </div>
                   </a>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Presentations */}
+          {presentations.length > 0 && (
+            <section>
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
+                Presentations
+              </h2>
+              <div className="space-y-4">
+                {presentations.map((presentation: any) => (
+                  <Link
+                    key={presentation.id}
+                    href={`/presentations/${presentation.slug}`}
+                    className="be-card block hover:shadow-lg transition-shadow"
+                    style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
+                  >
+                    <h3 className="font-heading font-semibold text-navy text-lg mb-2">
+                      {presentation.title}
+                    </h3>
+                    {presentation.short_description && (
+                      <p className="text-sm text-text-dark line-clamp-2">
+                        {presentation.short_description}
+                      </p>
+                    )}
+                    <span className="inline-flex items-center gap-1 text-sm mt-3" style={{ color: '#017ab2' }}>
+                      View Presentation
+                      <ArrowLeft className="h-3 w-3 rotate-180" />
+                    </span>
+                  </Link>
                 ))}
               </div>
             </section>

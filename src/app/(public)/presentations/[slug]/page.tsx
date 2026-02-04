@@ -307,8 +307,8 @@ export default async function PresentationPage({ params }: PresentationPageProps
             </section>
           )}
 
-          {/* Company Section - Show if no panelists have companies */}
-          {presentation.company && !hasPanelists && (
+          {/* Company Section */}
+          {presentation.company && (
             <section>
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 About {presentation.company.name}
