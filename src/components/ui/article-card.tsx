@@ -1,6 +1,5 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
-import { FileText } from "lucide-react"
 
 export interface ArticleCardProps {
   id: string
@@ -15,10 +14,11 @@ export interface ArticleCardProps {
 /**
  * ArticleCard - Consistent article display card
  *
- * Styled to match LeaderCard with:
+ * Horizontal layout with:
+ * - Thumbnail on left (33% width) when available
+ * - Title and excerpt on the right
  * - Blue ring around card
  * - Hover shadow effect
- * - Consistent typography
  */
 export function ArticleCard({
   id,
@@ -35,31 +35,33 @@ export function ArticleCard({
     <Link
       href={linkHref}
       className={cn(
-        "be-card hover:shadow-lg transition-shadow group block",
+        "be-card hover:shadow-lg transition-shadow group flex gap-4",
         className
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
     >
       {featuredImage && (
-        <div className="aspect-video w-full overflow-hidden rounded-lg mb-4">
+        <div className="w-1/3 flex-shrink-0 aspect-video overflow-hidden rounded-lg bg-gray-100">
           <img
             src={featuredImage}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain"
           />
         </div>
       )}
-      <h3
-        className="font-heading font-semibold transition-colors line-clamp-2"
-        style={{ color: "#0d2840" }}
-      >
-        {title}
-      </h3>
-      {excerpt && (
-        <p className="text-sm mt-2 line-clamp-2" style={{ color: "#5a6a7a" }}>
-          {excerpt}
-        </p>
-      )}
+      <div className="flex-1 min-w-0">
+        <h3
+          className="font-heading font-semibold transition-colors line-clamp-2"
+          style={{ color: "#0d2840" }}
+        >
+          {title}
+        </h3>
+        {excerpt && (
+          <p className="text-sm mt-2 line-clamp-2" style={{ color: "#5a6a7a" }}>
+            {excerpt}
+          </p>
+        )}
+      </div>
     </Link>
   )
 }
