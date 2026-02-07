@@ -86,10 +86,11 @@ ${article.excerpt ? `- Excerpt: ${article.excerpt}` : ""}`
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { mode = "descriptions", title, notes, leaders, leader, company, article } = body as {
+    const { mode = "descriptions", title, notes, transcript, leaders, leader, company, article } = body as {
       mode?: "titles" | "descriptions"
       title?: string
       notes?: string
+      transcript?: string
       leaders?: LeaderContext[]
       leader?: LeaderContext
       company?: CompanyContext
@@ -102,9 +103,9 @@ export async function POST(request: NextRequest) {
 
     // Mode: Generate title suggestions
     if (mode === "titles") {
-      if (!hasLeaders && !company && !article && !notes) {
+      if (!hasLeaders && !company && !article && !notes && !transcript) {
         return NextResponse.json(
-          { error: "Please select a leader, company, article, or add notes to generate title suggestions" },
+          { error: "Please select a leader, company, article, add notes, or paste a transcript to generate title suggestions" },
           { status: 400 }
         )
       }
@@ -112,6 +113,7 @@ export async function POST(request: NextRequest) {
       const titlePrompt = `You are a content writer for bioEDGE, a media company focused on longevity, biohacking, and health optimization. Generate 3 compelling ${isPanel ? "panel discussion" : "session/presentation"} title suggestions based on the following context.
 ${contextSections}
 ${notes ? `\nAdditional Notes from organizer:\n${notes}` : ""}
+${transcript ? `\n**Transcript from the presentation:**\n${transcript.slice(0, 8000)}` : ""}
 
 Generate 3 distinct title options that:
 - Are engaging and capture attention
@@ -163,6 +165,7 @@ Respond ONLY with valid JSON in this exact format:
 Session Title: ${title}
 ${notes ? `\nAdditional Notes from organizer:\n${notes}` : ""}
 ${contextSections}
+${transcript ? `\n**Transcript from the presentation:**\nUse this transcript to extract specific topics, insights, key points, and the actual substance of what was discussed. Ground the descriptions in the real content rather than making general assumptions.\n\n${transcript.slice(0, 12000)}` : ""}
 
 Generate the following in JSON format:
 
@@ -199,7 +202,7 @@ Respond ONLY with valid JSON in this exact format:
 
     const message = await client.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 1500,
+      max_tokens: transcript ? 2000 : 1500,
       messages: [
         {
           role: "user",

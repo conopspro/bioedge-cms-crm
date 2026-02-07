@@ -180,6 +180,8 @@ export function PresentationForm({
   // AI state
   const [aiNotes, setAiNotes] = useState("")
   const [showAiNotes, setShowAiNotes] = useState(false)
+  const [transcript, setTranscript] = useState("")
+  const [showTranscript, setShowTranscript] = useState(false)
   const [titleSuggestions, setTitleSuggestions] = useState<string[]>([])
   const [isGeneratingTitles, setIsGeneratingTitles] = useState(false)
   const [isGeneratingDescriptions, setIsGeneratingDescriptions] = useState(false)
@@ -201,7 +203,7 @@ export function PresentationForm({
   }
 
   // Check if we have any context for AI
-  const hasContext = panelists.length > 0 || aiNotes.trim()
+  const hasContext = panelists.length > 0 || aiNotes.trim() || transcript.trim()
 
   // Build AI context from all panelists
   const buildAiContext = () => {
@@ -221,6 +223,7 @@ export function PresentationForm({
 
     return {
       notes: aiNotes.trim() || undefined,
+      transcript: transcript.trim() || undefined,
       leaders: leaders.length > 0 ? leaders : undefined,
       // For backwards compatibility, also send first leader as primary
       leader: leaders[0] || undefined,
@@ -732,6 +735,49 @@ export function PresentationForm({
             )}
           </div>
 
+          {/* Transcript */}
+          <div>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowTranscript(!showTranscript)}
+              className="text-xs text-muted-foreground h-auto p-0"
+            >
+              {showTranscript ? (
+                <>
+                  <ChevronUp className="h-3 w-3 mr-1" />
+                  Hide transcript
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="h-3 w-3 mr-1" />
+                  Paste transcript from YouTube
+                </>
+              )}
+              {!showTranscript && transcript.trim() && (
+                <Badge variant="secondary" className="ml-2 text-xs">
+                  Transcript added
+                </Badge>
+              )}
+            </Button>
+
+            {showTranscript && (
+              <div className="mt-2 space-y-2">
+                <Textarea
+                  value={transcript}
+                  onChange={(e) => setTranscript(e.target.value)}
+                  placeholder="Paste the YouTube transcript here. The AI will use it to extract specific topics, insights, and key points for more accurate descriptions..."
+                  rows={6}
+                  className="text-sm font-mono text-xs"
+                />
+                <p className="text-xs text-muted-foreground">
+                  {transcript.trim() ? `${transcript.trim().split(/\s+/).length.toLocaleString()} words` : "Tip: Open the YouTube video, click ··· below, then \"Show transcript\" to copy it."}
+                </p>
+              </div>
+            )}
+          </div>
+
           {/* Title with AI Suggestions */}
           <div className="rounded-lg border-2 border-[#ff914d]/30 bg-[#ff914d]/5 p-4 space-y-4">
             <div className="flex items-center justify-between">
@@ -761,6 +807,12 @@ export function PresentationForm({
                 {aiNotes.trim() && (
                   <Badge variant="secondary" className="text-xs">
                     + Notes
+                  </Badge>
+                )}
+                {transcript.trim() && (
+                  <Badge variant="secondary" className="text-xs">
+                    <FileText className="h-3 w-3 mr-1" />
+                    Transcript
                   </Badge>
                 )}
               </div>
