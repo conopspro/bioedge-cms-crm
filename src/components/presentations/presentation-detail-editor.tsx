@@ -122,6 +122,74 @@ const statusLabels: Record<string, string> = {
   archived: "Archived",
 }
 
+function EditableCard({
+  title,
+  description,
+  section,
+  fields,
+  children,
+  editContent,
+  emptyState,
+  editingSection,
+  isSaving,
+  presentation,
+  onStartEditing,
+  onCancelEditing,
+  onSave,
+}: {
+  title: string
+  description?: string
+  section: string
+  fields: string[]
+  children: React.ReactNode
+  editContent: React.ReactNode
+  emptyState?: React.ReactNode
+  editingSection: string | null
+  isSaving: boolean
+  presentation: Record<string, any>
+  onStartEditing: (section: string) => void
+  onCancelEditing: () => void
+  onSave: (fields: string[]) => void
+}) {
+  const isEditing = editingSection === section
+
+  const hasContent = fields.some((field) => {
+    const value = presentation[field]
+    if (Array.isArray(value)) return value.length > 0
+    return !!value
+  })
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="text-lg">{title}</CardTitle>
+            {description && <CardDescription>{description}</CardDescription>}
+          </div>
+          {isEditing ? (
+            <div className="flex gap-2">
+              <Button size="sm" variant="ghost" onClick={onCancelEditing} disabled={isSaving}>
+                <X className="h-4 w-4" />
+              </Button>
+              <Button size="sm" onClick={() => onSave(fields)} disabled={isSaving}>
+                {isSaving ? "Saving..." : <Check className="h-4 w-4" />}
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" variant="ghost" onClick={() => onStartEditing(section)}>
+              <Pencil className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      <CardContent>
+        {isEditing ? editContent : hasContent ? children : emptyState || children}
+      </CardContent>
+    </Card>
+  )
+}
+
 function extractYouTubeId(url: string): string | null {
   const patterns = [
     /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\n?#]+)/,
@@ -280,62 +348,6 @@ export function PresentationDetailEditor({
     }
   }
 
-  const EditableCard = ({
-    title,
-    description,
-    section,
-    fields,
-    children,
-    editContent,
-    emptyState,
-  }: {
-    title: string
-    description?: string
-    section: string
-    fields: string[]
-    children: React.ReactNode
-    editContent: React.ReactNode
-    emptyState?: React.ReactNode
-  }) => {
-    const isEditing = editingSection === section
-
-    const hasContent = fields.some((field) => {
-      const value = presentation[field as keyof typeof presentation]
-      if (Array.isArray(value)) return value.length > 0
-      return !!value
-    })
-
-    return (
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-lg">{title}</CardTitle>
-              {description && <CardDescription>{description}</CardDescription>}
-            </div>
-            {isEditing ? (
-              <div className="flex gap-2">
-                <Button size="sm" variant="ghost" onClick={cancelEditing} disabled={isSaving}>
-                  <X className="h-4 w-4" />
-                </Button>
-                <Button size="sm" onClick={() => saveSection(fields)} disabled={isSaving}>
-                  {isSaving ? "Saving..." : <Check className="h-4 w-4" />}
-                </Button>
-              </div>
-            ) : (
-              <Button size="sm" variant="ghost" onClick={() => startEditing(section)}>
-                <Pencil className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isEditing ? editContent : hasContent ? children : emptyState || children}
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
     <div className="grid gap-6 lg:grid-cols-3">
       {/* Left column - Main content */}
@@ -346,6 +358,12 @@ export function PresentationDetailEditor({
           description="Title and descriptions"
           section="content"
           fields={["title", "short_description", "long_description"]}
+          editingSection={editingSection}
+          isSaving={isSaving}
+          presentation={presentation}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-4">
               <div className="space-y-2">
@@ -421,6 +439,12 @@ export function PresentationDetailEditor({
           description="YouTube video recording"
           section="recording"
           fields={["recording_url", "recording_embed", "recording_metadata"]}
+          editingSection={editingSection}
+          isSaving={isSaving}
+          presentation={presentation}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-4">
               <div className="space-y-2">
@@ -577,6 +601,12 @@ export function PresentationDetailEditor({
           title="Status"
           section="status"
           fields={["status"]}
+          editingSection={editingSection}
+          isSaving={isSaving}
+          presentation={presentation}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-2">
               <Label>Status</Label>
@@ -610,6 +640,12 @@ export function PresentationDetailEditor({
           description="YouTube video for thumbnail image"
           section="youtube_url"
           fields={["youtube_url"]}
+          editingSection={editingSection}
+          isSaving={isSaving}
+          presentation={presentation}
+          onStartEditing={startEditing}
+          onCancelEditing={cancelEditing}
+          onSave={saveSection}
           editContent={
             <div className="space-y-4">
               <div className="space-y-2">
