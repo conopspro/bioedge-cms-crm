@@ -17,6 +17,9 @@ import {
   Calendar,
   Trash2,
   Image as ImageIcon,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react"
 import { getYouTubeThumbnailUrl, extractYouTubeVideoId } from "@/lib/youtube"
 import { Button } from "@/components/ui/button"
@@ -225,6 +228,11 @@ export function PresentationDetailEditor({
   const [isFetchingVideo, setIsFetchingVideo] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
+  // AI assist states
+  const [transcript, setTranscript] = useState("")
+  const [showTranscript, setShowTranscript] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
+
   // Form data
   const [formData, setFormData] = useState({ ...initialPresentation })
 
@@ -328,6 +336,51 @@ export function PresentationDetailEditor({
     setIsFetchingVideo(false)
   }
 
+  const handleAiGenerate = async () => {
+    if (!formData.title?.trim()) return
+
+    setIsGenerating(true)
+    try {
+      // Build leader context from panelists
+      const leaders = panelists
+        .filter((p) => p.contact)
+        .map((p) => ({
+          name: p.contact ? `${p.contact.first_name} ${p.contact.last_name}` : "",
+          title: p.contact?.title || undefined,
+          bio: p.contact?.bio || undefined,
+          role: p.role,
+          company: p.company?.name || undefined,
+        }))
+
+      const response = await fetch("/api/ai-presentation-content", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mode: "descriptions",
+          title: formData.title.trim(),
+          transcript: transcript.trim() || undefined,
+          leaders: leaders.length > 0 ? leaders : undefined,
+          leader: leaders[0] || undefined,
+          company: company ? { name: company.name } : undefined,
+        }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setFormData({
+          ...formData,
+          short_description: data.short_description || formData.short_description,
+          long_description: data.long_description || formData.long_description,
+        })
+      } else {
+        console.error("Failed to generate descriptions")
+      }
+    } catch (err) {
+      console.error("AI generation error:", err)
+    }
+    setIsGenerating(false)
+  }
+
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this presentation?")) return
 
@@ -397,6 +450,88 @@ export function PresentationDetailEditor({
                 />
                 <p className="text-xs text-muted-foreground">
                   {(formData.long_description || "").split(/\s+/).filter(Boolean).length} words
+                </p>
+              </div>
+
+              {/* AI Assist */}
+              <Separator />
+              <div className="rounded-lg border-2 border-[#ff914d]/30 bg-[#ff914d]/5 p-4 space-y-3">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-xs border-[#ff914d]/50 text-[#ff914d]">
+                    AI Assist
+                  </Badge>
+                  <p className="text-sm font-medium">Generate descriptions from transcript</p>
+                </div>
+
+                <div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowTranscript(!showTranscript)}
+                    className="text-xs text-muted-foreground h-auto p-0"
+                  >
+                    {showTranscript ? (
+                      <>
+                        <ChevronUp className="h-3 w-3 mr-1" />
+                        Hide transcript
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-3 w-3 mr-1" />
+                        Paste transcript from YouTube
+                      </>
+                    )}
+                    {!showTranscript && transcript.trim() && (
+                      <Badge variant="secondary" className="ml-2 text-xs">
+                        Transcript added
+                      </Badge>
+                    )}
+                  </Button>
+
+                  {showTranscript && (
+                    <div className="mt-2 space-y-2">
+                      <Textarea
+                        value={transcript}
+                        onChange={(e) => setTranscript(e.target.value)}
+                        placeholder="Paste the YouTube transcript here. The AI will use it to extract specific topics, insights, and key points for more accurate descriptions..."
+                        rows={6}
+                        className="text-sm font-mono text-xs"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        {transcript.trim() ? `${transcript.trim().split(/\s+/).length.toLocaleString()} words` : "Tip: Open the YouTube video, click ··· below, then \"Show transcript\" to copy it."}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={handleAiGenerate}
+                  disabled={isGenerating || !formData.title?.trim()}
+                  className="w-full bg-[#ff914d] hover:bg-[#ff914d]/90 text-white"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Generating descriptions...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="h-4 w-4 mr-2" />
+                      {transcript.trim() ? "Generate from Transcript" : "Generate Descriptions"}
+                    </>
+                  )}
+                </Button>
+
+                {!formData.title?.trim() && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    Add a title above first
+                  </p>
+                )}
+
+                <p className="text-xs text-muted-foreground text-center">
+                  This will replace the current descriptions above
                 </p>
               </div>
             </div>
