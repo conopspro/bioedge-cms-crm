@@ -17,6 +17,7 @@ import {
   Image,
   Home,
   Navigation,
+  Star,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -51,6 +52,11 @@ const mainNavItems = [
     label: "Presentations",
     href: "/dashboard/presentations",
     icon: Presentation,
+  },
+  {
+    label: "Spotlight",
+    href: "/dashboard/spotlights",
+    icon: Star,
   },
   {
     label: "Articles",

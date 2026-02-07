@@ -259,7 +259,7 @@ export interface Contact {
   // Required fields (NOT NULL in database)
   first_name: string
   last_name: string
-  email: string
+  email: string | null
   // Optional fields
   phone: string | null
   title: string | null
@@ -298,6 +298,8 @@ export interface Contact {
   state: string | null
   zip: string | null
   country: string | null
+  // YouTube channel
+  youtube_channel_url: string | null
 }
 
 /** Article/content piece linked to a company */
@@ -378,6 +380,91 @@ export type AgendaItem = Presentation
 
 /** @deprecated Use PresentationWithRelations instead */
 export type AgendaItemWithRelations = PresentationWithRelations
+
+// ============================================
+// SPOTLIGHT (CURATED VIDEO LIBRARY)
+// ============================================
+
+/** Spotlight - curated YouTube video content from external creators */
+export interface Spotlight {
+  id: string
+  title: string
+  slug: string
+  short_description: string | null // ~100 words
+  long_description: string | null  // ~400 words
+  // Session type (keynote, panel, workshop, etc.)
+  session_type: SessionType
+  // Related entities (optional)
+  contact_id: string | null
+  company_id: string | null
+  article_id: string | null
+  // Recording (YouTube)
+  recording_url: string | null
+  recording_embed: string | null
+  recording_metadata: YouTubeEnhancementMetadata | null
+  // YouTube video for thumbnail (separate from recording)
+  youtube_url: string | null
+  // Status
+  status: PresentationStatus
+  // Featured flag for homepage display (defaults to false in database)
+  is_featured?: boolean
+  // Timestamps
+  created_at: string
+  updated_at: string
+}
+
+/** Spotlight with related entities for display */
+export interface SpotlightWithRelations extends Spotlight {
+  contact?: Contact | null
+  company?: Company | null
+  article?: Article | null
+  panelists?: SpotlightPanelist[]
+}
+
+/** Spotlight panelist / featured creator */
+export interface SpotlightPanelist {
+  id: string
+  spotlight_id: string
+  contact_id: string
+  role: PanelistRole
+  company_id: string | null // Override company
+  article_id: string | null // Related article
+  display_order: number
+  notes: string | null
+  created_at: string
+  updated_at: string
+}
+
+/** Spotlight panelist with full details (from view) */
+export interface SpotlightPanelistWithDetails {
+  id: string
+  spotlight_id: string
+  contact_id: string
+  role: PanelistRole
+  display_order: number
+  notes: string | null
+  created_at: string
+  // Contact details
+  first_name: string
+  last_name: string
+  title: string | null
+  avatar_url: string | null
+  linkedin_url: string | null
+  bio: string | null
+  contact_slug: string | null
+  // Company (resolved from override or contact)
+  company_id: string | null
+  company_name: string | null
+  company_logo: string | null
+  company_slug: string | null
+  // Article
+  article_id: string | null
+  article_title: string | null
+  article_slug: string | null
+  // Spotlight context
+  spotlight_title: string
+  spotlight_slug: string
+}
 
 // ============================================
 // EVENT JUNCTION TABLES
@@ -1110,6 +1197,12 @@ export type PresentationPanelistInsert = Omit<PresentationPanelist, "id" | "crea
 
 /** Data for updating a presentation panelist */
 export type PresentationPanelistUpdate = Partial<PresentationPanelistInsert>
+
+/** Data for creating a spotlight panelist */
+export type SpotlightPanelistInsert = Omit<SpotlightPanelist, "id" | "created_at" | "updated_at">
+
+/** Data for updating a spotlight panelist */
+export type SpotlightPanelistUpdate = Partial<SpotlightPanelistInsert>
 
 // ============================================
 // EVENT LANDING PAGE TYPES

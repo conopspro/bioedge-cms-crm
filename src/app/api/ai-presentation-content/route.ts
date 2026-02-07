@@ -86,7 +86,7 @@ ${article.excerpt ? `- Excerpt: ${article.excerpt}` : ""}`
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { mode = "descriptions", title, notes, transcript, leaders, leader, company, article } = body as {
+    const { mode = "descriptions", title, notes, transcript, leaders, leader, company, article, contentType = "presentation" } = body as {
       mode?: "titles" | "descriptions"
       title?: string
       notes?: string
@@ -95,11 +95,14 @@ export async function POST(request: NextRequest) {
       leader?: LeaderContext
       company?: CompanyContext
       article?: ArticleContext
+      contentType?: "presentation" | "spotlight"
     }
 
     const contextSections = buildContextSections(leaders, leader, company, article)
     const hasLeaders = (leaders && leaders.length > 0) || leader
     const isPanel = leaders && leaders.length > 1
+    const isSpotlight = contentType === "spotlight"
+    const contentLabel = isSpotlight ? "curated video" : (isPanel ? "panel discussion" : "session/presentation")
 
     // Mode: Generate title suggestions
     if (mode === "titles") {
@@ -110,7 +113,7 @@ export async function POST(request: NextRequest) {
         )
       }
 
-      const titlePrompt = `You are a content writer for bioEDGE, a media company focused on longevity, biohacking, and health optimization. Generate 3 compelling ${isPanel ? "panel discussion" : "session/presentation"} title suggestions based on the following context.
+      const titlePrompt = `You are a content writer for bioEDGE, a media company focused on longevity, biohacking, and health optimization. Generate 3 compelling ${contentLabel} title suggestions based on the following context.
 ${contextSections}
 ${notes ? `\nAdditional Notes from organizer:\n${notes}` : ""}
 ${transcript ? `\n**Transcript from the presentation:**\n${transcript.slice(0, 8000)}` : ""}
@@ -160,7 +163,7 @@ Respond ONLY with valid JSON in this exact format:
       )
     }
 
-    const prompt = `You are a content writer for bioEDGE, a media company focused on longevity, biohacking, and health optimization. Generate compelling descriptions for ${isPanel ? "a panel discussion" : "an agenda session/presentation"}.
+    const prompt = `You are a content writer for bioEDGE, a media company focused on longevity, biohacking, and health optimization. Generate compelling descriptions for ${isSpotlight ? "a curated video spotlight" : (isPanel ? "a panel discussion" : "an agenda session/presentation")}.
 
 Session Title: ${title}
 ${notes ? `\nAdditional Notes from organizer:\n${notes}` : ""}
@@ -180,15 +183,16 @@ Generate the following in JSON format:
 
 2. **long_description**: A comprehensive description (~400 words). Should:
    - Provide a thorough overview of what the ${isPanel ? "panel" : "session"} covers
-   - Explain key topics, themes, or questions that will be addressed
-   - Describe what attendees will learn or gain
+   - Summarize the key topics, themes, insights, and questions addressed
+   - Describe the substance and content of the discussion
    - Include context about why this topic matters in the longevity/biohacking space
    - Maintain bioEDGE's authoritative yet approachable tone
    - Be suitable for a detail page
+   - Do NOT frame the description around what attendees will learn or expect. Simply describe and summarize the content.
    - IMPORTANT: Structure with 3-4 paragraphs separated by double newlines (\\n\\n) for readability
-   - First paragraph: Hook and overview
-   - Middle paragraphs: Key topics and what attendees will learn
-   - Final paragraph: Takeaways and why this matters
+   - First paragraph: Hook and overview of the session
+   - Middle paragraphs: Key topics, insights, and ideas discussed
+   - Final paragraph: Broader significance and context in the longevity space
    ${isPanel ? "- Highlight the diverse expertise of the panelists and how they'll contribute unique perspectives" : ""}
    ${hasLeaders ? "- Incorporate the speaker(s) credentials and perspectives" : ""}
    ${company ? "- Weave in the company's expertise and contributions to the field" : ""}

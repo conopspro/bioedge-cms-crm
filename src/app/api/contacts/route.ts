@@ -99,23 +99,17 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    if (!body.email) {
-      return NextResponse.json(
-        { error: "Email is required" },
-        { status: 400 }
-      )
-    }
-
     // Build insert data with explicit fields matching the database schema
     const contactData: Record<string, unknown> = {
       company_id: body.company_id,
       name: `${body.first_name} ${body.last_name}`.trim(),
       first_name: body.first_name,
       last_name: body.last_name,
-      email: body.email,
+      email: body.email || null,
       phone: body.phone || null,
       title: body.title || null,
       linkedin_url: body.linkedin_url || null,
+      youtube_channel_url: body.youtube_channel_url || null,
       notes: body.notes || null,
       source: body.source || "manual",
       outreach_status: body.outreach_status || "not_contacted",

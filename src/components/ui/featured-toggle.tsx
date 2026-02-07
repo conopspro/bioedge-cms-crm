@@ -6,7 +6,7 @@ import { Star } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface FeaturedToggleProps {
-  entityType: "articles" | "contacts" | "companies" | "presentations"
+  entityType: "articles" | "contacts" | "companies" | "presentations" | "spotlights"
   entityId: string
   isFeatured: boolean
   className?: string

@@ -79,7 +79,7 @@ export function ContactForm({ contact, companies, enhancements = [], outreachLog
   const companyIdFromUrl = searchParams.get("company")
 
   // Form state matching actual database schema
-  // Note: first_name, last_name, email, and company_id are required
+  // Note: first_name, last_name, and company_id are required. Email is optional.
   const [formData, setFormData] = useState({
     company_id: contact?.company_id || companyIdFromUrl || null,
     first_name: contact?.first_name || "",
@@ -88,6 +88,7 @@ export function ContactForm({ contact, companies, enhancements = [], outreachLog
     phone: contact?.phone || null,
     title: contact?.title || null,
     linkedin_url: contact?.linkedin_url || null,
+    youtube_channel_url: contact?.youtube_channel_url || null,
     source: contact?.source || null,
     outreach_status: contact?.outreach_status || "not_contacted",
     show_on_articles: contact?.show_on_articles || false,
@@ -173,12 +174,6 @@ export function ContactForm({ contact, companies, enhancements = [], outreachLog
     // Validate required fields
     if (!formData.first_name.trim() || !formData.last_name.trim()) {
       setError("First name and last name are required")
-      setIsLoading(false)
-      return
-    }
-
-    if (!formData.email?.trim()) {
-      setError("Email is required")
       setIsLoading(false)
       return
     }
@@ -377,6 +372,18 @@ export function ContactForm({ contact, companies, enhancements = [], outreachLog
               value={formData.linkedin_url || ""}
               onChange={handleChange}
               placeholder="https://linkedin.com/in/..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="youtube_channel_url">YouTube Channel</Label>
+            <Input
+              id="youtube_channel_url"
+              name="youtube_channel_url"
+              type="url"
+              value={formData.youtube_channel_url || ""}
+              onChange={handleChange}
+              placeholder="https://youtube.com/@channel"
             />
           </div>
         </CardContent>

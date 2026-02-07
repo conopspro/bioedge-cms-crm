@@ -71,7 +71,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const cleanBody: Record<string, any> = {}
     const allowedFields = [
       "company_id", "first_name", "last_name", "email", "phone", "title",
-      "linkedin_url", "source", "outreach_status", "show_on_articles", "notes",
+      "linkedin_url", "youtube_channel_url", "source", "outreach_status", "show_on_articles", "notes",
       "avatar_url", "is_featured", "slug", "bio",
       "address1", "address2", "city", "state", "zip", "country"
     ]
