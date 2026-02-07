@@ -34,7 +34,7 @@ export type ArticleStatus = "draft" | "review" | "published"
 export type EnhancementType = "youtube" | "scholar" | "book" | "image" | "link"
 
 /** Types of outreach methods */
-export type OutreachType = "email" | "linkedin" | "call" | "other"
+export type OutreachType = "email" | "phone" | "linkedin" | "call" | "text" | "meeting" | "other"
 
 /** Presentation status */
 export type PresentationStatus = "draft" | "published" | "archived"

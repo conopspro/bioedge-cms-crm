@@ -44,7 +44,7 @@ interface OutreachLogEntry {
   id: string
   contact_id: string
   date: string
-  type: "email" | "phone" | "linkedin" | "meeting" | "other"
+  type: "email" | "phone" | "linkedin" | "text" | "meeting" | "call" | "other"
   notes: string | null
   response_received: boolean
   created_at: string
