@@ -6,6 +6,7 @@ import { MarkdownContent } from "@/components/articles/markdown-content"
 import { ArticleEnhancements } from "@/components/articles/article-enhancements"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
+import { getArticleImageUrl } from "@/lib/youtube"
 import type { ArticleEnhancement } from "@/types/database"
 
 interface ArticlePageProps {
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 
   const { data: article } = await supabase
     .from("articles")
-    .select("title, excerpt")
+    .select("title, excerpt, featured_image_url, youtube_url")
     .eq("slug", slug)
     .eq("status", "published")
     .single()
@@ -29,9 +30,16 @@ export async function generateMetadata({ params }: ArticlePageProps) {
     }
   }
 
+  const ogImage = getArticleImageUrl(article.featured_image_url, article.youtube_url)
+
   return {
     title: `${article.title} | bioEDGE Magazine`,
     description: article.excerpt,
+    openGraph: {
+      title: `${article.title} | bioEDGE Magazine`,
+      description: article.excerpt || undefined,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
   }
 }
 

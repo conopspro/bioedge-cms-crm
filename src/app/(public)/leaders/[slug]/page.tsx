@@ -620,7 +620,7 @@ export async function generateMetadata({ params }: PageProps) {
   let contact = null
   const { data: contactBySlug } = await supabase
     .from("contacts")
-    .select("first_name, last_name, title, bio")
+    .select("first_name, last_name, title, bio, avatar_url, linkedin_avatar_url")
     .eq("slug", slug)
     .eq("show_on_articles", true)
     .single()
@@ -630,7 +630,7 @@ export async function generateMetadata({ params }: PageProps) {
   } else {
     const { data: contactById } = await supabase
       .from("contacts")
-      .select("first_name, last_name, title, bio")
+      .select("first_name, last_name, title, bio, avatar_url, linkedin_avatar_url")
       .eq("id", slug)
       .eq("show_on_articles", true)
       .single()
@@ -644,9 +644,16 @@ export async function generateMetadata({ params }: PageProps) {
   }
 
   const fullName = `${contact.first_name} ${contact.last_name}`.trim()
+  const description = contact.bio?.slice(0, 160) || `Learn about ${fullName}${contact.title ? `, ${contact.title}` : ""}.`
+  const ogImage = contact.avatar_url || contact.linkedin_avatar_url
 
   return {
     title: `${fullName} | Leaders | BioEdge`,
-    description: contact.bio?.slice(0, 160) || `Learn about ${fullName}${contact.title ? `, ${contact.title}` : ""}.`,
+    description,
+    openGraph: {
+      title: `${fullName} | Leaders | BioEdge`,
+      description,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
   }
 }

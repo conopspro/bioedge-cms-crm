@@ -5,6 +5,7 @@ import { ArrowLeft, ExternalLink, Calendar, MapPin } from "lucide-react"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
 import { ArticleCard } from "@/components/ui/article-card"
+import { getYouTubeThumbnailUrl } from "@/lib/youtube"
 
 interface PresentationPageProps {
   params: Promise<{ slug: string }>
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: PresentationPageProps) {
 
   const { data: presentation } = await supabase
     .from("presentations")
-    .select("title, short_description")
+    .select("title, short_description, recording_metadata, youtube_url")
     .eq("slug", slug)
     .eq("status", "published")
     .single()
@@ -35,9 +36,17 @@ export async function generateMetadata({ params }: PresentationPageProps) {
     }
   }
 
+  const ogImage = presentation.recording_metadata?.thumbnail
+    || getYouTubeThumbnailUrl(presentation.youtube_url)
+
   return {
     title: `${presentation.title} | bioEDGE`,
     description: presentation.short_description,
+    openGraph: {
+      title: `${presentation.title} | bioEDGE`,
+      description: presentation.short_description || undefined,
+      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
   }
 }
 

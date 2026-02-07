@@ -470,7 +470,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   const { data: companyBySlug } = await supabase
     .from("companies")
-    .select("name, description")
+    .select("name, description, logo_url")
     .eq("slug", slug)
     .single()
 
@@ -479,7 +479,7 @@ export async function generateMetadata({ params }: PageProps) {
   } else {
     const { data: companyByDomain } = await supabase
       .from("companies")
-      .select("name, description")
+      .select("name, description, logo_url")
       .eq("domain", slug)
       .single()
 
@@ -488,7 +488,7 @@ export async function generateMetadata({ params }: PageProps) {
     } else {
       const { data: companyById } = await supabase
         .from("companies")
-        .select("name, description")
+        .select("name, description, logo_url")
         .eq("id", slug)
         .single()
       company = companyById
@@ -504,5 +504,10 @@ export async function generateMetadata({ params }: PageProps) {
   return {
     title: `${company.name} | Solutions Directory | BioEdge`,
     description: company.description || `Learn about ${company.name} and their longevity solutions.`,
+    openGraph: {
+      title: `${company.name} | Solutions Directory | BioEdge`,
+      description: company.description || `Learn about ${company.name} and their longevity solutions.`,
+      ...(company.logo_url ? { images: [{ url: company.logo_url }] } : {}),
+    },
   }
 }
