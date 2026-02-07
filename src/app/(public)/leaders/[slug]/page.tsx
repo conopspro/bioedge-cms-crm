@@ -639,7 +639,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!contact) {
     return {
-      title: "Leader Not Found | BioEdge",
+      title: "Leader Not Found | bioEDGE",
     }
   }
 
@@ -648,10 +648,10 @@ export async function generateMetadata({ params }: PageProps) {
   const ogImage = contact.avatar_url || contact.linkedin_avatar_url
 
   return {
-    title: `${fullName} | Leaders | BioEdge`,
+    title: `${fullName} | Leaders | bioEDGE`,
     description,
     openGraph: {
-      title: `${fullName} | Leaders | BioEdge`,
+      title: `${fullName} | Leaders | bioEDGE`,
       description,
       ...(ogImage ? { images: [{ url: ogImage }] } : {}),
     },

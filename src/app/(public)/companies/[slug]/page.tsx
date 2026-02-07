@@ -497,15 +497,15 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!company) {
     return {
-      title: "Company Not Found | BioEdge",
+      title: "Company Not Found | bioEDGE",
     }
   }
 
   return {
-    title: `${company.name} | Solutions Directory | BioEdge`,
+    title: `${company.name} | Solutions Directory | bioEDGE`,
     description: company.description || `Learn about ${company.name} and their longevity solutions.`,
     openGraph: {
-      title: `${company.name} | Solutions Directory | BioEdge`,
+      title: `${company.name} | Solutions Directory | bioEDGE`,
       description: company.description || `Learn about ${company.name} and their longevity solutions.`,
       ...(company.logo_url ? { images: [{ url: company.logo_url }] } : {}),
     },
