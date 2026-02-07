@@ -45,7 +45,7 @@ export default async function LeadersDirectoryPage({ searchParams }: PageProps) 
       avatar_url,
       linkedin_url,
       bio,
-      company:companies(name, logo_url, category)
+      company:companies(name, logo_url, category, is_draft)
     `)
     .eq("show_on_articles", true)
     .order("last_name", { ascending: true })
@@ -55,7 +55,13 @@ export default async function LeadersDirectoryPage({ searchParams }: PageProps) 
     query = query.or(`first_name.ilike.%${searchQuery}%,last_name.ilike.%${searchQuery}%`)
   }
 
-  const { data } = await query
+  const { data: rawData } = await query
+
+  // Hide draft companies from public display
+  const data = (rawData || []).map((leader: any) => ({
+    ...leader,
+    company: leader.company?.is_draft === true ? null : leader.company,
+  }))
 
   let leaders = data || []
 

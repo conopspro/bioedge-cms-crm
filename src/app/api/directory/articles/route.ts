@@ -24,7 +24,8 @@ export async function GET(request: NextRequest) {
       company:companies (
         id,
         name,
-        category
+        category,
+        is_draft
       )
     `)
     .eq("status", "published")
@@ -42,8 +43,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Filter by company category client-side (Supabase doesn't support filtering on joined table easily)
-  let articles = data || []
+  // Hide draft companies from public display, then filter by category
+  let articles = (data || []).map((a: any) => ({
+    ...a,
+    company: a.company?.is_draft === true ? null : a.company,
+  }))
   if (category) {
     articles = articles.filter(
       (article: any) =>

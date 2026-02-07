@@ -44,7 +44,7 @@ export default async function PresentationsPage({ searchParams }: PageProps) {
       recording_embed,
       youtube_url,
       contact:contacts(id, first_name, last_name, avatar_url),
-      company:companies(id, name, logo_url, category)
+      company:companies(id, name, logo_url, category, is_draft)
     `)
     .eq("status", "published")
     .order("title", { ascending: true })
@@ -56,7 +56,11 @@ export default async function PresentationsPage({ searchParams }: PageProps) {
 
   const { data } = await query
 
-  let presentations = data || []
+  // Hide draft companies from public display
+  let presentations = (data || []).map((p: any) => ({
+    ...p,
+    company: p.company?.is_draft === true ? null : p.company,
+  }))
 
   // Filter by category
   if (activeCategory) {

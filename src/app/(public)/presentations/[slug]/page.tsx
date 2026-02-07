@@ -59,7 +59,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
     .select(`
       *,
       contact:contacts(id, first_name, last_name, title, avatar_url, bio, linkedin_url, slug, ai_highlights, ai_expertise),
-      company:companies(id, name, logo_url, domain, description, slug),
+      company:companies(id, name, logo_url, domain, description, slug, is_draft),
       article:articles(id, title, slug, excerpt, featured_image_url, youtube_url),
       panelists:presentation_panelists(
         id,
@@ -69,7 +69,7 @@ export default async function PresentationPage({ params }: PresentationPageProps
         article_id,
         display_order,
         contact:contacts(id, first_name, last_name, title, avatar_url, bio, linkedin_url, slug),
-        company:companies(id, name, logo_url, domain, slug),
+        company:companies(id, name, logo_url, domain, slug, is_draft),
         article:articles(id, title, slug)
       )
     `)
@@ -79,6 +79,17 @@ export default async function PresentationPage({ params }: PresentationPageProps
 
   if (!presentation) {
     notFound()
+  }
+
+  // Hide draft companies from public display
+  if (presentation.company?.is_draft === true) {
+    presentation.company = null
+  }
+  if (presentation.panelists) {
+    presentation.panelists = presentation.panelists.map((p: any) => ({
+      ...p,
+      company: p.company?.is_draft === true ? null : p.company,
+    }))
   }
 
   // Fetch upcoming events where this presentation is scheduled

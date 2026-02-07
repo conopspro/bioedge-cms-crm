@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
       recording_embed,
       youtube_url,
       contact:contacts(id, first_name, last_name, avatar_url),
-      company:companies(id, name, logo_url, category)
+      company:companies(id, name, logo_url, category, is_draft)
     `)
     .eq("status", "published")
     .order("title", { ascending: true })
@@ -39,8 +39,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Filter by company category client-side
-  let presentations = data || []
+  // Hide draft companies from public display, then filter by category
+  let presentations = (data || []).map((p: any) => ({
+    ...p,
+    company: p.company?.is_draft === true ? null : p.company,
+  }))
   if (category) {
     presentations = presentations.filter(
       (p: any) =>

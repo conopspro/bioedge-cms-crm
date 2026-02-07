@@ -69,6 +69,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
       .from("companies")
       .select("id, name, slug, domain, website, logo_url, description, differentiators")
       .eq("id", contact.company_id)
+      .or("is_draft.is.null,is_draft.eq.false")
       .single()
     company = companyData
   }

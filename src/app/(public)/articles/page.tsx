@@ -46,7 +46,8 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
       company:companies (
         id,
         name,
-        category
+        category,
+        is_draft
       )
     `)
     .eq("status", "published")
@@ -59,7 +60,11 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
 
   const { data } = await query
 
-  let articles = data || []
+  // Hide draft companies from public display
+  let articles = (data || []).map((a: any) => ({
+    ...a,
+    company: a.company?.is_draft === true ? null : a.company,
+  }))
 
   // Filter by category
   if (activeCategory) {

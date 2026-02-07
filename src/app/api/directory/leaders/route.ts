@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       avatar_url,
       linkedin_url,
       bio,
-      company:companies(name, logo_url, category)
+      company:companies(name, logo_url, category, is_draft)
     `)
     .eq("show_on_articles", true)
     .order("last_name", { ascending: true })
@@ -34,7 +34,13 @@ export async function GET(request: NextRequest) {
     query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%`)
   }
 
-  const { data, error } = await query
+  const { data: rawData, error } = await query
+
+  // Hide draft companies from public display
+  const data = (rawData || []).map((leader: any) => ({
+    ...leader,
+    company: leader.company?.is_draft === true ? null : leader.company,
+  }))
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })

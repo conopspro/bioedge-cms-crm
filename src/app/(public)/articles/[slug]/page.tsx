@@ -83,7 +83,8 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         domain,
         website,
         description,
-        logo_url
+        logo_url,
+        is_draft
       )
     `)
     .eq("slug", slug)
@@ -94,6 +95,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
   if (!article) {
     notFound()
+  }
+
+  // Hide draft companies from public display
+  if ((article as any).company?.is_draft === true) {
+    (article as any).company = null
   }
 
   // Fetch article enhancements
