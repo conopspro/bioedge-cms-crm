@@ -394,7 +394,7 @@ export function SpotlightDetailEditor({
       .eq("id", spotlight.id)
 
     if (!error) {
-      router.push("/dashboard/spotlights")
+      router.push("/dashboard/spotlight")
       router.refresh()
     } else {
       console.error("Failed to delete:", error)
@@ -710,7 +710,7 @@ export function SpotlightDetailEditor({
             {spotlight.status === "published" && (
               <Button variant="outline" asChild className="w-full">
                 <a
-                  href={`/spotlights/${spotlight.slug}`}
+                  href={`/spotlight/${spotlight.slug}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -859,7 +859,7 @@ export function SpotlightDetailEditor({
                 </CardDescription>
               </div>
               <Button size="sm" variant="outline" asChild>
-                <Link href={`/dashboard/spotlights/new?edit=${spotlight.id}`}>
+                <Link href={`/dashboard/spotlight/new?edit=${spotlight.id}`}>
                   <Pencil className="h-4 w-4 mr-1" />
                   Edit
                 </Link>

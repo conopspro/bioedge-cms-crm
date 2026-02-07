@@ -55,7 +55,7 @@ const mainNavItems = [
   },
   {
     label: "Spotlight",
-    href: "/dashboard/spotlights",
+    href: "/dashboard/spotlight",
     icon: Star,
   },
   {

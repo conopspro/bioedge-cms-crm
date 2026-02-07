@@ -63,7 +63,7 @@ export function SpotlightsGrid({ initialSpotlights, initialHasMore }: Spotlights
       if (category) params.set("category", category)
       if (search) params.set("q", search)
 
-      const res = await fetch(`/api/directory/spotlights?${params}`)
+      const res = await fetch(`/api/directory/spotlight?${params}`)
       const data = await res.json()
 
       setSpotlights((prev) => [...prev, ...data.items])
@@ -101,7 +101,7 @@ export function SpotlightsGrid({ initialSpotlights, initialHasMore }: Spotlights
           return (
             <Link
               key={item.id}
-              href={`/spotlights/${item.slug || item.id}`}
+              href={`/spotlight/${item.slug || item.id}`}
               className="group overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
               <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-navy/10 to-electric-blue/10">

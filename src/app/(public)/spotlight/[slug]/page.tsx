@@ -97,7 +97,7 @@ export default async function SpotlightPage({ params }: SpotlightPageProps) {
         <div className="be-container py-12 relative z-10">
           <div className="max-w-3xl mx-auto">
             <Link
-              href="/spotlights"
+              href="/spotlight"
               className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-gold transition-colors mb-6"
             >
               <ArrowLeft className="h-4 w-4" />

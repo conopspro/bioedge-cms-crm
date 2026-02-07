@@ -6,7 +6,7 @@ type RouteParams = {
 }
 
 /**
- * GET /api/spotlights/[id]
+ * GET /api/spotlight/[id]
  * Get a single spotlight item with related entities and panelists
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * PATCH /api/spotlights/[id]
+ * PATCH /api/spotlight/[id]
  * Update a spotlight item and its panelists
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
@@ -217,7 +217,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/spotlights/[id]
+ * DELETE /api/spotlight/[id]
  * Delete a spotlight item (panelists are cascade deleted)
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {

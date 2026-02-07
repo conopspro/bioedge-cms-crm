@@ -12,7 +12,7 @@ function generateSlug(title: string): string {
 }
 
 /**
- * GET /api/spotlights
+ * GET /api/spotlight
  * List all spotlight items with optional filtering
  */
 export async function GET(request: NextRequest) {
@@ -95,7 +95,7 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST /api/spotlights
+ * POST /api/spotlight
  * Create a new spotlight item with panelists
  */
 export async function POST(request: NextRequest) {

@@ -92,7 +92,7 @@ export default async function SpotlightsPage({ searchParams }: PageProps) {
           <Suspense fallback={<div className="h-24" />}>
             <DirectoryFilters
               categories={categories}
-              basePath="/spotlights"
+              basePath="/spotlight"
               searchPlaceholder="Search spotlights..."
               allLabel="All Categories"
             />

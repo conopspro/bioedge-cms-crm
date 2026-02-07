@@ -84,7 +84,7 @@ export default async function SpotlightDetailPage({ params }: PageProps) {
     <div className="space-y-6">
       {/* Back link */}
       <Link
-        href="/dashboard/spotlights"
+        href="/dashboard/spotlight"
         className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
       >
         <ArrowLeft className="mr-2 h-4 w-4" />

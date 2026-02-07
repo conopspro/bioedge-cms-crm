@@ -488,7 +488,7 @@ export function SpotlightForm({
         })),
       }
 
-      const url = isEditing ? `/api/spotlights/${spotlight.id}` : "/api/spotlights"
+      const url = isEditing ? `/api/spotlight/${spotlight.id}` : "/api/spotlight"
       const method = isEditing ? "PATCH" : "POST"
 
       const response = await fetch(url, {
@@ -503,7 +503,7 @@ export function SpotlightForm({
       }
 
       const saved = await response.json()
-      router.push(`/dashboard/spotlights/${saved.id}`)
+      router.push(`/dashboard/spotlight/${saved.id}`)
       router.refresh()
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save")

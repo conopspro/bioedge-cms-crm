@@ -60,7 +60,7 @@ export default async function SpotlightsListPage() {
           </p>
         </div>
         <Button asChild>
-          <Link href="/dashboard/spotlights/new">
+          <Link href="/dashboard/spotlight/new">
             <Plus className="mr-2 h-4 w-4" />
             Add Spotlight
           </Link>
@@ -134,12 +134,12 @@ export default async function SpotlightsListPage() {
                   className="flex items-start gap-2 rounded-lg border p-4 hover:bg-muted/50 transition-colors"
                 >
                   <FeaturedToggle
-                    entityType="spotlights"
+                    entityType="spotlight"
                     entityId={item.id}
                     isFeatured={item.is_featured || false}
                   />
                   <Link
-                    href={`/dashboard/spotlights/${item.id}`}
+                    href={`/dashboard/spotlight/${item.id}`}
                     className="block flex-1 min-w-0"
                   >
                   <div className="flex items-start justify-between gap-4">
@@ -201,7 +201,7 @@ export default async function SpotlightsListPage() {
                 Add your first curated video to build your spotlight library
               </p>
               <Button asChild>
-                <Link href="/dashboard/spotlights/new">
+                <Link href="/dashboard/spotlight/new">
                   <Plus className="mr-2 h-4 w-4" />
                   Add Spotlight
                 </Link>
