@@ -1,12 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
-import { Search, FileText, Users, Building2, Calendar } from "lucide-react"
+import { Search, FileText, Users, Building2, Calendar, Play, Sparkles } from "lucide-react"
 import { SearchInput } from "@/components/search/search-input"
 import { Suspense } from "react"
 
 export const metadata = {
   title: "Search | bioEDGE",
-  description: "Search articles, leaders, companies, and events across bioEDGE.",
+  description: "Search articles, leaders, companies, presentations, spotlights, and events across bioEDGE.",
 }
 
 interface PageProps {
@@ -43,6 +43,20 @@ interface EventResult {
   start_date: string | null
 }
 
+interface PresentationResult {
+  id: string
+  title: string
+  slug: string | null
+  short_description: string | null
+}
+
+interface SpotlightResult {
+  id: string
+  title: string
+  slug: string | null
+  short_description: string | null
+}
+
 export default async function SearchPage({ searchParams }: PageProps) {
   const params = await searchParams
   const query = params.q?.trim() || ""
@@ -52,52 +66,81 @@ export default async function SearchPage({ searchParams }: PageProps) {
   let leaders: LeaderResult[] = []
   let companies: CompanyResult[] = []
   let events: EventResult[] = []
+  let presentations: PresentationResult[] = []
+  let spotlights: SpotlightResult[] = []
 
   if (query.length >= 2) {
-    // Search articles
-    const { data: articlesData } = await supabase
-      .from("articles")
-      .select("id, title, slug, excerpt")
-      .eq("status", "published")
-      .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%`)
-      .limit(10)
+    // Run all searches in parallel for better performance
+    const [
+      articlesRes,
+      leadersRes,
+      companiesRes,
+      eventsRes,
+      presentationsRes,
+      spotlightsRes,
+    ] = await Promise.all([
+      // Search articles - title, excerpt, and body content
+      supabase
+        .from("articles")
+        .select("id, title, slug, excerpt")
+        .eq("status", "published")
+        .or(`title.ilike.%${query}%,excerpt.ilike.%${query}%,content.ilike.%${query}%`)
+        .limit(10),
 
-    articles = (articlesData || []) as ArticleResult[]
+      // Search leaders (contacts) - name, title, and bio
+      supabase
+        .from("contacts")
+        .select("id, slug, first_name, last_name, title, company:companies(name)")
+        .eq("show_on_articles", true)
+        .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,title.ilike.%${query}%,bio.ilike.%${query}%`)
+        .limit(10),
 
-    // Search leaders (contacts)
-    const { data: leadersData } = await supabase
-      .from("contacts")
-      .select("id, slug, first_name, last_name, title, company:companies(name)")
-      .eq("show_on_articles", true)
-      .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%,title.ilike.%${query}%`)
-      .limit(10)
+      // Search companies - name, description, and differentiators
+      supabase
+        .from("companies")
+        .select("id, name, slug, domain, is_draft")
+        .or(`name.ilike.%${query}%,description.ilike.%${query}%,differentiators.ilike.%${query}%`)
+        .limit(20),
 
-    leaders = (leadersData || []) as unknown as LeaderResult[]
+      // Search events - title and description
+      supabase
+        .from("events")
+        .select("id, title, slug, start_date")
+        .eq("status", "published")
+        .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
+        .limit(10),
 
-    // Search companies (exclude drafts - include NULL and false)
-    const { data: companiesData } = await supabase
-      .from("companies")
-      .select("id, name, slug, domain, is_draft")
-      .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
-      .limit(20)
+      // Search presentations - title, short description, and long description
+      supabase
+        .from("presentations")
+        .select("id, title, slug, short_description")
+        .eq("status", "published")
+        .or(`title.ilike.%${query}%,short_description.ilike.%${query}%,long_description.ilike.%${query}%`)
+        .limit(10),
 
-    // Filter out drafts in code since we can't combine .or() filters easily
-    companies = ((companiesData || []) as (CompanyResult & { is_draft?: boolean })[])
+      // Search spotlights - title, short description, and long description
+      supabase
+        .from("spotlights")
+        .select("id, title, slug, short_description")
+        .eq("status", "published")
+        .or(`title.ilike.%${query}%,short_description.ilike.%${query}%,long_description.ilike.%${query}%`)
+        .limit(10),
+    ])
+
+    articles = (articlesRes.data || []) as ArticleResult[]
+    leaders = (leadersRes.data || []) as unknown as LeaderResult[]
+
+    // Filter out draft companies
+    companies = ((companiesRes.data || []) as (CompanyResult & { is_draft?: boolean })[])
       .filter(c => c.is_draft !== true)
       .slice(0, 10) as CompanyResult[]
 
-    // Search events
-    const { data: eventsData } = await supabase
-      .from("events")
-      .select("id, title, slug, start_date")
-      .eq("status", "published")
-      .or(`title.ilike.%${query}%,description.ilike.%${query}%`)
-      .limit(10)
-
-    events = (eventsData || []) as EventResult[]
+    events = (eventsRes.data || []) as EventResult[]
+    presentations = (presentationsRes.data || []) as PresentationResult[]
+    spotlights = (spotlightsRes.data || []) as SpotlightResult[]
   }
 
-  const totalResults = articles.length + leaders.length + companies.length + events.length
+  const totalResults = articles.length + leaders.length + companies.length + events.length + presentations.length + spotlights.length
   const hasQuery = query.length >= 2
 
   return (
@@ -112,7 +155,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             Search
           </h1>
           <p className="max-w-2xl text-lg text-white/90">
-            Find articles, leaders, companies, and events across bioEDGE.
+            Find articles, leaders, companies, presentations, spotlights, and events across bioEDGE.
           </p>
 
           {/* Search Input */}
@@ -144,6 +187,64 @@ export default async function SearchPage({ searchParams }: PageProps) {
             <p className="text-sm text-gray-600">
               Found {totalResults} result{totalResults !== 1 ? "s" : ""} for &quot;{query}&quot;
             </p>
+
+            {/* Presentations */}
+            {presentations.length > 0 && (
+              <div>
+                <div className="mb-4 flex items-center gap-2">
+                  <Play className="h-5 w-5 text-electric-blue" />
+                  <h2 className="text-lg font-bold text-navy">Presentations</h2>
+                  <span className="text-sm text-gray-500">({presentations.length})</span>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {presentations.map((presentation) => (
+                    <Link
+                      key={presentation.id}
+                      href={`/presentations/${presentation.slug || presentation.id}`}
+                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
+                        {presentation.title}
+                      </h3>
+                      {presentation.short_description && (
+                        <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+                          {presentation.short_description}
+                        </p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Spotlights */}
+            {spotlights.length > 0 && (
+              <div>
+                <div className="mb-4 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-electric-blue" />
+                  <h2 className="text-lg font-bold text-navy">Spotlights</h2>
+                  <span className="text-sm text-gray-500">({spotlights.length})</span>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {spotlights.map((spotlight) => (
+                    <Link
+                      key={spotlight.id}
+                      href={`/spotlight/${spotlight.slug || spotlight.id}`}
+                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
+                        {spotlight.title}
+                      </h3>
+                      {spotlight.short_description && (
+                        <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+                          {spotlight.short_description}
+                        </p>
+                      )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Articles */}
             {articles.length > 0 && (
