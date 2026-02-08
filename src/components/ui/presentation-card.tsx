@@ -34,13 +34,13 @@ export function PresentationCard({
     <Link
       href={linkHref}
       className={cn(
-        "be-card hover:shadow-lg transition-shadow group flex gap-4",
+        "bg-white border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow group flex",
         className
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
     >
       {thumbnailUrl && (
-        <div className="w-1/3 flex-shrink-0 aspect-video overflow-hidden rounded-lg bg-black relative">
+        <div className="w-1/3 flex-shrink-0 overflow-hidden bg-black relative">
           <img
             src={thumbnailUrl}
             alt={title}
@@ -54,7 +54,7 @@ export function PresentationCard({
           </div>
         </div>
       )}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 p-5">
         <h3
           className="font-heading font-semibold transition-colors line-clamp-2"
           style={{ color: "#0d2840" }}
