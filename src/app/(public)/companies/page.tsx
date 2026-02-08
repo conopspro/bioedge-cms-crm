@@ -64,7 +64,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
       <section className="relative bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
         <div className="mx-auto max-w-[1200px] px-8 py-16 md:py-20">
           <span className="mb-4 inline-block rounded bg-deep-blue px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
-            Solutions & Partners
+            Directory
           </span>
           <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
             Companies Offering Longevity Solutions
