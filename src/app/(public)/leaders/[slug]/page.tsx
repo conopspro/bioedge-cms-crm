@@ -422,7 +422,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Presentations
               </h2>
-              <div className={`grid gap-4 ${presentations.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+              <div className="space-y-4">
                 {presentations.map((presentation: any) => (
                   <PresentationCard
                     key={presentation.id}
@@ -443,7 +443,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Spotlight
               </h2>
-              <div className={`grid gap-4 ${spotlights.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+              <div className="space-y-4">
                 {spotlights.map((spotlight: any) => (
                   <SpotlightCard
                     key={spotlight.id}
@@ -464,7 +464,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Related Articles
               </h2>
-              <div className={`grid gap-4 ${articles.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+              <div className="space-y-4">
                 {articles.map((article: any) => (
                   <ArticleCard
                     key={article.id}

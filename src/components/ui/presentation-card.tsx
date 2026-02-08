@@ -34,13 +34,13 @@ export function PresentationCard({
     <Link
       href={linkHref}
       className={cn(
-        "bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow group flex",
+        "bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow group flex flex-col sm:flex-row",
         className
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
     >
       {thumbnailUrl && (
-        <div className="w-1/3 flex-shrink-0 overflow-hidden bg-gray-100 relative aspect-video">
+        <div className="w-full sm:w-1/3 flex-shrink-0 overflow-hidden bg-gray-100 relative aspect-video">
           <img
             src={thumbnailUrl}
             alt={title}
