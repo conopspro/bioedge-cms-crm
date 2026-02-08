@@ -175,7 +175,7 @@ export default async function SpotlightPage({ params }: SpotlightPageProps) {
           {hasPanelists && (
             <section>
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                {isPanel ? "Featured Creators" : "Featured Creator"}
+                {isPanel ? "Leader Spotlight" : "Leader Spotlight"}
               </h2>
               <LeaderCardGrid>
                 {sortedPanelists.map((panelist: any) => (
@@ -200,7 +200,7 @@ export default async function SpotlightPage({ params }: SpotlightPageProps) {
           {!hasPanelists && spotlight.contact && (
             <section>
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Featured Creator
+                Leader Spotlight
               </h2>
               <LeaderCard
                 id={spotlight.contact.id}
