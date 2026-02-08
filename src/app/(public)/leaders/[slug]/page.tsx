@@ -13,6 +13,7 @@ import { CompanyCard } from "@/components/ui/company-card"
 import { ArticleCard, ArticleCardGrid } from "@/components/ui/article-card"
 import { PresentationCard, PresentationCardGrid } from "@/components/ui/presentation-card"
 import { SpotlightCard, SpotlightCardGrid } from "@/components/ui/spotlight-card"
+import { PersonJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 type PageProps = {
   params: Promise<{ slug: string }>
@@ -244,6 +245,25 @@ export default async function LeaderProfilePage({ params }: PageProps) {
 
   return (
     <>
+      <PersonJsonLd
+        firstName={contact.first_name}
+        lastName={contact.last_name}
+        slug={contact.slug || slug}
+        jobTitle={contact.title}
+        bio={contact.bio}
+        imageUrl={contact.avatar_url}
+        companyName={company?.name}
+        linkedinUrl={contact.linkedin_url}
+        youtubeUrl={contact.youtube_channel_url}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Leaders", href: "/leaders" },
+          { name: fullName, href: `/leaders/${contact.slug || slug}` },
+        ]}
+      />
+
       {/* Hero */}
       <div className="be-event-hero">
         <div className="be-container py-12 relative z-10">
@@ -578,6 +598,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                           src={video.metadata.thumbnail}
                           alt={video.title}
                           className="w-full aspect-video object-cover"
+                          loading="lazy"
                         />
                         <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                           <div className="w-12 h-12 rounded-full bg-red-600 flex items-center justify-center">
@@ -658,6 +679,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                           src={book.metadata.thumbnail}
                           alt={book.title}
                           className="w-16 h-24 object-cover rounded flex-shrink-0"
+                          loading="lazy"
                         />
                       )}
                       <div className="min-w-0 flex-1">
@@ -715,7 +737,7 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!contact) {
     return {
-      title: "Leader Not Found | bioEDGE",
+      title: "Leader Not Found",
     }
   }
 
@@ -724,12 +746,19 @@ export async function generateMetadata({ params }: PageProps) {
   const ogImage = contact.avatar_url || contact.linkedin_avatar_url
 
   return {
-    title: `${fullName} | Leaders | bioEDGE`,
+    title: `${fullName} | Longevity Leaders`,
     description,
     openGraph: {
-      title: `${fullName} | Leaders | bioEDGE`,
+      title: fullName,
       description,
+      type: "profile",
       ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title: fullName,
+      description,
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   }
 }

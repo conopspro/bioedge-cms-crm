@@ -125,6 +125,7 @@ export function HomepageFeaturedLeaders({
                       src={leader.avatar_url}
                       alt={`${leader.first_name} ${leader.last_name}`}
                       className="h-20 w-20 rounded-full object-cover ring-2 ring-electric-blue/20 mb-4"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-navy via-deep-blue to-electric-blue text-2xl font-bold text-white mb-4">

@@ -106,6 +106,7 @@ export function PhotoSlider({
                   src={image.image_url}
                   alt={image.alt_text || `Gallery image ${index + 1}`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
                 {showCaption && image.caption && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
@@ -119,6 +120,7 @@ export function PhotoSlider({
                   src={image.image_url}
                   alt={image.alt_text || `Gallery image ${index + 1}`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
                 {showCaption && image.caption && (
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">

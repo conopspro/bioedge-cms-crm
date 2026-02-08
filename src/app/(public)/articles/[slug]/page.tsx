@@ -7,6 +7,7 @@ import { ArticleEnhancements } from "@/components/articles/article-enhancements"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
 import { getArticleImageUrl } from "@/lib/youtube"
+import { ArticleJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 import type { ArticleEnhancement } from "@/types/database"
 
 interface ArticlePageProps {
@@ -26,19 +27,26 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 
   if (!article) {
     return {
-      title: "Article Not Found | bioEDGE Magazine",
+      title: "Article Not Found",
     }
   }
 
   const ogImage = getArticleImageUrl(article.featured_image_url, article.youtube_url)
 
   return {
-    title: `${article.title} | bioEDGE Magazine`,
+    title: article.title,
     description: article.excerpt,
     openGraph: {
-      title: `${article.title} | bioEDGE Magazine`,
+      title: article.title,
       description: article.excerpt || undefined,
+      type: "article",
       ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title: article.title,
+      description: article.excerpt || undefined,
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   }
 }
@@ -129,8 +137,29 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
     contacts = contactData || []
   }
 
+  const articleImageUrl = getArticleImageUrl(
+    (article as any).featured_image_url,
+    (article as any).youtube_url
+  )
+
   return (
     <>
+      <ArticleJsonLd
+        title={article.title}
+        slug={article.slug}
+        excerpt={article.excerpt}
+        publishedAt={article.published_at}
+        imageUrl={articleImageUrl}
+        companyName={article.company?.name}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Articles", href: "/articles" },
+          { name: article.title, href: `/articles/${article.slug}` },
+        ]}
+      />
+
       {/* Hero */}
       <div className="be-event-hero">
         <div className="be-container py-12 relative z-10">

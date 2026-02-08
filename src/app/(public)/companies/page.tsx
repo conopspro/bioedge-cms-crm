@@ -4,8 +4,12 @@ import { CompaniesGrid } from "@/components/directory/companies-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Companies Directory | bioEDGE",
+  title: "Solutions Directory",
   description: "Organizations and solutions that support longevity and health optimization.",
+  openGraph: {
+    title: "Solutions Directory",
+    description: "Organizations and solutions that support longevity and health optimization.",
+  },
 }
 
 interface Category {

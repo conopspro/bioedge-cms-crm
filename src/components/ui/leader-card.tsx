@@ -72,6 +72,7 @@ export function LeaderCard({
               size === "sm" ? "w-12 h-12" : size === "lg" ? "w-16 h-16" : "w-14 h-14"
             )}
             style={{ boxShadow: "0 0 0 3px rgba(1, 122, 178, 0.2)" }}
+            loading="lazy"
           />
         ) : (
           <div
@@ -133,6 +134,7 @@ export function LeaderCard({
           alt={name}
           className={cn("rounded-full object-cover mx-auto mb-3", avatarSizes[size])}
           style={{ boxShadow: "0 0 0 4px rgba(1, 122, 178, 0.2)" }}
+          loading="lazy"
         />
       ) : (
         <div

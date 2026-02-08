@@ -6,6 +6,7 @@ import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
 import { ArticleCard } from "@/components/ui/article-card"
 import { getYouTubeThumbnailUrl } from "@/lib/youtube"
+import { VideoJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 interface SpotlightPageProps {
   params: Promise<{ slug: string }>
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: SpotlightPageProps) {
 
   if (!spotlight) {
     return {
-      title: "Spotlight Not Found | bioEDGE",
+      title: "Spotlight Not Found",
     }
   }
 
@@ -40,12 +41,19 @@ export async function generateMetadata({ params }: SpotlightPageProps) {
     || getYouTubeThumbnailUrl(spotlight.youtube_url)
 
   return {
-    title: `${spotlight.title} | bioEDGE`,
+    title: spotlight.title,
     description: spotlight.short_description,
     openGraph: {
-      title: `${spotlight.title} | bioEDGE`,
+      title: spotlight.title,
       description: spotlight.short_description || undefined,
+      type: "video.other",
       ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title: spotlight.title,
+      description: spotlight.short_description || undefined,
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   }
 }
@@ -101,8 +109,28 @@ export default async function SpotlightPage({ params }: SpotlightPageProps) {
   const hasPanelists = sortedPanelists.length > 0
   const isPanel = sortedPanelists.length > 1
 
+  const thumbnailUrl = spotlight.recording_metadata?.thumbnail
+    || getYouTubeThumbnailUrl(spotlight.youtube_url)
+
   return (
     <>
+      <VideoJsonLd
+        title={spotlight.title}
+        slug={spotlight.slug}
+        description={spotlight.short_description}
+        thumbnailUrl={thumbnailUrl}
+        uploadDate={spotlight.created_at}
+        youtubeUrl={spotlight.youtube_url}
+        basePath="spotlight"
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Spotlight", href: "/spotlight" },
+          { name: spotlight.title, href: `/spotlight/${spotlight.slug}` },
+        ]}
+      />
+
       {/* Hero */}
       <div className="be-event-hero">
         <div className="be-container py-12 relative z-10">

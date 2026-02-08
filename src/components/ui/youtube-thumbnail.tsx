@@ -34,6 +34,7 @@ export function YouTubeThumbnail({
         src={thumbnailUrl}
         alt={alt}
         className={className}
+        loading="lazy"
         onError={() => {
           if (quality === "maxresdefault") {
             setQuality("hqdefault")

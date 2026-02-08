@@ -4,8 +4,12 @@ import { SpotlightsGrid } from "@/components/directory/spotlights-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Spotlight | bioEDGE",
+  title: "Longevity Leader Spotlight",
   description: "Curated video library featuring the best longevity, biohacking, and health optimization content.",
+  openGraph: {
+    title: "Longevity Leader Spotlight",
+    description: "Curated video library featuring the best longevity, biohacking, and health optimization content.",
+  },
 }
 
 interface Category {

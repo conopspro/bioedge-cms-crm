@@ -9,6 +9,7 @@ import { PhotoSlider } from "@/components/events/public/photo-slider"
 import { VideoPlaylist } from "@/components/events/public/video-playlist"
 import { FinalCtaSection } from "@/components/events/final-cta-section"
 import { RichText } from "@/components/ui/rich-text"
+import { EventJsonLd } from "@/components/seo/json-ld"
 
 // TODO: Re-enable caching for production
 export const revalidate = 60
@@ -441,6 +442,20 @@ export default async function EventLandingPage({ params }: PageProps) {
 
   return (
     <>
+      <EventJsonLd
+        name={event.name}
+        slug={event.slug}
+        description={event.description}
+        startDate={event.start_date}
+        endDate={event.end_date}
+        venueName={event.venue_name}
+        city={event.city}
+        state={event.state}
+        imageUrl={event.og_image_url}
+        ticketUrl={event.ticket_url}
+        status={event.status}
+      />
+
       {/* ============================================ */}
       {/* HERO SECTION - WHAT, WHEN, WHERE */}
       {/* ============================================ */}
@@ -990,7 +1005,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         <div className="flex items-center gap-3">
                           {testShowPhotos && (
                             image ? (
-                              <img src={image} alt={name || ""} className="w-14 h-14 rounded-full object-cover" />
+                              <img src={image} alt={name || ""} className="w-14 h-14 rounded-full object-cover" loading="lazy" />
                             ) : (
                               <div className="w-14 h-14 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-lg">
                                 {name?.charAt(0) || "?"}
@@ -1043,7 +1058,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                             <div className="flex items-center gap-2">
                               {testShowPhotos && (
                                 image ? (
-                                  <img src={image} alt={name || ""} className="w-10 h-10 rounded-full object-cover" />
+                                  <img src={image} alt={name || ""} className="w-10 h-10 rounded-full object-cover" loading="lazy" />
                                 ) : (
                                   <div className="w-10 h-10 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-sm">
                                     {name?.charAt(0) || "?"}
@@ -1099,7 +1114,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         <div className="flex items-center gap-2">
                           {testShowPhotos && (
                             image ? (
-                              <img src={image} alt={name || ""} className="w-10 h-10 rounded-full object-cover" />
+                              <img src={image} alt={name || ""} className="w-10 h-10 rounded-full object-cover" loading="lazy" />
                             ) : (
                               <div className="w-10 h-10 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-sm">
                                 {name?.charAt(0) || "?"}
@@ -1211,6 +1226,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                         src={image}
                         alt={name}
                         className="w-20 h-20 rounded-full object-cover mx-auto mb-3"
+                        loading="lazy"
                         style={{ boxShadow: '0 0 0 4px rgba(1, 122, 178, 0.2)' }}
                       />
                     ) : (
@@ -1488,12 +1504,14 @@ export default async function EventLandingPage({ params }: PageProps) {
                     src={venuePhoto.image_url}
                     alt={venuePhoto.alt_text || event.venue_name || "Venue"}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 ) : event.hero_image_url ? (
                   <img
                     src={event.hero_image_url}
                     alt={event.venue_name || "Venue"}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-text-light">
@@ -1580,6 +1598,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                             src={ec.company.logo_url}
                             alt={ec.company.name}
                             className="max-h-28 max-w-full object-contain"
+                            loading="lazy"
                           />
                         ) : (
                           <span className="font-heading font-medium text-navy text-xs text-center">
@@ -1865,7 +1884,14 @@ export async function generateMetadata({ params }: PageProps) {
     openGraph: {
       title,
       description,
+      type: "website",
       images: event.og_image_url ? [event.og_image_url] : [],
+    },
+    twitter: {
+      card: event.og_image_url ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(event.og_image_url ? { images: [event.og_image_url] } : {}),
     },
   }
 }

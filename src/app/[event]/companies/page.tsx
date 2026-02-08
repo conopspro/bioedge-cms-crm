@@ -218,6 +218,7 @@ export default async function EventCompaniesPage({ params }: PageProps) {
                                   src={company.logo_url}
                                   alt={company.name}
                                   className="object-contain max-h-32"
+                                  loading="lazy"
                                 />
                               </div>
                             ) : (

@@ -15,6 +15,7 @@ import { HomepageFeaturedLeaders } from "@/components/home/homepage-featured-lea
 import { HomepageFeaturedCompanies } from "@/components/home/homepage-featured-companies"
 import { HomepageFeaturedPresentations } from "@/components/home/homepage-featured-presentations"
 import { HomepageFeaturedArticles } from "@/components/home/homepage-featured-articles"
+import { WebSiteJsonLd } from "@/components/seo/json-ld"
 
 /**
  * Homepage
@@ -286,6 +287,7 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-off-white">
+      <WebSiteJsonLd />
       <PublicHeader events={headerEvents || []} navItems={headerNavItems || undefined} />
       <main className="flex-1">
         {/* Hero is always first */}

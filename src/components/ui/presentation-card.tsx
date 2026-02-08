@@ -45,6 +45,7 @@ export function PresentationCard({
             src={thumbnailUrl}
             alt={title}
             className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
           />
           {/* Play icon overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">

@@ -83,6 +83,7 @@ export function CompanyCard({
             src={logoUrl}
             alt={name}
             className="object-contain max-h-28 max-w-full"
+            loading="lazy"
           />
         ) : (
           <span className="font-heading font-medium text-xs text-center" style={{ color: "#0d2840" }}>
@@ -110,6 +111,7 @@ export function CompanyCard({
               src={logoUrl}
               alt={name}
               className="object-contain max-h-32 max-w-40"
+              loading="lazy"
             />
           </div>
         ) : (
@@ -159,6 +161,7 @@ export function CompanyCard({
             src={logoUrl}
             alt={name}
             className="object-contain max-h-32"
+            loading="lazy"
           />
         </div>
       ) : (

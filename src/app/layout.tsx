@@ -3,12 +3,24 @@ import Script from "next/script"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "BioEdge CMS",
-  description: "Content Management System and CRM for BioEdge Magazine",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://bioedgelongevity.com"),
+  title: {
+    default: "bioEDGE Longevity | Science-Backed Longevity & Health Optimization",
+    template: "%s | bioEDGE Longevity",
+  },
+  description: "Discover evidence-based longevity science, health optimization strategies, and cutting-edge solutions from industry-leading experts and companies.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
     ],
+  },
+  openGraph: {
+    type: "website",
+    siteName: "bioEDGE Longevity",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
   },
 }
 

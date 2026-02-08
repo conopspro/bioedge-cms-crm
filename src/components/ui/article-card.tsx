@@ -57,6 +57,7 @@ export function ArticleCard({
             src={imageUrl}
             alt={title}
             className="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
             onError={(e) => {
               // Fallback to hqdefault if maxresdefault doesn't exist
               const target = e.target as HTMLImageElement

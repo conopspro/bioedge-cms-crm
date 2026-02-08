@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server"
 import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { ArticleCard, ArticleCardGrid } from "@/components/ui/article-card"
 import { PresentationCard, PresentationCardGrid } from "@/components/ui/presentation-card"
+import { OrganizationJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 type PageProps = {
   params: Promise<{ slug: string }>
@@ -164,6 +165,21 @@ export default async function CompanyDetailPage({ params }: PageProps) {
 
   return (
     <>
+      <OrganizationJsonLd
+        name={company.name}
+        slug={company.slug || slug}
+        description={company.description}
+        logoUrl={company.logo_url}
+        website={company.website}
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Companies", href: "/companies" },
+          { name: company.name, href: `/companies/${company.slug || slug}` },
+        ]}
+      />
+
       {/* Hero */}
       <div className="be-event-hero">
         <div className="be-container py-16 relative z-10">
@@ -497,17 +513,25 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!company) {
     return {
-      title: "Company Not Found | bioEDGE",
+      title: "Company Not Found",
     }
   }
 
+  const description = company.description || `Learn about ${company.name} and their longevity solutions.`
+
   return {
-    title: `${company.name} | Solutions Directory | bioEDGE`,
-    description: company.description || `Learn about ${company.name} and their longevity solutions.`,
+    title: `${company.name} | Solutions Directory`,
+    description,
     openGraph: {
-      title: `${company.name} | Solutions Directory | bioEDGE`,
-      description: company.description || `Learn about ${company.name} and their longevity solutions.`,
+      title: company.name,
+      description,
       ...(company.logo_url ? { images: [{ url: company.logo_url }] } : {}),
+    },
+    twitter: {
+      card: company.logo_url ? "summary_large_image" : "summary",
+      title: company.name,
+      description,
+      ...(company.logo_url ? { images: [company.logo_url] } : {}),
     },
   }
 }

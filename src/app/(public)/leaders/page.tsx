@@ -4,8 +4,12 @@ import { LeadersGrid } from "@/components/directory/leaders-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Leader Directory | bioEDGE",
+  title: "Longevity Leaders Directory",
   description: "Industry experts and thought leaders in the longevity space.",
+  openGraph: {
+    title: "Longevity Leaders Directory",
+    description: "Industry experts and thought leaders in the longevity space.",
+  },
 }
 
 interface Category {

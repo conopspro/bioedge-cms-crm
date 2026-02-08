@@ -153,6 +153,7 @@ export function HomepageFeaturedPresentations({
                           src={presentation.contact.avatar_url}
                           alt=""
                           className="h-8 w-8 rounded-full object-cover ring-1 ring-electric-blue/20"
+                          loading="lazy"
                         />
                       ) : (
                         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-navy via-deep-blue to-electric-blue">

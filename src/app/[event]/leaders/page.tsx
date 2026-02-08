@@ -193,6 +193,7 @@ export default async function EventLeadersPage({ params }: PageProps) {
                               src={image}
                               alt={name}
                               className="w-20 h-20 rounded-full object-cover mx-auto mb-3"
+                              loading="lazy"
                               style={{ boxShadow: '0 0 0 4px rgba(1, 122, 178, 0.2)' }}
                             />
                           ) : (
@@ -257,6 +258,7 @@ export default async function EventLeadersPage({ params }: PageProps) {
                               src={image}
                               alt={name}
                               className="w-20 h-20 rounded-full object-cover mx-auto mb-3"
+                              loading="lazy"
                             />
                           ) : (
                             <div className="w-20 h-20 rounded-full mx-auto mb-3 be-avatar-gradient flex items-center justify-center text-white text-xl font-heading font-bold">

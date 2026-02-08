@@ -578,6 +578,7 @@ export default async function EventAgendaPage({ params }: PageProps) {
                                           src={contact.avatar_url}
                                           alt={`${contact.first_name} ${contact.last_name}`}
                                           className="w-8 h-8 rounded-full object-cover"
+                                          loading="lazy"
                                         />
                                       ) : (
                                         <div className="w-8 h-8 rounded-full be-avatar-gradient flex items-center justify-center text-white text-xs font-bold">

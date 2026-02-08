@@ -123,6 +123,7 @@ export function HomepageFeaturedCompanies({
                         src={company.logo_url}
                         alt={company.name}
                         className="h-16 max-w-[180px] object-contain"
+                        loading="lazy"
                       />
                     ) : (
                       <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-gradient-to-br from-navy via-deep-blue to-electric-blue">

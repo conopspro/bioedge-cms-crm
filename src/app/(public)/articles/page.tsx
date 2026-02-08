@@ -4,8 +4,12 @@ import { ArticlesGrid } from "@/components/directory/articles-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Articles | bioEDGE Magazine",
+  title: "Articles",
   description: "Evidence-informed insights on longevity, health optimization, and the science of living better.",
+  openGraph: {
+    title: "Articles",
+    description: "Evidence-informed insights on longevity, health optimization, and the science of living better.",
+  },
 }
 
 interface Category {

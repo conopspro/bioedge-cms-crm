@@ -6,6 +6,7 @@ import { LeaderCard, LeaderCardGrid } from "@/components/ui/leader-card"
 import { CompanyCard } from "@/components/ui/company-card"
 import { ArticleCard } from "@/components/ui/article-card"
 import { getYouTubeThumbnailUrl } from "@/lib/youtube"
+import { VideoJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld"
 
 interface PresentationPageProps {
   params: Promise<{ slug: string }>
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PresentationPageProps) {
 
   if (!presentation) {
     return {
-      title: "Presentation Not Found | bioEDGE",
+      title: "Presentation Not Found",
     }
   }
 
@@ -40,12 +41,19 @@ export async function generateMetadata({ params }: PresentationPageProps) {
     || getYouTubeThumbnailUrl(presentation.youtube_url)
 
   return {
-    title: `${presentation.title} | bioEDGE`,
+    title: presentation.title,
     description: presentation.short_description,
     openGraph: {
-      title: `${presentation.title} | bioEDGE`,
+      title: presentation.title,
       description: presentation.short_description || undefined,
+      type: "video.other",
       ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title: presentation.title,
+      description: presentation.short_description || undefined,
+      ...(ogImage ? { images: [ogImage] } : {}),
     },
   }
 }
@@ -143,8 +151,28 @@ export default async function PresentationPage({ params }: PresentationPageProps
   const hasPanelists = sortedPanelists.length > 0
   const isPanel = sortedPanelists.length > 1
 
+  const thumbnailUrl = presentation.recording_metadata?.thumbnail
+    || getYouTubeThumbnailUrl(presentation.youtube_url)
+
   return (
     <>
+      <VideoJsonLd
+        title={presentation.title}
+        slug={presentation.slug}
+        description={presentation.short_description}
+        thumbnailUrl={thumbnailUrl}
+        uploadDate={presentation.created_at}
+        youtubeUrl={presentation.youtube_url}
+        basePath="presentations"
+      />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", href: "/" },
+          { name: "Presentations", href: "/presentations" },
+          { name: presentation.title, href: `/presentations/${presentation.slug}` },
+        ]}
+      />
+
       {/* Hero */}
       <div className="be-event-hero">
         <div className="be-container py-12 relative z-10">

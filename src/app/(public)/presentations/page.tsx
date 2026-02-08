@@ -4,8 +4,12 @@ import { PresentationsGrid } from "@/components/directory/presentations-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Presentations | bioEDGE",
+  title: "Presentations",
   description: "Explore our library of presentations, panels, and talks on longevity and health optimization.",
+  openGraph: {
+    title: "Presentations",
+    description: "Explore our library of presentations, panels, and talks on longevity and health optimization.",
+  },
 }
 
 interface Category {
