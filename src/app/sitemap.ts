@@ -58,6 +58,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${BASE_URL}/spotlight`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
       url: `${BASE_URL}/search`,
       lastModified: new Date(),
       changeFrequency: "weekly",
@@ -181,6 +187,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
+  // Fetch published spotlights
+  const { data: spotlights } = await supabase
+    .from("spotlights")
+    .select("slug, updated_at")
+    .eq("status", "published")
+    .not("slug", "is", null)
+
+  const spotlightPages: MetadataRoute.Sitemap = (spotlights || []).map((spotlight) => ({
+    url: `${BASE_URL}/spotlight/${spotlight.slug}`,
+    lastModified: spotlight.updated_at ? new Date(spotlight.updated_at) : new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }))
+
   return [
     ...staticPages,
     ...systemPages,
@@ -189,5 +209,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...companyPages,
     ...leaderPages,
     ...presentationPages,
+    ...spotlightPages,
   ]
 }
