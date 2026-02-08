@@ -56,6 +56,7 @@ interface Contact {
   bio: string | null
   ai_highlights: string[] | null
   ai_expertise: string[] | null
+  bio_sources: { title: string; url: string }[] | null
   created_at: string
   updated_at: string
   hunter_confidence?: number
@@ -449,7 +450,7 @@ export function ContactDetailEditor({
           title="Leader Profile"
           description={contact.show_on_articles ? "Public bio and career highlights (visible on public site)" : "Public bio and career highlights (enable 'Key Person' to show on public site)"}
           section="profile"
-          fields={["bio", "ai_highlights", "ai_expertise"]}
+          fields={["bio", "ai_highlights", "ai_expertise", "bio_sources"]}
           isEditing={isEditingSection("profile")}
           isSaving={isSaving}
           onStartEditing={startEditing}
@@ -516,6 +517,32 @@ export function ContactDetailEditor({
                     </Button>
                   </div>
                 </div>
+
+                {/* Bio Sources */}
+                {(formData.bio_sources || []).length > 0 && (
+                  <div className="space-y-2">
+                    <Label>Bio Sources</Label>
+                    <div className="space-y-2">
+                      {(formData.bio_sources || []).map((source, idx) => (
+                        <div key={idx} className="flex items-center gap-2 p-2 rounded border bg-muted/50">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">{source.title}</p>
+                            <p className="text-xs text-muted-foreground truncate">{source.url}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const sources = (formData.bio_sources || []).filter((_, i) => i !== idx)
+                              setFormData({ ...formData, bio_sources: sources })
+                            }}
+                          >
+                            <X className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             }
           >
@@ -548,6 +575,27 @@ export function ContactDetailEditor({
                       </li>
                     ))}
                   </ul>
+                </div>
+              )}
+
+              {contact.bio_sources && contact.bio_sources.length > 0 && (
+                <div>
+                  <p className="text-xs font-medium text-muted-foreground mb-2">Bio Sources</p>
+                  <div className="flex flex-wrap gap-2">
+                    {contact.bio_sources.map((source: { title: string; url: string }, idx: number) => (
+                      <a
+                        key={idx}
+                        href={source.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground transition-colors"
+                      >
+                        <span className="font-medium">[{idx + 1}]</span>
+                        {source.title}
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
