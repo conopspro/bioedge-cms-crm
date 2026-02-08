@@ -4,10 +4,10 @@ import { SpotlightsGrid } from "@/components/directory/spotlights-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Longevity Leader Spotlight",
+  title: "Longevity Spotlight",
   description: "Curated video library featuring the best longevity, biohacking, and health optimization content.",
   openGraph: {
-    title: "Longevity Leader Spotlight",
+    title: "Longevity Spotlight",
     description: "Curated video library featuring the best longevity, biohacking, and health optimization content.",
   },
 }
@@ -85,7 +85,7 @@ export default async function SpotlightsPage({ searchParams }: PageProps) {
             Curated Library
           </span>
           <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
-            Spotlight
+            Longevity Spotlight
           </h1>
           <p className="max-w-2xl text-lg text-white/90">
             Curated video content featuring the best longevity, biohacking, and health optimization insights from across the web.

@@ -4,10 +4,10 @@ import { LeadersGrid } from "@/components/directory/leaders-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Longevity Leaders Directory",
+  title: "Longevity Leaders",
   description: "Industry experts and thought leaders in the longevity space.",
   openGraph: {
-    title: "Longevity Leaders Directory",
+    title: "Longevity Leaders",
     description: "Industry experts and thought leaders in the longevity space.",
   },
 }
@@ -88,7 +88,7 @@ export default async function LeadersDirectoryPage({ searchParams }: PageProps) 
             Longevity Leaders
           </span>
           <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
-            Leader Directory
+            Longevity Leaders
           </h1>
           <p className="max-w-2xl text-lg text-white/90">
             Industry experts and thought leaders pioneering the future of longevity and health optimization.

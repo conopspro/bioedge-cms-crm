@@ -4,10 +4,10 @@ import { CompaniesGrid } from "@/components/directory/companies-grid"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Solutions Directory",
+  title: "Longevity Solutions",
   description: "Organizations and solutions that support longevity and health optimization.",
   openGraph: {
-    title: "Solutions Directory",
+    title: "Longevity Solutions",
     description: "Organizations and solutions that support longevity and health optimization.",
   },
 }
@@ -67,7 +67,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
             Solutions & Partners
           </span>
           <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
-            Companies Directory
+            Companies Offering Longevity Solutions
           </h1>
           <p className="max-w-2xl text-lg text-white/90">
             Organizations and solutions that support longevity and health optimization.
