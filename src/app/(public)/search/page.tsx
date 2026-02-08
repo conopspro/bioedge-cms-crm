@@ -230,12 +230,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Presentations</h2>
                   <span className="text-sm text-gray-500">({presentations.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {presentations.map((presentation) => (
                     <Link
                       key={presentation.id}
                       href={`/presentations/${presentation.slug || presentation.id}`}
-                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="group overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
                         {presentation.title}
@@ -259,12 +259,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Spotlights</h2>
                   <span className="text-sm text-gray-500">({spotlights.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {spotlights.map((spotlight) => (
                     <Link
                       key={spotlight.id}
                       href={`/spotlight/${spotlight.slug || spotlight.id}`}
-                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="group overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
                         {spotlight.title}
@@ -288,12 +288,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Biological Systems</h2>
                   <span className="text-sm text-gray-500">({systems.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {systems.map((system) => (
                     <Link
                       key={system.slug}
                       href={`/systems/${system.slug}`}
-                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="group overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
                         {system.name}
@@ -316,12 +316,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Articles</h2>
                   <span className="text-sm text-gray-500">({articles.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {articles.map((article) => (
                     <Link
                       key={article.id}
                       href={`/articles/${article.slug}`}
-                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="group overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
                         {article.title}
@@ -345,12 +345,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Leaders</h2>
                   <span className="text-sm text-gray-500">({leaders.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {leaders.map((leader) => (
                     <Link
                       key={leader.id}
                       href={`/leaders/${leader.slug || leader.id}`}
-                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="group overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
                         {leader.first_name} {leader.last_name}
@@ -375,12 +375,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Companies</h2>
                   <span className="text-sm text-gray-500">({companies.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {companies.map((company) => (
                     <Link
                       key={company.id}
                       href={`/companies/${company.slug || company.domain || company.id}`}
-                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="group overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
                         {company.name}
@@ -399,12 +399,12 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Events</h2>
                   <span className="text-sm text-gray-500">({events.length})</span>
                 </div>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {events.map((event) => (
                     <Link
                       key={event.id}
                       href={`/events/${event.slug || event.id}`}
-                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                      className="group overflow-hidden rounded-2xl bg-white p-6 shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                     >
                       <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
                         {event.title}
