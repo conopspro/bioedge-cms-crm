@@ -1,13 +1,32 @@
 import { createClient } from "@/lib/supabase/server"
 import Link from "next/link"
-import { Search, FileText, Users, Building2, Calendar, Play, Sparkles } from "lucide-react"
+import { Search, FileText, Users, Building2, Calendar, Play, Sparkles, Brain } from "lucide-react"
 import { SearchInput } from "@/components/search/search-input"
 import { Suspense } from "react"
 
 export const metadata = {
   title: "Search | bioEDGE",
-  description: "Search articles, leaders, companies, presentations, spotlights, and events across bioEDGE.",
+  description: "Search articles, leaders, companies, presentations, spotlights, systems, and events across bioEDGE.",
 }
+
+// Static systems data (these are not in Supabase — they're hardcoded content pages)
+const SYSTEMS = [
+  { name: "Breath", slug: "breath", tagline: "Your Body's Bridge", description: "Respiratory system, oxygen delivery, breathing patterns" },
+  { name: "Circulation", slug: "circulation", tagline: "Your Body's Delivery Network", description: "Heart, blood vessels, blood flow, cardiovascular health" },
+  { name: "Consciousness", slug: "consciousness", tagline: "Your Body's Inner Witness", description: "Awareness, presence, thought quality, mental clarity" },
+  { name: "Defense", slug: "defense", tagline: "Your Body's Intelligent Shield", description: "Immune function, inflammation, autoimmunity" },
+  { name: "Detoxification", slug: "detoxification", tagline: "Your Body's Clearing House", description: "Liver function, lymphatic drainage, elimination" },
+  { name: "Digestive", slug: "digestive", tagline: "Your Body's Transformation Engine", description: "Gut health, microbiome, nutrient absorption" },
+  { name: "Emotional", slug: "emotional", tagline: "Your Body's Meaning Maker", description: "Mental wellbeing, mood regulation, psychological health" },
+  { name: "Energy Production", slug: "energy-production", tagline: "Your Body's Power Grid", description: "Mitochondrial function, ATP, metabolic efficiency" },
+  { name: "Hormonal", slug: "hormonal", tagline: "Your Body's Orchestra", description: "Endocrine system, hormone balance, thyroid, adrenals" },
+  { name: "Hydration", slug: "hydration", tagline: "Your Body's Internal Ocean", description: "Fluid balance, electrolytes, cellular hydration" },
+  { name: "Nervous System", slug: "nervous-system", tagline: "Your Body's Communication Network", description: "Brain-body connection, neural pathways, vagal tone" },
+  { name: "Regeneration", slug: "regeneration", tagline: "Your Body's Rebuild Crew", description: "Cellular repair, stem cells, longevity pathways" },
+  { name: "Stress Response", slug: "stress-response", tagline: "Your Body's Alert System", description: "Fight or flight, cortisol regulation, stress adaptation" },
+  { name: "Structure & Movement", slug: "structure-movement", tagline: "Your Body's Living Architecture", description: "Bones, joints, connective tissue, muscles, mobility" },
+  { name: "Temperature", slug: "temperature", tagline: "Your Body's Thermostat", description: "Heat regulation, cold tolerance, metabolic temperature" },
+]
 
 interface PageProps {
   searchParams: Promise<{ q?: string }>
@@ -57,6 +76,13 @@ interface SpotlightResult {
   short_description: string | null
 }
 
+interface SystemResult {
+  name: string
+  slug: string
+  tagline: string
+  description: string
+}
+
 export default async function SearchPage({ searchParams }: PageProps) {
   const params = await searchParams
   const query = params.q?.trim() || ""
@@ -68,8 +94,16 @@ export default async function SearchPage({ searchParams }: PageProps) {
   let events: EventResult[] = []
   let presentations: PresentationResult[] = []
   let spotlights: SpotlightResult[] = []
+  let systems: SystemResult[] = []
 
   if (query.length >= 2) {
+    // Search systems (static data — case-insensitive match on name, tagline, description)
+    const lowerQuery = query.toLowerCase()
+    systems = SYSTEMS.filter(s =>
+      s.name.toLowerCase().includes(lowerQuery) ||
+      s.tagline.toLowerCase().includes(lowerQuery) ||
+      s.description.toLowerCase().includes(lowerQuery)
+    )
     // Run all searches in parallel for better performance
     const [
       articlesRes,
@@ -140,7 +174,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
     spotlights = (spotlightsRes.data || []) as SpotlightResult[]
   }
 
-  const totalResults = articles.length + leaders.length + companies.length + events.length + presentations.length + spotlights.length
+  const totalResults = articles.length + leaders.length + companies.length + events.length + presentations.length + spotlights.length + systems.length
   const hasQuery = query.length >= 2
 
   return (
@@ -155,7 +189,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
             Search
           </h1>
           <p className="max-w-2xl text-lg text-white/90">
-            Find articles, leaders, companies, presentations, spotlights, and events across bioEDGE.
+            Find articles, leaders, companies, presentations, spotlights, systems, and events across bioEDGE.
           </p>
 
           {/* Search Input */}
@@ -240,6 +274,34 @@ export default async function SearchPage({ searchParams }: PageProps) {
                           {spotlight.short_description}
                         </p>
                       )}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Systems */}
+            {systems.length > 0 && (
+              <div>
+                <div className="mb-4 flex items-center gap-2">
+                  <Brain className="h-5 w-5 text-electric-blue" />
+                  <h2 className="text-lg font-bold text-navy">Biological Systems</h2>
+                  <span className="text-sm text-gray-500">({systems.length})</span>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {systems.map((system) => (
+                    <Link
+                      key={system.slug}
+                      href={`/systems/${system.slug}`}
+                      className="group rounded-xl bg-white p-4 shadow-md transition-all hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      <h3 className="font-semibold text-navy transition-colors group-hover:text-electric-blue">
+                        {system.name}
+                      </h3>
+                      <p className="text-sm text-electric-blue mt-0.5">{system.tagline}</p>
+                      <p className="mt-1 text-sm text-gray-600 line-clamp-2">
+                        {system.description}
+                      </p>
                     </Link>
                   ))}
                 </div>
