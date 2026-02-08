@@ -181,7 +181,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
     <div className="min-h-screen bg-off-white">
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
-        <div className="mx-auto max-w-[1200px] px-8 py-16 md:py-20">
+        <div className="be-container py-16 md:py-20">
           <span className="mb-4 inline-block rounded bg-deep-blue px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
             Explore
           </span>
@@ -202,7 +202,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
       </section>
 
       {/* Results Section */}
-      <section className="mx-auto max-w-[1200px] px-8 py-12">
+      <section className="be-container py-12">
         {!hasQuery ? (
           <div className="py-16 text-center">
             <Search className="mx-auto mb-4 h-16 w-16 text-navy/20" />
@@ -230,7 +230,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Presentations</h2>
                   <span className="text-sm text-gray-500">({presentations.length})</span>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={`grid gap-6 ${presentations.length === 1 ? "grid-cols-1" : presentations.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                   {presentations.map((presentation) => (
                     <Link
                       key={presentation.id}
@@ -259,7 +259,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Spotlights</h2>
                   <span className="text-sm text-gray-500">({spotlights.length})</span>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={`grid gap-6 ${spotlights.length === 1 ? "grid-cols-1" : spotlights.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                   {spotlights.map((spotlight) => (
                     <Link
                       key={spotlight.id}
@@ -288,7 +288,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Biological Systems</h2>
                   <span className="text-sm text-gray-500">({systems.length})</span>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={`grid gap-6 ${systems.length === 1 ? "grid-cols-1" : systems.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                   {systems.map((system) => (
                     <Link
                       key={system.slug}
@@ -316,7 +316,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Articles</h2>
                   <span className="text-sm text-gray-500">({articles.length})</span>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={`grid gap-6 ${articles.length === 1 ? "grid-cols-1" : articles.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                   {articles.map((article) => (
                     <Link
                       key={article.id}
@@ -345,7 +345,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Leaders</h2>
                   <span className="text-sm text-gray-500">({leaders.length})</span>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={`grid gap-6 ${leaders.length === 1 ? "grid-cols-1" : leaders.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                   {leaders.map((leader) => (
                     <Link
                       key={leader.id}
@@ -375,7 +375,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Companies</h2>
                   <span className="text-sm text-gray-500">({companies.length})</span>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={`grid gap-6 ${companies.length === 1 ? "grid-cols-1" : companies.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                   {companies.map((company) => (
                     <Link
                       key={company.id}
@@ -399,7 +399,7 @@ export default async function SearchPage({ searchParams }: PageProps) {
                   <h2 className="text-lg font-bold text-navy">Events</h2>
                   <span className="text-sm text-gray-500">({events.length})</span>
                 </div>
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className={`grid gap-6 ${events.length === 1 ? "grid-cols-1" : events.length === 2 ? "sm:grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-3"}`}>
                   {events.map((event) => (
                     <Link
                       key={event.id}
