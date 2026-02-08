@@ -46,7 +46,7 @@ export function ArticleCard({
     <Link
       href={linkHref}
       className={cn(
-        "bg-white border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow group flex",
+        "bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow group flex",
         className
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
