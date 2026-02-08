@@ -12,7 +12,7 @@ import type { CompanyResearchInput, CompanyResearchOutput, BiologicalSystem } fr
  * - Native article (500-600 words)
  * - Warm pitch email
  *
- * Uses Claude Opus 4 for the research and content generation.
+ * Uses Claude Opus 4.6 for the research and content generation.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
 
     // Call Claude with the research prompt
     const message = await anthropic.messages.create({
-      model: "claude-opus-4-20250514",
+      model: "claude-opus-4-6",
       max_tokens: 4096,
       messages: [
         {

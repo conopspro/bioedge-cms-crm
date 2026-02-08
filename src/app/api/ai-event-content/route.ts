@@ -72,7 +72,7 @@ Respond ONLY with valid JSON in this exact format:
 }`
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
       max_tokens: 1500,
       messages: [
         {

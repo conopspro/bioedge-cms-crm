@@ -136,7 +136,7 @@ Respond ONLY with valid JSON in this exact format:
 }`
 
       const message = await client.messages.create({
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-4-5-20250929",
         max_tokens: 500,
         messages: [{ role: "user", content: titlePrompt }],
       })
@@ -205,7 +205,7 @@ Respond ONLY with valid JSON in this exact format:
 }`
 
     const message = await client.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-5-20250929",
       max_tokens: transcript ? 2000 : 1500,
       messages: [
         {

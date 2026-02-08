@@ -5,23 +5,23 @@
  *
  * API Docs: https://docs.anthropic.com/claude/reference
  *
- * Available Models (Jan 2025):
- * - claude-sonnet-4-20250514: Best balance of quality and cost
- * - claude-opus-4-20250514: Most capable, best for complex tasks
- * - claude-3-5-haiku-20241022: Fastest and cheapest
+ * Available Models (Feb 2026):
+ * - claude-sonnet-4-5-20250929: Best balance of quality and cost
+ * - claude-opus-4-6: Most capable, best for complex tasks
+ * - claude-haiku-4-5-20251001: Fastest and cheapest
  */
 
 import Anthropic from "@anthropic-ai/sdk"
 
 // Model configuration - can be overridden via environment variable
-const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-20250514"
+const DEFAULT_MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-5-20250929"
 
 // Model options for different use cases
 const MODELS = {
   default: DEFAULT_MODEL,
-  fast: "claude-3-5-haiku-20241022",    // Quick, cheap tasks
-  quality: "claude-sonnet-4-20250514",   // Good balance
-  best: "claude-opus-4-20250514",        // Highest quality
+  fast: "claude-haiku-4-5-20251001",     // Quick, cheap tasks
+  quality: "claude-sonnet-4-5-20250929", // Good balance (great writer)
+  best: "claude-opus-4-6",              // Highest quality (research)
 } as const
 
 // Timeout for API calls (5 minutes - AI prompts can take a while)
