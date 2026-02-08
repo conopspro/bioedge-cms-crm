@@ -40,11 +40,11 @@ export function PresentationCard({
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
     >
       {thumbnailUrl && (
-        <div className="w-1/3 flex-shrink-0 overflow-hidden bg-black relative">
+        <div className="w-1/3 flex-shrink-0 overflow-hidden bg-gray-100 relative aspect-video">
           <img
             src={thumbnailUrl}
             alt={title}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
           />
           {/* Play icon overlay */}
           <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/10 transition-colors">

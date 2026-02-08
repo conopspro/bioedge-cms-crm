@@ -52,11 +52,11 @@ export function ArticleCard({
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
     >
       {imageUrl && (
-        <div className="w-1/3 flex-shrink-0 overflow-hidden bg-gray-100 relative">
+        <div className="w-1/3 flex-shrink-0 overflow-hidden bg-gray-100 relative aspect-video">
           <img
             src={imageUrl}
             alt={title}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             onError={(e) => {
               // Fallback to hqdefault if maxresdefault doesn't exist
               const target = e.target as HTMLImageElement
