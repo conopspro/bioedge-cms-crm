@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/server"
 import { CompanyCard } from "@/components/ui/company-card"
 import { ArticleCard, ArticleCardGrid } from "@/components/ui/article-card"
 import { PresentationCard, PresentationCardGrid } from "@/components/ui/presentation-card"
+import { SpotlightCard, SpotlightCardGrid } from "@/components/ui/spotlight-card"
 
 type PageProps = {
   params: Promise<{ slug: string }>
@@ -144,6 +145,44 @@ export default async function LeaderProfilePage({ params }: PageProps) {
   }
 
   presentations = Array.from(presentationMap.values())
+
+  // Fetch spotlights where this contact is featured (via spotlight_panelists or legacy contact_id)
+  let spotlights: any[] = []
+
+  // Check spotlight_panelists table
+  const { data: panelistSpotlights } = await supabase
+    .from("spotlight_panelists")
+    .select(`
+      spotlight:spotlights(id, title, slug, short_description, status, recording_metadata)
+    `)
+    .eq("contact_id", contact.id)
+
+  // Also check legacy spotlights with direct contact_id
+  const { data: legacySpotlights } = await supabase
+    .from("spotlights")
+    .select("id, title, slug, short_description, status, recording_metadata")
+    .eq("contact_id", contact.id)
+    .eq("status", "published")
+
+  // Combine and dedupe spotlights
+  const spotlightMap = new Map()
+
+  if (panelistSpotlights) {
+    for (const sp of panelistSpotlights) {
+      const spot = Array.isArray(sp.spotlight) ? sp.spotlight[0] : sp.spotlight
+      if (spot && spot.status === "published") {
+        spotlightMap.set(spot.id, spot)
+      }
+    }
+  }
+
+  if (legacySpotlights) {
+    for (const spot of legacySpotlights) {
+      spotlightMap.set(spot.id, spot)
+    }
+  }
+
+  spotlights = Array.from(spotlightMap.values())
 
   // Fetch upcoming events where this contact is participating
   const today = new Date().toISOString().split('T')[0]
@@ -581,6 +620,27 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                   />
                 ))}
               </PresentationCardGrid>
+            </section>
+          )}
+
+          {/* Spotlight */}
+          {spotlights.length > 0 && (
+            <section>
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
+                Spotlight
+              </h2>
+              <SpotlightCardGrid>
+                {spotlights.map((spotlight: any) => (
+                  <SpotlightCard
+                    key={spotlight.id}
+                    id={spotlight.id}
+                    title={spotlight.title}
+                    slug={spotlight.slug}
+                    shortDescription={spotlight.short_description}
+                    thumbnailUrl={spotlight.recording_metadata?.thumbnail}
+                  />
+                ))}
+              </SpotlightCardGrid>
             </section>
           )}
 
