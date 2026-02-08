@@ -321,7 +321,146 @@ export default async function LeaderProfilePage({ params }: PageProps) {
 
       {/* Content */}
       <div className="be-container py-12">
-        <div className="max-w-3xl mx-auto space-y-10">
+        <div className="max-w-4xl mx-auto space-y-10">
+
+          {/* Upcoming Events */}
+          {upcomingEvents.length > 0 && (
+            <section>
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
+                {upcomingEvents.length === 1 ? "Upcoming Event" : "Upcoming Events"}
+              </h2>
+              <div className="space-y-4">
+                {upcomingEvents.map((ec: any) => {
+                  const event = Array.isArray(ec.event) ? ec.event[0] : ec.event
+                  if (!event) return null
+
+                  // Format event date
+                  const formatEventDate = (dateStr: string) => {
+                    const [year, month, day] = dateStr.split('T')[0].split('-').map(Number)
+                    return new Date(year, month - 1, day).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  }
+
+                  const location = [event.venue_name, event.city, event.state].filter(Boolean).join(", ")
+                  const roleLabel = roleLabels[ec.role] || ec.role
+
+                  return (
+                    <Link
+                      key={ec.id}
+                      href={`/${event.slug}`}
+                      className="block bg-gradient-to-r from-navy/5 to-electric-blue/5 rounded-xl p-5 border border-navy/10 hover:border-[#017ab2]/50 hover:shadow-md transition-all"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <div className="flex-1">
+                          <h3 className="font-heading font-semibold text-navy text-lg mb-2">
+                            {event.name}
+                          </h3>
+                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-dark">
+                            <span className="flex items-center gap-1.5">
+                              <Calendar className="h-4 w-4" style={{ color: '#017ab2' }} />
+                              {formatEventDate(event.start_date)}
+                              {event.end_date && event.end_date !== event.start_date && (
+                                <> - {formatEventDate(event.end_date)}</>
+                              )}
+                            </span>
+                            {location && (
+                              <span className="flex items-center gap-1.5">
+                                <MapPin className="h-4 w-4" style={{ color: '#017ab2' }} />
+                                {location}
+                              </span>
+                            )}
+                          </div>
+                          {roleLabel && (
+                            <div className="mt-2">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(1, 122, 178, 0.1)', color: '#017ab2' }}>
+                                {roleLabel}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex-shrink-0">
+                          <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: '#017ab2' }}>
+                            View Event
+                            <ArrowLeft className="h-3 w-3 rotate-180" />
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  )
+                })}
+              </div>
+            </section>
+          )}
+
+          {/* Presentations */}
+          {presentations.length > 0 && (
+            <section>
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
+                Presentations
+              </h2>
+              <div className={`grid gap-4 ${presentations.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+                {presentations.map((presentation: any) => (
+                  <PresentationCard
+                    key={presentation.id}
+                    id={presentation.id}
+                    title={presentation.title}
+                    slug={presentation.slug}
+                    shortDescription={presentation.short_description}
+                    thumbnailUrl={presentation.recording_metadata?.thumbnail}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Spotlight */}
+          {spotlights.length > 0 && (
+            <section>
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
+                Spotlight
+              </h2>
+              <div className={`grid gap-4 ${spotlights.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+                {spotlights.map((spotlight: any) => (
+                  <SpotlightCard
+                    key={spotlight.id}
+                    id={spotlight.id}
+                    title={spotlight.title}
+                    slug={spotlight.slug}
+                    shortDescription={spotlight.short_description}
+                    thumbnailUrl={spotlight.recording_metadata?.thumbnail}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* Related Articles */}
+          {articles.length > 0 && (
+            <section>
+              <h2 className="font-heading font-bold text-navy text-xl mb-4">
+                Related Articles
+              </h2>
+              <div className={`grid gap-4 ${articles.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+                {articles.map((article: any) => (
+                  <ArticleCard
+                    key={article.id}
+                    id={article.id}
+                    title={article.title}
+                    slug={article.slug}
+                    excerpt={article.excerpt}
+                    publishedAt={article.published_at}
+                    featuredImage={article.featured_image_url}
+                    youtubeUrl={article.youtube_url}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
+
           {/* Bio */}
           {contact.bio && (
             <section>
@@ -396,79 +535,6 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                     </li>
                   ))}
                 </ul>
-              </div>
-            </section>
-          )}
-
-          {/* Upcoming Events */}
-          {upcomingEvents.length > 0 && (
-            <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                {upcomingEvents.length === 1 ? "Upcoming Event" : "Upcoming Events"}
-              </h2>
-              <div className="space-y-4">
-                {upcomingEvents.map((ec: any) => {
-                  const event = Array.isArray(ec.event) ? ec.event[0] : ec.event
-                  if (!event) return null
-
-                  // Format event date
-                  const formatEventDate = (dateStr: string) => {
-                    const [year, month, day] = dateStr.split('T')[0].split('-').map(Number)
-                    return new Date(year, month - 1, day).toLocaleDateString("en-US", {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })
-                  }
-
-                  const location = [event.venue_name, event.city, event.state].filter(Boolean).join(", ")
-                  const roleLabel = roleLabels[ec.role] || ec.role
-
-                  return (
-                    <Link
-                      key={ec.id}
-                      href={`/${event.slug}`}
-                      className="block bg-gradient-to-r from-navy/5 to-electric-blue/5 rounded-xl p-5 border border-navy/10 hover:border-[#017ab2]/50 hover:shadow-md transition-all"
-                    >
-                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                        <div className="flex-1">
-                          <h3 className="font-heading font-semibold text-navy text-lg mb-2">
-                            {event.name}
-                          </h3>
-                          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-text-dark">
-                            <span className="flex items-center gap-1.5">
-                              <Calendar className="h-4 w-4" style={{ color: '#017ab2' }} />
-                              {formatEventDate(event.start_date)}
-                              {event.end_date && event.end_date !== event.start_date && (
-                                <> - {formatEventDate(event.end_date)}</>
-                              )}
-                            </span>
-                            {location && (
-                              <span className="flex items-center gap-1.5">
-                                <MapPin className="h-4 w-4" style={{ color: '#017ab2' }} />
-                                {location}
-                              </span>
-                            )}
-                          </div>
-                          {roleLabel && (
-                            <div className="mt-2">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(1, 122, 178, 0.1)', color: '#017ab2' }}>
-                                {roleLabel}
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-shrink-0">
-                          <span className="inline-flex items-center gap-1 text-sm font-medium" style={{ color: '#017ab2' }}>
-                            View Event
-                            <ArrowLeft className="h-3 w-3 rotate-180" />
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  )
-                })}
               </div>
             </section>
           )}
@@ -611,71 +677,6 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                   </a>
                 ))}
               </div>
-            </section>
-          )}
-
-          {/* Presentations */}
-          {presentations.length > 0 && (
-            <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Presentations
-              </h2>
-              <PresentationCardGrid>
-                {presentations.map((presentation: any) => (
-                  <PresentationCard
-                    key={presentation.id}
-                    id={presentation.id}
-                    title={presentation.title}
-                    slug={presentation.slug}
-                    shortDescription={presentation.short_description}
-                    thumbnailUrl={presentation.recording_metadata?.thumbnail}
-                  />
-                ))}
-              </PresentationCardGrid>
-            </section>
-          )}
-
-          {/* Spotlight */}
-          {spotlights.length > 0 && (
-            <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Spotlight
-              </h2>
-              <SpotlightCardGrid>
-                {spotlights.map((spotlight: any) => (
-                  <SpotlightCard
-                    key={spotlight.id}
-                    id={spotlight.id}
-                    title={spotlight.title}
-                    slug={spotlight.slug}
-                    shortDescription={spotlight.short_description}
-                    thumbnailUrl={spotlight.recording_metadata?.thumbnail}
-                  />
-                ))}
-              </SpotlightCardGrid>
-            </section>
-          )}
-
-          {/* Related Articles */}
-          {articles.length > 0 && (
-            <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Related Articles
-              </h2>
-              <ArticleCardGrid>
-                {articles.map((article: any) => (
-                  <ArticleCard
-                    key={article.id}
-                    id={article.id}
-                    title={article.title}
-                    slug={article.slug}
-                    excerpt={article.excerpt}
-                    publishedAt={article.published_at}
-                    featuredImage={article.featured_image_url}
-                    youtubeUrl={article.youtube_url}
-                  />
-                ))}
-              </ArticleCardGrid>
             </section>
           )}
 
