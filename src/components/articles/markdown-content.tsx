@@ -8,10 +8,46 @@ interface MarkdownContentProps {
 }
 
 /**
+ * Auto-link bare URLs and domain names in markdown content.
+ * Converts plain text URLs like "example.com" or "https://example.com"
+ * into proper markdown links, but skips URLs already inside markdown link syntax.
+ */
+function autoLinkUrls(text: string): string {
+  // Match bare URLs (with or without protocol) that are NOT already inside markdown links
+  // This regex handles:
+  // 1. Full URLs: https://example.com/path
+  // 2. Bare domains: example.com, example.co.uk, example.com/path
+  return text.replace(
+    /(?<!\]\()(?<!\()((?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9][-a-zA-Z0-9]*\.[a-zA-Z]{2,}(?:[-a-zA-Z0-9._~:/?#\[\]@!$&'()*+,;=%]*[a-zA-Z0-9/])?)(?!\))/g,
+    (match, url, offset) => {
+      // Check if this URL is already part of a markdown link [text](url) or <url>
+      const before = text.slice(Math.max(0, offset - 2), offset)
+      if (before.endsWith("](") || before.endsWith("<")) return match
+
+      // Check if it's inside a markdown link text portion [url](...)
+      // Look backwards for an unmatched [
+      const textBefore = text.slice(0, offset)
+      const lastOpenBracket = textBefore.lastIndexOf("[")
+      const lastCloseBracket = textBefore.lastIndexOf("]")
+      if (lastOpenBracket > lastCloseBracket) {
+        // We're inside [...] — check if followed by (...) which makes it a link
+        const afterMatch = text.slice(offset + match.length)
+        if (afterMatch.match(/^\]\(/)) return match
+      }
+
+      const href = url.startsWith("http") ? url : `https://${url}`
+      return `[${url}](${href})`
+    }
+  )
+}
+
+/**
  * Renders markdown content with proper styling
  * Uses react-markdown with GFM (GitHub Flavored Markdown) support
  */
 export function MarkdownContent({ content }: MarkdownContentProps) {
+  const processedContent = autoLinkUrls(content)
+
   return (
     <ReactMarkdown
       remarkPlugins={[remarkGfm]}
@@ -149,7 +185,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
         ),
       }}
     >
-      {content}
+      {processedContent}
     </ReactMarkdown>
   )
 }
