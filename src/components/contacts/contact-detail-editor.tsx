@@ -8,6 +8,7 @@ import {
   Mail,
   Phone,
   Linkedin,
+  Youtube,
   Star,
   Pencil,
   X,
@@ -44,6 +45,7 @@ interface Contact {
   phone: string | null
   title: string | null
   linkedin_url: string | null
+  youtube_channel_url: string | null
   avatar_url: string | null
   company_id: string | null
   notes: string | null
@@ -355,37 +357,62 @@ export function ContactDetailEditor({
           title="Social Media"
           description="LinkedIn and other profiles"
           section="social"
-          fields={["linkedin_url"]}
+          fields={["linkedin_url", "youtube_channel_url"]}
           isEditing={isEditingSection("social")}
           isSaving={isSaving}
           onStartEditing={startEditing}
           onCancelEditing={cancelEditing}
           onSave={saveSection}
           editContent={
-            <div className="space-y-2">
-              <Label>LinkedIn URL</Label>
-              <Input
-                value={formData.linkedin_url || ""}
-                onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
-                placeholder="https://linkedin.com/in/..."
-              />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>LinkedIn URL</Label>
+                <Input
+                  value={formData.linkedin_url || ""}
+                  onChange={(e) => setFormData({ ...formData, linkedin_url: e.target.value })}
+                  placeholder="https://linkedin.com/in/..."
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>YouTube Channel URL</Label>
+                <Input
+                  value={formData.youtube_channel_url || ""}
+                  onChange={(e) => setFormData({ ...formData, youtube_channel_url: e.target.value })}
+                  placeholder="https://youtube.com/@..."
+                />
+              </div>
             </div>
           }
         >
-          {contact.linkedin_url ? (
-            <a
-              href={contact.linkedin_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-muted transition-colors"
-            >
-              <Linkedin className="h-5 w-5 text-[#0A66C2]" />
-              <span className="text-sm font-medium">LinkedIn Profile</span>
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          ) : (
-            <p className="text-sm text-muted-foreground">No LinkedIn profile linked</p>
-          )}
+          <div className="flex flex-wrap gap-3">
+            {contact.linkedin_url && (
+              <a
+                href={contact.linkedin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-muted transition-colors"
+              >
+                <Linkedin className="h-5 w-5 text-[#0A66C2]" />
+                <span className="text-sm font-medium">LinkedIn Profile</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
+            {contact.youtube_channel_url && (
+              <a
+                href={contact.youtube_channel_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-muted transition-colors"
+              >
+                <Youtube className="h-5 w-5 text-[#FF0000]" />
+                <span className="text-sm font-medium">YouTube Channel</span>
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            )}
+            {!contact.linkedin_url && !contact.youtube_channel_url && (
+              <p className="text-sm text-muted-foreground">No social profiles linked</p>
+            )}
+          </div>
         </EditableCard>
 
         {/* Notes */}
