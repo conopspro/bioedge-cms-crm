@@ -1403,6 +1403,9 @@ export interface CompanyResearchInput {
   contact_last_name?: string
   contact_title?: string
   contact_email?: string
+  contact_phone?: string
+  contact_linkedin_url?: string
+  contact_youtube_channel_url?: string
   event: string // Event where we noticed them
 }
 

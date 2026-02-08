@@ -67,10 +67,10 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
             Directory
           </span>
           <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
-            Companies Offering Longevity Solutions
+            Longevity Solutions
           </h1>
           <p className="max-w-2xl text-lg text-white/90">
-            Organizations and solutions that support longevity and health optimization.
+            Companies and organizations that support longevity and health optimization.
           </p>
         </div>
       </section>

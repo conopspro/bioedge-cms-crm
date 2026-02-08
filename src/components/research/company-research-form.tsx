@@ -27,6 +27,9 @@ export function CompanyResearchForm() {
     contact_last_name: "",
     contact_title: "",
     contact_email: "",
+    contact_phone: "",
+    contact_linkedin_url: "",
+    contact_youtube_channel_url: "",
     event: "",
   })
 
@@ -177,6 +180,40 @@ export function CompanyResearchForm() {
                 placeholder="e.g., meredith@company.com"
               />
             </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="contact_phone">Phone</Label>
+              <Input
+                id="contact_phone"
+                name="contact_phone"
+                value={formData.contact_phone}
+                onChange={handleChange}
+                placeholder="e.g., (555) 123-4567"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contact_linkedin_url">LinkedIn</Label>
+              <Input
+                id="contact_linkedin_url"
+                name="contact_linkedin_url"
+                value={formData.contact_linkedin_url}
+                onChange={handleChange}
+                placeholder="e.g., https://linkedin.com/in/..."
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="contact_youtube_channel_url">YouTube Channel</Label>
+            <Input
+              id="contact_youtube_channel_url"
+              name="contact_youtube_channel_url"
+              value={formData.contact_youtube_channel_url}
+              onChange={handleChange}
+              placeholder="e.g., https://youtube.com/@..."
+            />
           </div>
         </CardContent>
       </Card>

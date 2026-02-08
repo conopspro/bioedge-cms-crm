@@ -56,6 +56,9 @@ export async function POST(request: NextRequest) {
     console.log("input.contact_first_name:", input.contact_first_name)
     console.log("input.contact_last_name:", input.contact_last_name)
     console.log("input.contact_email:", input.contact_email)
+    console.log("input.contact_phone:", input.contact_phone)
+    console.log("input.contact_linkedin_url:", input.contact_linkedin_url)
+    console.log("input.contact_youtube_channel_url:", input.contact_youtube_channel_url)
     console.log("research.article_title:", research.article_title ? "present" : "MISSING")
     console.log("research.article_content:", research.article_content ? `${research.article_content.length} chars` : "MISSING")
     console.log("research.discovered_contacts:", research.discovered_contacts?.length || 0)
@@ -174,9 +177,11 @@ export async function POST(request: NextRequest) {
       const contactsToCreate: Array<{
         first_name: string
         last_name: string
-        email: string
+        email?: string | null
+        phone?: string | null
         title?: string | null
         linkedin_url?: string | null
+        youtube_channel_url?: string | null
       }> = []
 
       // Helper to split full name into first/last (for discovered contacts)
@@ -188,32 +193,35 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Add contact from user input
-      if (input.contact_email) {
+      // Add contact from user input (requires at least a first name)
+      if (input.contact_first_name) {
         contactsToCreate.push({
-          first_name: input.contact_first_name || "Unknown",
+          first_name: input.contact_first_name,
           last_name: input.contact_last_name || "",
-          email: input.contact_email,
+          email: input.contact_email || null,
+          phone: input.contact_phone || null,
           title: input.contact_title || null,
+          linkedin_url: input.contact_linkedin_url || null,
+          youtube_channel_url: input.contact_youtube_channel_url || null,
         })
       }
 
       // Add contacts discovered by AI research
       if (research.discovered_contacts && research.discovered_contacts.length > 0) {
         for (const dc of research.discovered_contacts) {
-          // Only add if we have an email (required field)
-          if (dc.email) {
-            // Skip if we already have this email
-            if (!contactsToCreate.some(c => c.email.toLowerCase() === dc.email!.toLowerCase())) {
-              const names = splitName(dc.name || "Unknown")
-              contactsToCreate.push({
-                first_name: names.first_name,
-                last_name: names.last_name,
-                email: dc.email,
-                title: dc.title || null,
-                linkedin_url: dc.linkedin_url || null,
-              })
+          if (dc.name) {
+            // Skip if we already have this email (when both have emails)
+            if (dc.email && contactsToCreate.some(c => c.email && c.email.toLowerCase() === dc.email!.toLowerCase())) {
+              continue
             }
+            const names = splitName(dc.name)
+            contactsToCreate.push({
+              first_name: names.first_name,
+              last_name: names.last_name,
+              email: dc.email || null,
+              title: dc.title || null,
+              linkedin_url: dc.linkedin_url || null,
+            })
           }
         }
       }
@@ -228,9 +236,11 @@ export async function POST(request: NextRequest) {
             company_id: company.id,
             first_name: contactData.first_name,
             last_name: contactData.last_name,
-            email: contactData.email,
+            email: contactData.email || null,
+            phone: contactData.phone || null,
             title: contactData.title,
             linkedin_url: contactData.linkedin_url || null,
+            youtube_channel_url: contactData.youtube_channel_url || null,
             source: input.event,
             outreach_status: "not_contacted",
             show_on_articles: false,
@@ -266,7 +276,7 @@ export async function POST(request: NextRequest) {
 
       // If user wanted contacts but we couldn't create any
       if (contactsToCreate.length === 0) {
-        contactError = "No contacts with email addresses were found"
+        contactError = "No contacts were found to create"
       }
     }
 
