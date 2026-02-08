@@ -3,6 +3,7 @@ import Link from "next/link"
 import {
   ArrowLeft,
   Linkedin,
+  Youtube,
   Building2,
   Calendar,
   MapPin,
@@ -299,6 +300,17 @@ export default async function LeaderProfilePage({ params }: PageProps) {
                   >
                     <Linkedin className="h-4 w-4" />
                     LinkedIn
+                  </a>
+                )}
+                {contact.youtube_channel_url && (
+                  <a
+                    href={contact.youtube_channel_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white hover:bg-white/20 transition-colors"
+                  >
+                    <Youtube className="h-4 w-4" />
+                    YouTube
                   </a>
                 )}
               </div>
