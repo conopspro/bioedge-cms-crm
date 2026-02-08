@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
 
-const PERPLEXITY_API = "https://api.perplexity.ai/chat/completions"
-
 /**
  * POST /api/fetch-metadata
  *
- * Fetches metadata (title, author) from a URL using Perplexity.
- * Useful for auto-filling book info from Amazon links.
+ * Fetches metadata (title, author) from a URL by scraping the actual page.
+ * Extracts Open Graph tags, meta tags, and structured data from the HTML.
+ * No AI involved - returns the exact metadata from the source page.
  */
 export async function POST(request: NextRequest) {
   try {
@@ -16,111 +15,39 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 })
     }
 
-    const apiKey = process.env.PERPLEXITY_API_KEY
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Perplexity API not configured" },
-        { status: 500 }
-      )
-    }
-
-    // Check if URL is an Amazon link (including short URLs like a.co and amzn.to)
-    const isAmazonUrl = url.includes("amazon") || url.includes("a.co") || url.includes("amzn")
-
-    // Build prompt based on type
-    let prompt = ""
-    if (type === "book" && isAmazonUrl) {
-      prompt = `Look at this Amazon book URL and extract the book information:
-URL: ${url}
-
-Return ONLY a JSON object with these fields:
-{
-  "title": "Full book title including subtitle",
-  "author": "Author name(s)"
-}
-
-Only return the JSON, no other text.`
-    } else if (type === "scholar") {
-      prompt = `Look at this research paper/academic article URL and extract the paper information:
-URL: ${url}
-
-Return ONLY a JSON object with these fields:
-{
-  "title": "Full paper title",
-  "publication": "Journal name, conference name, or publisher (if available)"
-}
-
-Only return the JSON, no other text.`
-    } else {
-      // Generic URL metadata extraction
-      prompt = `Look at this URL and extract the page title:
-URL: ${url}
-
-Return ONLY a JSON object with:
-{
-  "title": "The page/content title"
-}
-
-Only return the JSON, no other text.`
-    }
-
-    const response = await fetch(PERPLEXITY_API, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "sonar",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a metadata extraction assistant. Extract information from URLs and return clean JSON.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.1,
-        max_tokens: 500,
-      }),
-    })
-
-    if (!response.ok) {
-      console.error("Perplexity API error:", response.status)
-      return NextResponse.json(
-        { error: "Failed to fetch metadata" },
-        { status: 500 }
-      )
-    }
-
-    const data = await response.json()
-    const content = data.choices?.[0]?.message?.content || ""
-
-    // Parse JSON from response
-    let metadata = {}
+    // Fetch the actual page HTML
+    let html = ""
     try {
-      let jsonStr = content.trim()
-      // Extract JSON from markdown code block if present
-      const jsonMatch = jsonStr.match(/```(?:json)?\s*([\s\S]*?)```/)
-      if (jsonMatch) {
-        jsonStr = jsonMatch[1].trim()
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          Accept:
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.9",
+        },
+        redirect: "follow",
+      })
+
+      if (!response.ok) {
+        console.error("Failed to fetch URL:", response.status, url)
+        return NextResponse.json(
+          { error: "Failed to fetch page" },
+          { status: 502 }
+        )
       }
-      // Find JSON object
-      const objectMatch = jsonStr.match(/\{[\s\S]*\}/)
-      if (objectMatch) {
-        jsonStr = objectMatch[0]
-      }
-      metadata = JSON.parse(jsonStr)
-    } catch (parseError) {
-      console.error("Failed to parse metadata:", parseError)
+
+      html = await response.text()
+    } catch (fetchError) {
+      console.error("Error fetching URL:", fetchError)
       return NextResponse.json(
-        { error: "Failed to parse metadata" },
-        { status: 500 }
+        { error: "Failed to fetch page" },
+        { status: 502 }
       )
     }
+
+    // Extract metadata from HTML
+    const metadata = extractMetadata(html, type, url)
 
     return NextResponse.json(metadata)
   } catch (error) {
@@ -130,4 +57,198 @@ Only return the JSON, no other text.`
       { status: 500 }
     )
   }
+}
+
+/**
+ * Extract metadata from HTML based on content type
+ */
+function extractMetadata(
+  html: string,
+  type: string,
+  url: string
+): Record<string, string> {
+  const result: Record<string, string> = {}
+
+  if (type === "book") {
+    // For Amazon books, extract title and author from the page
+    result.title = extractBookTitle(html) || extractOGTitle(html) || extractPageTitle(html) || ""
+    result.author = extractBookAuthor(html) || ""
+  } else if (type === "scholar") {
+    // For research papers, extract title and publication
+    result.title = extractOGTitle(html) || extractPageTitle(html) || ""
+    result.publication = extractMetaContent(html, "citation_journal_title") || ""
+  } else {
+    // Generic: just get the page title
+    result.title = extractOGTitle(html) || extractPageTitle(html) || ""
+  }
+
+  // Clean up titles - remove site name suffixes
+  if (result.title) {
+    result.title = cleanTitle(result.title, url)
+  }
+
+  return result
+}
+
+/**
+ * Extract book title from Amazon page HTML
+ * Tries multiple approaches in order of reliability
+ */
+function extractBookTitle(html: string): string {
+  // 1. Try the product title span (most reliable on Amazon)
+  const productTitleMatch = html.match(
+    /id="productTitle"[^>]*>\s*([^<]+)/i
+  )
+  if (productTitleMatch) {
+    return productTitleMatch[1].trim()
+  }
+
+  // 2. Try the ebook product title
+  const ebookTitleMatch = html.match(
+    /id="ebooksProductTitle"[^>]*>\s*([^<]+)/i
+  )
+  if (ebookTitleMatch) {
+    return ebookTitleMatch[1].trim()
+  }
+
+  // 3. Try schema.org structured data for name
+  const schemaNameMatch = html.match(
+    /"name"\s*:\s*"([^"]+)"/
+  )
+  if (schemaNameMatch) {
+    return decodeHTMLEntities(schemaNameMatch[1].trim())
+  }
+
+  // 4. Try og:title
+  return extractOGTitle(html) || ""
+}
+
+/**
+ * Extract book author from Amazon page HTML
+ */
+function extractBookAuthor(html: string): string {
+  // 1. Try the author link/span on Amazon
+  // Amazon uses "bylineInfo" div with author links
+  const bylineMatch = html.match(
+    /id="bylineInfo"[\s\S]*?class="author[\s\S]*?<a[^>]*>([^<]+)/i
+  )
+  if (bylineMatch) {
+    return bylineMatch[1].trim()
+  }
+
+  // 2. Try contributorNameID
+  const contributorMatch = html.match(
+    /class="contributorNameID"[^>]*>([^<]+)/i
+  )
+  if (contributorMatch) {
+    return contributorMatch[1].trim()
+  }
+
+  // 3. Try the simpler author pattern on Amazon
+  const authorLinkMatch = html.match(
+    /class="a-link-normal contributorNameID"[^>]*>([^<]+)/i
+  )
+  if (authorLinkMatch) {
+    return authorLinkMatch[1].trim()
+  }
+
+  // 4. Try any link within bylineInfo
+  const bylineAnyMatch = html.match(
+    /id="bylineInfo"[\s\S]*?<a[^>]*class="a-link-normal"[^>]*>([^<]+)/i
+  )
+  if (bylineAnyMatch) {
+    return bylineAnyMatch[1].trim()
+  }
+
+  // 5. Try schema.org author
+  const schemaAuthorMatch = html.match(
+    /"author"\s*:\s*\{[^}]*"name"\s*:\s*"([^"]+)"/
+  )
+  if (schemaAuthorMatch) {
+    return decodeHTMLEntities(schemaAuthorMatch[1].trim())
+  }
+
+  // 6. Try simple schema.org author (string value)
+  const schemaAuthorSimple = html.match(
+    /"author"\s*:\s*"([^"]+)"/
+  )
+  if (schemaAuthorSimple) {
+    return decodeHTMLEntities(schemaAuthorSimple[1].trim())
+  }
+
+  // 7. Try meta tag author
+  return extractMetaContent(html, "author") || ""
+}
+
+/**
+ * Extract Open Graph title
+ */
+function extractOGTitle(html: string): string {
+  const match = html.match(
+    /<meta\s+(?:property|name)="og:title"\s+content="([^"]+)"/i
+  ) || html.match(
+    /<meta\s+content="([^"]+)"\s+(?:property|name)="og:title"/i
+  )
+  return match ? decodeHTMLEntities(match[1].trim()) : ""
+}
+
+/**
+ * Extract <title> tag content
+ */
+function extractPageTitle(html: string): string {
+  const match = html.match(/<title[^>]*>([^<]+)<\/title>/i)
+  return match ? decodeHTMLEntities(match[1].trim()) : ""
+}
+
+/**
+ * Extract content from a meta tag by name
+ */
+function extractMetaContent(html: string, name: string): string {
+  const match = html.match(
+    new RegExp(
+      `<meta\\s+(?:name|property)="${name}"\\s+content="([^"]+)"`,
+      "i"
+    )
+  ) || html.match(
+    new RegExp(
+      `<meta\\s+content="([^"]+)"\\s+(?:name|property)="${name}"`,
+      "i"
+    )
+  )
+  return match ? decodeHTMLEntities(match[1].trim()) : ""
+}
+
+/**
+ * Clean title by removing common site name suffixes
+ */
+function cleanTitle(title: string, url: string): string {
+  // Remove Amazon-style suffixes
+  if (url.includes("amazon")) {
+    title = title
+      .replace(/\s*:\s*Amazon\.com\s*:\s*Books\s*$/i, "")
+      .replace(/\s*-\s*Amazon\.com\s*$/i, "")
+      .replace(/\s*\|\s*Amazon\.com\s*$/i, "")
+      .replace(/Amazon\.com\s*:\s*/i, "")
+  }
+
+  // Remove generic suffixes
+  title = title
+    .replace(/\s*\|\s*[^|]+$/, "") // Remove " | Site Name"
+    .replace(/\s*-\s*[^-]+$/, "") // Remove " - Site Name" (careful: only last one)
+
+  return title.trim()
+}
+
+/**
+ * Decode HTML entities
+ */
+function decodeHTMLEntities(text: string): string {
+  return text
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#x27;/g, "'")
+    .replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num)))
 }

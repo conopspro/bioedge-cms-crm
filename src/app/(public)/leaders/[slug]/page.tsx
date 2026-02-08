@@ -643,39 +643,41 @@ export default async function LeaderProfilePage({ params }: PageProps) {
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
                 Books
               </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {books.map((book: any) => (
-                  <a
-                    key={book.id}
-                    href={book.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="be-card hover:shadow-lg transition-shadow flex gap-4"
-                  >
-                    {book.metadata?.thumbnail && (
-                      <img
-                        src={book.metadata.thumbnail}
-                        alt={book.title}
-                        className="w-16 h-24 object-cover rounded flex-shrink-0"
-                      />
-                    )}
-                    <div className="min-w-0">
-                      <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors line-clamp-2">
-                        {book.title}
-                      </h3>
-                      {book.metadata?.authors && (
-                        <p className="text-sm text-text-light mt-1">
-                          {book.metadata.authors.join(", ")}
-                        </p>
+              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
+                <div className="space-y-4">
+                  {books.map((book: any) => (
+                    <a
+                      key={book.id}
+                      href={book.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex gap-4 hover:bg-gray-50 -mx-2 px-2 py-2 rounded-lg transition-colors"
+                    >
+                      {book.metadata?.thumbnail && (
+                        <img
+                          src={book.metadata.thumbnail}
+                          alt={book.title}
+                          className="w-16 h-24 object-cover rounded flex-shrink-0"
+                        />
                       )}
-                      {book.metadata?.rating && (
-                        <p className="text-sm mt-1" style={{ color: "#017ab2" }}>
-                          ★ {book.metadata.rating}
-                        </p>
-                      )}
-                    </div>
-                  </a>
-                ))}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors line-clamp-2">
+                          {book.title}
+                        </h3>
+                        {book.metadata?.authors && (
+                          <p className="text-sm text-text-light mt-1">
+                            {book.metadata.authors.join(", ")}
+                          </p>
+                        )}
+                        {book.metadata?.rating && (
+                          <p className="text-sm mt-1" style={{ color: "#017ab2" }}>
+                            ★ {book.metadata.rating}
+                          </p>
+                        )}
+                      </div>
+                    </a>
+                  ))}
+                </div>
               </div>
             </section>
           )}
