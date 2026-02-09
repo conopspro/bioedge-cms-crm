@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Building2 } from "lucide-react"
+import { FeaturedCardSlider } from "@/components/ui/featured-card-slider"
 
 interface Company {
   id: string
@@ -13,6 +14,7 @@ interface HomepageFeaturedCompaniesProps {
   label?: string | null
   title?: string | null
   companies: Company[]
+  totalCount?: number
   settings?: {
     bg_color?: string | null
     title_color?: string | null
@@ -39,6 +41,7 @@ export function HomepageFeaturedCompanies({
   label = "COMPANIES",
   title = "Featured Companies",
   companies,
+  totalCount,
   settings,
 }: HomepageFeaturedCompaniesProps) {
   const bgColor = settings?.bg_color || null
@@ -108,12 +111,13 @@ export function HomepageFeaturedCompanies({
           )}
         </div>
 
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          {companies.slice(0, 4).map((company) => (
+        <FeaturedCardSlider>
+          {companies.map((company) => (
             <Link
               key={company.id}
               href={`/companies/${company.slug || company.domain || company.id}`}
-              className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              style={{ scrollSnapAlign: "start" }}
             >
               <div className="p-6">
                 <div className="flex flex-col items-center text-center">
@@ -142,14 +146,14 @@ export function HomepageFeaturedCompanies({
               </div>
             </Link>
           ))}
-        </div>
+        </FeaturedCardSlider>
 
         <div className="mt-8 text-center">
           <Link
             href="/companies"
             className="inline-flex items-center gap-2 text-electric-blue font-semibold hover:text-navy transition-colors"
           >
-            View All Companies →
+            View All {totalCount ? `${totalCount} ` : ""}Companies →
           </Link>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Users, Linkedin } from "lucide-react"
+import { FeaturedCardSlider } from "@/components/ui/featured-card-slider"
 
 interface Leader {
   id: string
@@ -16,6 +17,7 @@ interface HomepageFeaturedLeadersProps {
   label?: string | null
   title?: string | null
   leaders: Leader[]
+  totalCount?: number
   settings?: {
     bg_color?: string | null
     title_color?: string | null
@@ -42,6 +44,7 @@ export function HomepageFeaturedLeaders({
   label = "LEADERS",
   title = "Featured Leaders",
   leaders,
+  totalCount,
   settings,
 }: HomepageFeaturedLeadersProps) {
   const bgColor = settings?.bg_color || null
@@ -111,12 +114,13 @@ export function HomepageFeaturedLeaders({
           )}
         </div>
 
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          {leaders.slice(0, 4).map((leader) => (
+        <FeaturedCardSlider>
+          {leaders.map((leader) => (
             <Link
               key={leader.id}
               href={`/leaders/${leader.slug || leader.id}`}
-              className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              style={{ scrollSnapAlign: "start" }}
             >
               <div className="p-6">
                 <div className="flex flex-col items-center text-center">
@@ -159,14 +163,14 @@ export function HomepageFeaturedLeaders({
               </div>
             </Link>
           ))}
-        </div>
+        </FeaturedCardSlider>
 
         <div className="mt-8 text-center">
           <Link
             href="/leaders"
             className="inline-flex items-center gap-2 text-electric-blue font-semibold hover:text-navy transition-colors"
           >
-            View All Leaders →
+            View All {totalCount ? `${totalCount} ` : ""}Leaders →
           </Link>
         </div>
       </div>

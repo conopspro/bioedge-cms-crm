@@ -15,6 +15,7 @@ import { HomepageFeaturedLeaders } from "@/components/home/homepage-featured-lea
 import { HomepageFeaturedCompanies } from "@/components/home/homepage-featured-companies"
 import { HomepageFeaturedPresentations } from "@/components/home/homepage-featured-presentations"
 import { HomepageFeaturedArticles } from "@/components/home/homepage-featured-articles"
+import { HomepageFeaturedSpotlight } from "@/components/home/homepage-featured-spotlight"
 import { WebSiteJsonLd } from "@/components/seo/json-ld"
 
 /**
@@ -39,6 +40,12 @@ export default async function HomePage() {
     { data: featuredCompanies },
     { data: featuredPresentations },
     { data: featuredArticles },
+    { data: featuredSpotlights },
+    { count: totalLeadersCount },
+    { count: totalCompaniesCount },
+    { count: totalPresentationsCount },
+    { count: totalArticlesCount },
+    { count: totalSpotlightsCount },
   ] = await Promise.all([
     // Homepage settings
     supabase
@@ -105,7 +112,7 @@ export default async function HomePage() {
       .eq("is_featured", true)
       .eq("show_on_articles", true)
       .order("last_name")
-      .limit(4),
+      .limit(12),
 
     // Featured companies (exclude drafts - include NULL and false)
     supabase
@@ -114,7 +121,7 @@ export default async function HomePage() {
       .eq("is_featured", true)
       .or("is_draft.is.null,is_draft.eq.false")
       .order("name")
-      .limit(4),
+      .limit(12),
 
     // Featured presentations
     supabase
@@ -127,7 +134,7 @@ export default async function HomePage() {
       .eq("is_featured", true)
       .eq("status", "published")
       .order("title")
-      .limit(4),
+      .limit(12),
 
     // Featured articles
     supabase
@@ -139,7 +146,46 @@ export default async function HomePage() {
       .eq("is_featured", true)
       .eq("status", "published")
       .order("title")
-      .limit(4),
+      .limit(12),
+
+    // Featured spotlights
+    supabase
+      .from("spotlights")
+      .select(`
+        id, title, slug, short_description, youtube_url,
+        contact:contacts(id, first_name, last_name, avatar_url),
+        company:companies(name)
+      `)
+      .eq("is_featured", true)
+      .eq("status", "published")
+      .order("title")
+      .limit(12),
+
+    // Count queries for "View All" links
+    supabase
+      .from("contacts")
+      .select("id", { count: "exact", head: true })
+      .eq("show_on_articles", true),
+
+    supabase
+      .from("companies")
+      .select("id", { count: "exact", head: true })
+      .or("is_draft.is.null,is_draft.eq.false"),
+
+    supabase
+      .from("presentations")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published"),
+
+    supabase
+      .from("articles")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published"),
+
+    supabase
+      .from("spotlights")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "published"),
   ])
 
   // Prefetch slider data for any slider sections (avoids per-component DB queries)
@@ -247,6 +293,7 @@ export default async function HomePage() {
             label={section.label}
             title={section.title}
             leaders={(featuredLeaders || []) as any}
+            totalCount={totalLeadersCount || undefined}
             settings={section.settings}
           />
         )
@@ -257,6 +304,7 @@ export default async function HomePage() {
             label={section.label}
             title={section.title}
             companies={(featuredCompanies || []) as any}
+            totalCount={totalCompaniesCount || undefined}
             settings={section.settings}
           />
         )
@@ -267,6 +315,7 @@ export default async function HomePage() {
             label={section.label}
             title={section.title}
             presentations={(featuredPresentations || []) as any}
+            totalCount={totalPresentationsCount || undefined}
             settings={section.settings}
           />
         )
@@ -277,6 +326,18 @@ export default async function HomePage() {
             label={section.label}
             title={section.title}
             articles={(featuredArticles || []) as any}
+            totalCount={totalArticlesCount || undefined}
+            settings={section.settings}
+          />
+        )
+      case "featured_spotlight":
+        return (
+          <HomepageFeaturedSpotlight
+            key={section.id}
+            label={section.label}
+            title={section.title}
+            spotlights={(featuredSpotlights || []) as any}
+            totalCount={totalSpotlightsCount || undefined}
             settings={section.settings}
           />
         )

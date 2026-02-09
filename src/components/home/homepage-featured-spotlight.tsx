@@ -1,10 +1,10 @@
 import Link from "next/link"
-import { Video, User, Play } from "lucide-react"
+import { Sparkles, User, Play } from "lucide-react"
 import { getYouTubeThumbnailUrl } from "@/lib/youtube"
 import { YouTubeThumbnail } from "@/components/ui/youtube-thumbnail"
 import { FeaturedCardSlider } from "@/components/ui/featured-card-slider"
 
-interface Presentation {
+interface Spotlight {
   id: string
   title: string
   slug: string | null
@@ -21,10 +21,10 @@ interface Presentation {
   } | null
 }
 
-interface HomepageFeaturedPresentationsProps {
+interface HomepageFeaturedSpotlightProps {
   label?: string | null
   title?: string | null
-  presentations: Presentation[]
+  spotlights: Spotlight[]
   totalCount?: number
   settings?: {
     bg_color?: string | null
@@ -48,13 +48,13 @@ const isDarkColor = (color: string | null | undefined): boolean => {
   return color.includes('navy') || color.includes('0a2540') || color.includes('gradient')
 }
 
-export function HomepageFeaturedPresentations({
-  label = "PRESENTATIONS",
-  title = "Featured Presentations",
-  presentations,
+export function HomepageFeaturedSpotlight({
+  label = "EDUCATION SPOTLIGHT",
+  title = "Education Spotlight",
+  spotlights,
   totalCount,
   settings,
-}: HomepageFeaturedPresentationsProps) {
+}: HomepageFeaturedSpotlightProps) {
   const bgColor = settings?.bg_color || null
   const titleColor = settings?.title_color || null
   const labelBgColor = settings?.label_bg_color || "#0d598a"
@@ -64,7 +64,7 @@ export function HomepageFeaturedPresentations({
   const bgStyle: React.CSSProperties = bgColor ? { background: bgColor } : {}
   const bgClass = bgColor ? "" : "bg-off-white"
 
-  if (presentations.length === 0) {
+  if (spotlights.length === 0) {
     return (
       <section className={`py-12 px-8 ${bgClass}`} style={bgStyle}>
         <div className="mx-auto max-w-[1200px]">
@@ -89,10 +89,10 @@ export function HomepageFeaturedPresentations({
           <div className="max-w-lg mx-auto">
             <div className="rounded-2xl bg-white shadow-lg p-8 text-center">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-navy via-deep-blue to-electric-blue flex items-center justify-center">
-                <Video className="h-8 w-8 text-white" />
+                <Sparkles className="h-8 w-8 text-white" />
               </div>
-              <h3 className="text-xl font-bold text-navy mb-2">Presentations Coming Soon</h3>
-              <p className="text-deep-blue">Check back soon for featured presentations.</p>
+              <h3 className="text-xl font-bold text-navy mb-2">Spotlights Coming Soon</h3>
+              <p className="text-deep-blue">Check back soon for featured spotlight content.</p>
             </div>
           </div>
         </div>
@@ -123,23 +123,23 @@ export function HomepageFeaturedPresentations({
         </div>
 
         <FeaturedCardSlider>
-          {presentations.map((presentation) => {
-            const thumbnailUrl = presentation.youtube_url
-              ? getYouTubeThumbnailUrl(presentation.youtube_url)
+          {spotlights.map((spotlight) => {
+            const thumbnailUrl = spotlight.youtube_url
+              ? getYouTubeThumbnailUrl(spotlight.youtube_url)
               : null
 
             return (
               <Link
-                key={presentation.id}
-                href={`/presentations/${presentation.slug || presentation.id}`}
+                key={spotlight.id}
+                href={`/spotlight/${spotlight.slug || spotlight.id}`}
                 className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
                 style={{ scrollSnapAlign: "start" }}
               >
                 <div className="relative aspect-video w-full overflow-hidden bg-gradient-to-br from-navy/10 to-electric-blue/10">
                   {thumbnailUrl ? (
                     <YouTubeThumbnail
-                      url={presentation.youtube_url!}
-                      alt={presentation.title}
+                      url={spotlight.youtube_url!}
+                      alt={spotlight.title}
                       className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
@@ -150,11 +150,11 @@ export function HomepageFeaturedPresentations({
                 </div>
                 <div className="p-6">
                   {/* Speaker Info */}
-                  {presentation.contact && (
+                  {spotlight.contact && (
                     <div className="flex items-center gap-2 mb-3">
-                      {presentation.contact.avatar_url ? (
+                      {spotlight.contact.avatar_url ? (
                         <img
-                          src={presentation.contact.avatar_url}
+                          src={spotlight.contact.avatar_url}
                           alt=""
                           className="h-8 w-8 rounded-full object-cover ring-1 ring-electric-blue/20"
                           loading="lazy"
@@ -165,7 +165,7 @@ export function HomepageFeaturedPresentations({
                         </div>
                       )}
                       <span className="text-xs font-medium text-electric-blue truncate">
-                        {presentation.contact.first_name} {presentation.contact.last_name}
+                        {spotlight.contact.first_name} {spotlight.contact.last_name}
                       </span>
                     </div>
                   )}
@@ -174,18 +174,18 @@ export function HomepageFeaturedPresentations({
                     className="font-bold text-lg transition-colors group-hover:text-electric-blue line-clamp-2 mb-2"
                     style={{ color: textColor || "#0a2540" }}
                   >
-                    {presentation.title}
+                    {spotlight.title}
                   </h3>
 
-                  {presentation.short_description && (
+                  {spotlight.short_description && (
                     <p className="text-sm text-gray-600 line-clamp-2">
-                      {presentation.short_description}
+                      {spotlight.short_description}
                     </p>
                   )}
 
-                  {presentation.company?.name && !presentation.contact && (
+                  {spotlight.company?.name && !spotlight.contact && (
                     <p className="text-xs font-medium text-electric-blue mt-2">
-                      {presentation.company.name}
+                      {spotlight.company.name}
                     </p>
                   )}
                 </div>
@@ -196,10 +196,10 @@ export function HomepageFeaturedPresentations({
 
         <div className="mt-8 text-center">
           <Link
-            href="/presentations"
+            href="/spotlight"
             className="inline-flex items-center gap-2 text-electric-blue font-semibold hover:text-navy transition-colors"
           >
-            View All {totalCount ? `${totalCount} ` : ""}Presentations →
+            View All {totalCount ? `${totalCount} ` : ""}Spotlights →
           </Link>
         </div>
       </div>

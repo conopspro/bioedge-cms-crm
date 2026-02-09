@@ -24,6 +24,7 @@ import {
   FileText,
   Play,
   Home,
+  BookOpen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -134,6 +135,7 @@ const sectionIcons: Record<string, any> = {
   featured_companies: Building2,
   featured_presentations: Play,
   featured_articles: FileText,
+  featured_spotlight: BookOpen,
 }
 
 // Preset color options for quick selection - bioEDGE brand colors

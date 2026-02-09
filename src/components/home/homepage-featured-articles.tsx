@@ -2,6 +2,7 @@ import Link from "next/link"
 import { FileText } from "lucide-react"
 import { getArticleImageUrl } from "@/lib/youtube"
 import { YouTubeThumbnail } from "@/components/ui/youtube-thumbnail"
+import { FeaturedCardSlider } from "@/components/ui/featured-card-slider"
 
 interface Article {
   id: string
@@ -19,6 +20,7 @@ interface HomepageFeaturedArticlesProps {
   label?: string | null
   title?: string | null
   articles: Article[]
+  totalCount?: number
   settings?: {
     bg_color?: string | null
     title_color?: string | null
@@ -45,6 +47,7 @@ export function HomepageFeaturedArticles({
   label = "ARTICLES",
   title = "Featured Articles",
   articles,
+  totalCount,
   settings,
 }: HomepageFeaturedArticlesProps) {
   const bgColor = settings?.bg_color || null
@@ -114,8 +117,8 @@ export function HomepageFeaturedArticles({
           )}
         </div>
 
-        <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          {articles.slice(0, 4).map((article) => {
+        <FeaturedCardSlider>
+          {articles.map((article) => {
             const imageUrl = getArticleImageUrl(article.featured_image_url, article.youtube_url)
             const hasVideo = !article.featured_image_url && article.youtube_url
 
@@ -123,7 +126,8 @@ export function HomepageFeaturedArticles({
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="group overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+                className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+                style={{ scrollSnapAlign: "start" }}
               >
                 {imageUrl && (
                   <div className="relative aspect-video w-full overflow-hidden">
@@ -166,14 +170,14 @@ export function HomepageFeaturedArticles({
               </Link>
             )
           })}
-        </div>
+        </FeaturedCardSlider>
 
         <div className="mt-8 text-center">
           <Link
             href="/articles"
             className="inline-flex items-center gap-2 text-electric-blue font-semibold hover:text-navy transition-colors"
           >
-            View All Articles →
+            View All {totalCount ? `${totalCount} ` : ""}Articles →
           </Link>
         </div>
       </div>
