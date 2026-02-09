@@ -13,6 +13,7 @@ import {
   Copy,
   Check,
   Sparkles,
+  User,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -62,6 +63,7 @@ export default function ResearchReviewPage() {
 
   // Options for what to create
   const [createArticle, setCreateArticle] = useState(true)
+  const [createContact, setCreateContact] = useState(false)
 
   useEffect(() => {
     // Fetch categories from API
@@ -86,6 +88,10 @@ export default function ResearchReviewPage() {
         setResult(parsed)
         setResearch(parsed.data)
         setInput(parsed.input)
+        // Auto-enable contact creation if contact info was provided
+        if (parsed.input.contact_first_name) {
+          setCreateContact(true)
+        }
       } catch (e) {
         setError("Failed to load research results")
       }
@@ -131,7 +137,7 @@ export default function ResearchReviewPage() {
           input,
           research,
           createArticle,
-          createContact: false, // Never create contacts from research
+          createContact,
         }),
       })
 
@@ -146,6 +152,9 @@ export default function ResearchReviewPage() {
 
       // Build feedback message for any errors
       const errors: string[] = []
+      if (createContact && result.contact_error) {
+        errors.push(`Contact: ${result.contact_error}`)
+      }
       if (createArticle && result.article_error) {
         errors.push(`Article: ${result.article_error}`)
       }
@@ -428,6 +437,23 @@ export default function ResearchReviewPage() {
                 <label className="flex items-center gap-3 cursor-pointer">
                   <input
                     type="checkbox"
+                    checked={createContact}
+                    onChange={(e) => setCreateContact(e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                  <div>
+                    <p className="font-medium text-sm">Create Contact</p>
+                    <p className="text-xs text-muted-foreground">
+                      {input?.contact_first_name
+                        ? `${input.contact_first_name} ${input.contact_last_name || ""}`.trim()
+                        : "No contact info provided"}
+                    </p>
+                  </div>
+                </label>
+
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
                     checked={createArticle}
                     onChange={(e) => setCreateArticle(e.target.checked)}
                     className="h-4 w-4"
@@ -483,6 +509,48 @@ export default function ResearchReviewPage() {
                 <p className="text-muted-foreground">Event</p>
                 <p className="font-medium">{input.event}</p>
               </div>
+              {input.contact_first_name && (
+                <>
+                  <Separator />
+                  <div>
+                    <p className="text-muted-foreground flex items-center gap-1">
+                      <User className="h-3 w-3" /> Contact
+                    </p>
+                    <p className="font-medium">
+                      {input.contact_first_name} {input.contact_last_name || ""}
+                    </p>
+                    {input.contact_title && (
+                      <p className="text-muted-foreground">{input.contact_title}</p>
+                    )}
+                    {input.contact_email && (
+                      <p className="text-xs">{input.contact_email}</p>
+                    )}
+                    {input.contact_phone && (
+                      <p className="text-xs">{input.contact_phone}</p>
+                    )}
+                    {input.contact_linkedin_url && (
+                      <a
+                        href={input.contact_linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline block"
+                      >
+                        LinkedIn
+                      </a>
+                    )}
+                    {input.contact_youtube_channel_url && (
+                      <a
+                        href={input.contact_youtube_channel_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:underline block"
+                      >
+                        YouTube
+                      </a>
+                    )}
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
