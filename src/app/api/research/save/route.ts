@@ -234,6 +234,7 @@ export async function POST(request: NextRequest) {
           .from("contacts")
           .insert({
             company_id: company.id,
+            name: `${contactData.first_name} ${contactData.last_name}`.trim(),
             first_name: contactData.first_name,
             last_name: contactData.last_name,
             email: contactData.email || null,
