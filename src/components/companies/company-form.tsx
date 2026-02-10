@@ -88,7 +88,6 @@ export function CompanyForm({ company, mode }: CompanyFormProps) {
     warm_pitch: company?.warm_pitch || null,
     research_notes: company?.research_notes || null,
     researched_at: company?.researched_at || null,
-    primary_contact_id: company?.primary_contact_id || null,
     // Hunter.io enrichment fields (populated by AI Enhance)
     employee_count: company?.employee_count || null,
     industry: company?.industry || null,

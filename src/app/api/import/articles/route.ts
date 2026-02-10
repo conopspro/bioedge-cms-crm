@@ -603,12 +603,6 @@ export async function POST(request: NextRequest) {
 
               if (newContact) {
                 contactCreated = parsed.contactName
-
-                // Set as primary contact
-                await supabase
-                  .from("companies")
-                  .update({ primary_contact_id: newContact.id })
-                  .eq("id", companyId)
               } else if (contactError) {
                 console.error("Failed to create contact:", contactError.message)
               }

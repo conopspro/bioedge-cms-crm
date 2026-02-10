@@ -225,7 +225,6 @@ export interface Company {
   warm_pitch: string | null // Draft pitch email
   research_notes: string | null // Raw research findings
   researched_at: string | null // When research was performed
-  primary_contact_id: string | null // Reference to primary contact
   // Image fields
   logo_url: string | null // Company logo (400x400 square)
   logo_storage_path: string | null // Supabase storage path for self-hosted logos

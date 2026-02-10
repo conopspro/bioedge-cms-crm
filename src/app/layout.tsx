@@ -53,6 +53,18 @@ export default function RootLayout({
             gtag('config', 'G-K8TCH05R07');
           `}
         </Script>
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-J4YFNV6XZZ"
+          strategy="afterInteractive"
+        />
+        <Script id="google-adwords" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-J4YFNV6XZZ');
+          `}
+        </Script>
       </head>
       <body className="font-body antialiased">
         {children}

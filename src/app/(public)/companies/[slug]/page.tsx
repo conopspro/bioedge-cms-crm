@@ -268,7 +268,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {company.differentiators && (
             <section>
               <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                What Sets Them Apart
+                Longevity Contribution
               </h2>
               <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
                 {(() => {

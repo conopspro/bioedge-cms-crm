@@ -515,7 +515,7 @@ export function CompanyDetailEditor({
 
         {/* Key Differentiators */}
         <EditableCard
-          title="What Sets Them Apart"
+          title="Longevity Contribution"
           description="Key differentiators and unique value"
           isEditing={editingSection === "differentiators"}
           isSaving={isSaving}

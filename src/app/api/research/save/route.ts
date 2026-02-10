@@ -254,18 +254,8 @@ export async function POST(request: NextRequest) {
           contactErrors.push(`${contactData.email}: ${createContactError.message}`)
         } else {
           contactsCreated++
-          // Set first contact as primary
           if (!contactId) {
             contactId = contact.id
-            const { error: primaryContactError } = await supabase
-              .from("companies")
-              .update({ primary_contact_id: contact.id })
-              .eq("id", company.id)
-
-            if (primaryContactError) {
-              console.error("Error setting primary contact:", primaryContactError)
-              contactErrors.push(`Failed to set primary contact: ${primaryContactError.message}`)
-            }
           }
         }
       }
