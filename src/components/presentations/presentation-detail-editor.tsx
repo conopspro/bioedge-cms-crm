@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -242,6 +242,11 @@ export function PresentationDetailEditor({
   const [company, setCompany] = useState(initialCompany)
   const [article, setArticle] = useState(initialArticle)
   const [panelists, setPanelists] = useState(initialPanelists)
+
+  // Sync panelists when server data changes (after router.refresh())
+  useEffect(() => {
+    setPanelists(initialPanelists)
+  }, [initialPanelists])
 
   // Edit states
   const [editingSection, setEditingSection] = useState<string | null>(null)
