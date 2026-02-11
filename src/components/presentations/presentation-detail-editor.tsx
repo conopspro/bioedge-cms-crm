@@ -20,6 +20,8 @@ import {
   Sparkles,
   ChevronDown,
   ChevronUp,
+  Plus,
+  GripVertical,
 } from "lucide-react"
 import { getYouTubeThumbnailUrl, extractYouTubeVideoId } from "@/lib/youtube"
 import { Button } from "@/components/ui/button"
@@ -43,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { createClient } from "@/lib/supabase/client"
+import { SearchSelect } from "@/components/ui/search-select"
 import type { PresentationStatus, Company, Contact, Article, YouTubeEnhancementMetadata, PanelistRole } from "@/types/database"
 
 interface Presentation {
@@ -111,6 +114,24 @@ const roleLabels: Record<PanelistRole, string> = {
   presenter: "Presenter",
   host: "Host",
   guest: "Guest",
+}
+
+const PANELIST_ROLES: { value: PanelistRole; label: string }[] = [
+  { value: "moderator", label: "Moderator" },
+  { value: "panelist", label: "Panelist" },
+  { value: "presenter", label: "Presenter" },
+  { value: "host", label: "Host" },
+  { value: "guest", label: "Guest" },
+]
+
+// Editable panelist form item
+interface EditablePanelist {
+  id?: string
+  contact_id: string
+  role: PanelistRole
+  company_id: string | null
+  article_id: string | null
+  display_order: number
 }
 
 const statusColors: Record<string, "default" | "secondary" | "success"> = {
@@ -236,14 +257,113 @@ export function PresentationDetailEditor({
   // Form data
   const [formData, setFormData] = useState({ ...initialPresentation })
 
+  // Panelist editing state
+  const [editPanelists, setEditPanelists] = useState<EditablePanelist[]>([])
+
   const startEditing = (section: string) => {
     setFormData({ ...presentation })
+    if (section === "panelists") {
+      // Initialize edit panelists from current panelists
+      setEditPanelists(
+        panelists.map((p) => ({
+          id: p.id,
+          contact_id: p.contact_id,
+          role: p.role,
+          company_id: p.company_id,
+          article_id: p.article_id,
+          display_order: p.display_order,
+        }))
+      )
+    }
     setEditingSection(section)
   }
 
   const cancelEditing = () => {
     setFormData({ ...presentation })
+    setEditPanelists([])
     setEditingSection(null)
+  }
+
+  // Panelist editing helpers
+  const addEditPanelist = () => {
+    if (editPanelists.length >= 10) return
+    setEditPanelists([
+      ...editPanelists,
+      {
+        contact_id: "",
+        role: editPanelists.length === 0 ? "presenter" : "panelist",
+        company_id: null,
+        article_id: null,
+        display_order: editPanelists.length,
+      },
+    ])
+  }
+
+  const removeEditPanelist = (index: number) => {
+    const updated = editPanelists.filter((_, i) => i !== index)
+    setEditPanelists(updated.map((p, i) => ({ ...p, display_order: i })))
+  }
+
+  const updateEditPanelist = (index: number, field: keyof EditablePanelist, value: any) => {
+    const updated = [...editPanelists]
+    updated[index] = { ...updated[index], [field]: value }
+
+    // Auto-populate company when contact changes
+    if (field === "contact_id" && value) {
+      const contactMatch = contacts.find((c) => c.id === value)
+      if (contactMatch && "company_id" in contactMatch && contactMatch.company_id) {
+        updated[index].company_id = contactMatch.company_id as string
+      }
+    }
+
+    setEditPanelists(updated)
+  }
+
+  const moveEditPanelist = (index: number, direction: "up" | "down") => {
+    if (
+      (direction === "up" && index === 0) ||
+      (direction === "down" && index === editPanelists.length - 1)
+    ) return
+    const newIndex = direction === "up" ? index - 1 : index + 1
+    const updated = [...editPanelists]
+    const [removed] = updated.splice(index, 1)
+    updated.splice(newIndex, 0, removed)
+    setEditPanelists(updated.map((p, i) => ({ ...p, display_order: i })))
+  }
+
+  const savePanelists = async () => {
+    setIsSaving(true)
+    try {
+      const validPanelists = editPanelists.filter((p) => p.contact_id)
+
+      const response = await fetch(`/api/presentations/${presentation.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          panelists: validPanelists.map((p, index) => ({
+            id: p.id,
+            contact_id: p.contact_id,
+            role: p.role,
+            company_id: p.company_id,
+            article_id: p.article_id,
+            display_order: index,
+          })),
+          // Update legacy fields from first panelist
+          contact_id: validPanelists[0]?.contact_id || null,
+          company_id: validPanelists[0]?.company_id || null,
+          article_id: validPanelists[0]?.article_id || null,
+        }),
+      })
+
+      if (response.ok) {
+        setEditingSection(null)
+        setEditPanelists([])
+        router.refresh()
+      }
+    } catch (err) {
+      console.error("Failed to save panelists:", err)
+    }
+    setIsSaving(false)
   }
 
   const saveSection = async (fields: string[]) => {
@@ -854,19 +974,127 @@ export function PresentationDetailEditor({
               <div>
                 <CardTitle className="text-lg">Speakers & Panelists</CardTitle>
                 <CardDescription>
-                  {panelists.length > 0 ? `${panelists.length} speaker${panelists.length > 1 ? 's' : ''}` : 'No speakers assigned'}
+                  {editingSection === "panelists"
+                    ? "Add, remove, or reorder speakers"
+                    : panelists.length > 0
+                    ? `${panelists.length} speaker${panelists.length > 1 ? 's' : ''}`
+                    : 'No speakers assigned'}
                 </CardDescription>
               </div>
-              <Button size="sm" variant="outline" asChild>
-                <Link href={`/dashboard/presentations/new?edit=${presentation.id}`}>
-                  <Pencil className="h-4 w-4 mr-1" />
-                  Edit
-                </Link>
-              </Button>
+              {editingSection === "panelists" ? (
+                <div className="flex gap-2">
+                  <Button size="sm" variant="ghost" onClick={cancelEditing} disabled={isSaving}>
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" onClick={savePanelists} disabled={isSaving}>
+                    {isSaving ? "Saving..." : <Check className="h-4 w-4" />}
+                  </Button>
+                </div>
+              ) : (
+                <Button size="sm" variant="ghost" onClick={() => startEditing("panelists")}>
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
-            {panelists.length > 0 ? (
+            {editingSection === "panelists" ? (
+              /* Edit mode */
+              <div className="space-y-3">
+                {editPanelists.map((ep, index) => {
+                  const contactMatch = contacts.find((c) => c.id === ep.contact_id)
+                  return (
+                    <div key={index} className="rounded-lg border bg-muted/30 p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <GripVertical className="h-4 w-4 text-muted-foreground" />
+                          <Badge variant="outline" className="text-xs">#{index + 1}</Badge>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button type="button" variant="ghost" size="sm" onClick={() => moveEditPanelist(index, "up")} disabled={index === 0} className="h-7 w-7 p-0">
+                            <ChevronUp className="h-4 w-4" />
+                          </Button>
+                          <Button type="button" variant="ghost" size="sm" onClick={() => moveEditPanelist(index, "down")} disabled={index === editPanelists.length - 1} className="h-7 w-7 p-0">
+                            <ChevronDown className="h-4 w-4" />
+                          </Button>
+                          <Button type="button" variant="ghost" size="sm" onClick={() => removeEditPanelist(index)} className="h-7 w-7 p-0 text-destructive hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="grid gap-2 sm:grid-cols-2">
+                        <div className="space-y-1">
+                          <Label className="flex items-center gap-1 text-xs">
+                            <User className="h-3 w-3" /> Leader *
+                          </Label>
+                          <SearchSelect
+                            options={contacts
+                              .filter((c) => c.show_on_articles)
+                              .map((c) => ({
+                                value: c.id,
+                                label: `${c.first_name} ${c.last_name}`,
+                                sublabel: c.title || undefined,
+                              }))}
+                            value={ep.contact_id}
+                            onValueChange={(v) => updateEditPanelist(index, "contact_id", v)}
+                            placeholder="Search leaders..."
+                            searchPlaceholder="Type a name..."
+                            emptyMessage="No leaders found"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-xs">Role</Label>
+                          <Select value={ep.role} onValueChange={(v) => updateEditPanelist(index, "role", v)}>
+                            <SelectTrigger className="h-9">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {PANELIST_ROLES.map((r) => (
+                                <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="flex items-center gap-1 text-xs">
+                            <Building2 className="h-3 w-3" /> Company
+                          </Label>
+                          <SearchSelect
+                            options={companies.map((c) => ({ value: c.id, label: c.name }))}
+                            value={ep.company_id || ""}
+                            onValueChange={(v) => updateEditPanelist(index, "company_id", v || null)}
+                            placeholder="Select company..."
+                            searchPlaceholder="Type a name..."
+                            emptyMessage="No companies found"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="flex items-center gap-1 text-xs">
+                            <FileText className="h-3 w-3" /> Article
+                          </Label>
+                          <SearchSelect
+                            options={articles.map((a) => ({ value: a.id, label: a.title }))}
+                            value={ep.article_id || ""}
+                            onValueChange={(v) => updateEditPanelist(index, "article_id", v || null)}
+                            placeholder="Select article..."
+                            searchPlaceholder="Type to search..."
+                            emptyMessage="No articles found"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+                {editPanelists.length < 10 && (
+                  <Button type="button" variant="outline" onClick={addEditPanelist} className="w-full border-dashed" size="sm">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add {editPanelists.length === 0 ? "Speaker" : "Another Speaker"}
+                    <span className="text-muted-foreground ml-2">({editPanelists.length}/10)</span>
+                  </Button>
+                )}
+              </div>
+            ) : panelists.length > 0 ? (
+              /* Display mode - existing panelists */
               <div className="space-y-3">
                 {panelists.map((panelist) => (
                   <div
@@ -954,9 +1182,13 @@ export function PresentationDetailEditor({
                 </div>
               </Link>
             ) : (
-              <p className="text-sm text-muted-foreground text-center py-4">
-                No speakers assigned. Click Edit to add speakers.
-              </p>
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground mb-3">No speakers assigned</p>
+                <Button variant="outline" size="sm" onClick={() => startEditing("panelists")}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Speaker
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
