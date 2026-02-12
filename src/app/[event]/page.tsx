@@ -8,6 +8,7 @@ import { FAQAccordion } from "@/components/events/public/faq-accordion"
 import { PhotoSlider } from "@/components/events/public/photo-slider"
 import { VideoPlaylist } from "@/components/events/public/video-playlist"
 import { FinalCtaSection } from "@/components/events/final-cta-section"
+import { CompaniesGrid } from "@/components/events/public/companies-grid"
 import { RichText } from "@/components/ui/rich-text"
 import { EventJsonLd } from "@/components/seo/json-ld"
 
@@ -330,7 +331,7 @@ export default async function EventLandingPage({ params }: PageProps) {
   const venuePhoto = sectionPhotos?.find(p => p.section === 'venue')
   const heroPhoto = sectionPhotos?.find(p => p.section === 'hero')
 
-  // Group companies by role/tier (exclude draft companies - only skip if explicitly true)
+  // Group companies by tier (exclude draft companies - only skip if explicitly true)
   type EventCompany = NonNullable<typeof companies>[number]
   const companyGroups = (companies || []).reduce((acc, ec) => {
     // Handle Supabase returning arrays for single relations
@@ -338,22 +339,27 @@ export default async function EventLandingPage({ params }: PageProps) {
     const company = Array.isArray(rawCompany) ? rawCompany[0] : rawCompany
     // Skip draft companies (only if is_draft is explicitly true, not null)
     if (!company || company.is_draft === true) return acc
-    const role = ec.role || "exhibitor"
-    if (!acc[role]) acc[role] = []
-    acc[role].push(ec)
+    const tier = ec.tier || ec.role || "exhibitor"
+    if (!acc[tier]) acc[tier] = []
+    acc[tier].push(ec)
     return acc
   }, {} as Record<string, EventCompany[]>)
 
-  const tierOrder = ["title_sponsor", "platinum_sponsor", "gold_sponsor", "silver_sponsor", "bronze_sponsor", "exhibitor", "media_partner"]
+  const tierOrder = ["title_sponsor", "platinum", "platinum_sponsor", "gold", "gold_sponsor", "silver", "silver_sponsor", "bronze", "bronze_sponsor", "exhibitor", "contributor", "media_partner"]
   const activeTiers = tierOrder.filter(tier => companyGroups[tier]?.length > 0)
 
   const tierLabels: Record<string, string> = {
     title_sponsor: "Presented By",
+    platinum: "Platinum Sponsors",
     platinum_sponsor: "Platinum Sponsors",
+    gold: "Gold Sponsors",
     gold_sponsor: "Gold Sponsors",
+    silver: "Silver Sponsors",
     silver_sponsor: "Silver Sponsors",
+    bronze: "Bronze Sponsors",
     bronze_sponsor: "Bronze Sponsors",
     exhibitor: "Exhibitors",
+    contributor: "Contributors",
     media_partner: "Media Partners",
   }
 
@@ -1574,43 +1580,11 @@ export default async function EventLandingPage({ params }: PageProps) {
               </Link>
             </div>
 
-            <div className="space-y-6">
-              {activeTiers.slice(0, 3).map((tier) => (
-                <div key={tier}>
-                  <h3 className="font-heading text-sm font-semibold text-navy mb-3">
-                    {tierLabels[tier]}
-                  </h3>
-                  <div className={`grid gap-3 ${
-                    tier.includes("title") || tier.includes("platinum")
-                      ? "grid-cols-2 md:grid-cols-3"
-                      : "grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
-                  }`}>
-                    {(companyGroups[tier] || []).slice(0, tier.includes("title") ? 3 : 12).map((ec: EventCompany) => (
-                      <a
-                        key={ec.id}
-                        href={ec.company?.website || "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="be-card flex items-center justify-center p-3 hover:shadow-lg transition-shadow"
-                      >
-                        {ec.company?.logo_url ? (
-                          <img
-                            src={ec.company.logo_url}
-                            alt={ec.company.name}
-                            className="max-h-28 max-w-full object-contain"
-                            loading="lazy"
-                          />
-                        ) : (
-                          <span className="font-heading font-medium text-navy text-xs text-center">
-                            {ec.company?.name}
-                          </span>
-                        )}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <CompaniesGrid
+              companyGroups={companyGroups}
+              activeTiers={activeTiers}
+              tierLabels={tierLabels}
+            />
 
             <div className="mt-5 text-center">
               <a
