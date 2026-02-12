@@ -101,7 +101,7 @@ export default async function SpotlightsPage({ searchParams }: PageProps) {
             <DirectoryFilters
               categories={categories}
               basePath="/spotlight"
-              searchPlaceholder="Search spotlights..."
+
               allLabel="All Categories"
             />
           </Suspense>

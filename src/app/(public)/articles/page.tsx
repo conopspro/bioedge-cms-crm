@@ -105,7 +105,7 @@ export default async function ArticlesPage({ searchParams }: PageProps) {
             <DirectoryFilters
               categories={categories}
               basePath="/articles"
-              searchPlaceholder="Search articles..."
+
               allLabel="All Categories"
             />
           </Suspense>

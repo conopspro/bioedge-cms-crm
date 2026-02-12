@@ -83,7 +83,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
             <DirectoryFilters
               categories={categories}
               basePath="/companies"
-              searchPlaceholder="Search companies..."
+
               allLabel="All Categories"
             />
           </Suspense>

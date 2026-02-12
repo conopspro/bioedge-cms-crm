@@ -101,7 +101,7 @@ export default async function PresentationsPage({ searchParams }: PageProps) {
             <DirectoryFilters
               categories={categories}
               basePath="/presentations"
-              searchPlaceholder="Search presentations..."
+
               allLabel="All Categories"
             />
           </Suspense>

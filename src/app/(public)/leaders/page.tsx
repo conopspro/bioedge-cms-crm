@@ -104,7 +104,7 @@ export default async function LeadersDirectoryPage({ searchParams }: PageProps) 
             <DirectoryFilters
               categories={categories}
               basePath="/leaders"
-              searchPlaceholder="Search by name..."
+
               allLabel="All Categories"
             />
           </Suspense>

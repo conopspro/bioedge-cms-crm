@@ -19,14 +19,13 @@ interface DirectoryFiltersProps {
 export function DirectoryFilters({
   categories,
   basePath,
-  searchPlaceholder = "Search by name...",
+  searchPlaceholder = "Search articles, leaders, companies, presentations...",
   allLabel = "All"
 }: DirectoryFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const activeCategory = searchParams.get("category")
-  const currentSearch = searchParams.get("q") || ""
-  const [searchValue, setSearchValue] = useState(currentSearch)
+  const [searchValue, setSearchValue] = useState("")
   const [isPending, startTransition] = useTransition()
 
   const updateParams = (updates: Record<string, string | null>) => {
@@ -52,12 +51,15 @@ export function DirectoryFilters({
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    updateParams({ q: searchValue.trim() || null })
+    if (searchValue.trim().length >= 2) {
+      startTransition(() => {
+        router.push(`/search?q=${encodeURIComponent(searchValue.trim())}`)
+      })
+    }
   }
 
   const handleClearSearch = () => {
     setSearchValue("")
-    updateParams({ q: null })
   }
 
   return (
@@ -72,7 +74,7 @@ export function DirectoryFilters({
           className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm text-navy placeholder:text-gray-400 focus:border-electric-blue focus:outline-none focus:ring-1 focus:ring-electric-blue"
         />
         <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        {(searchValue || currentSearch) && (
+        {searchValue && (
           <button
             type="button"
             onClick={handleClearSearch}
