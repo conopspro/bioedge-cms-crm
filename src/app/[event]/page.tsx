@@ -1566,14 +1566,12 @@ export default async function EventLandingPage({ params }: PageProps) {
       {hasCompanies && (
         <section className="py-5" style={getBackgroundStyle(companiesColors.background)}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="flex items-end justify-between mb-5">
-              <div>
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: companiesColors.subtitle }}>{landingPageSettings?.companies?.subtitle || "Our Partners"}</p>
-                <h2 className="font-heading text-2xl font-bold" style={{ color: companiesColors.title }}>{landingPageSettings?.companies?.title || "Companies & Sponsors"}</h2>
-              </div>
+            <div className="text-center mb-5">
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: companiesColors.subtitle }}>{landingPageSettings?.companies?.subtitle || "Our Partners"}</p>
+              <h2 className="font-heading text-2xl font-bold" style={{ color: companiesColors.title }}>{landingPageSettings?.companies?.title || "Companies & Sponsors"}</h2>
               <Link
                 href={`/${event.slug}/companies`}
-                className="hidden sm:flex items-center gap-1 font-medium text-sm hover:opacity-80"
+                className="inline-flex items-center gap-1 font-medium text-sm hover:opacity-80 mt-2"
                 style={{ color: '#017ab2' }}
               >
                 View All <ChevronRight className="h-4 w-4" />

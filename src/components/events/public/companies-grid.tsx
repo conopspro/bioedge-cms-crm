@@ -122,14 +122,18 @@ export function CompaniesGrid({
         if (visible.length === 0) return null
 
         return (
-          <div key={tier}>
+          <div key={tier} className="text-center">
             <h3 className="font-heading text-sm font-semibold text-navy mb-3">
               {tierLabels[tier] || tier}
             </h3>
-            <div className={`grid gap-3 ${isLarge ? largeGridClass : smallGridClass}`}>
+            <div className={`flex flex-wrap justify-center gap-3`}>
               {visible.map((ec) => {
                 const company = ec.company
                 if (!company) return null
+
+                const cardWidth = isLarge
+                  ? "w-[calc(50%-0.375rem)] md:w-[calc(33.333%-0.5rem)]"
+                  : "w-[calc(33.333%-0.5rem)] md:w-[calc(25%-0.5625rem)] lg:w-[calc(16.666%-0.625rem)]"
 
                 return (
                   <a
@@ -137,7 +141,7 @@ export function CompaniesGrid({
                     href={company.website || "#"}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="be-card flex items-center justify-center p-3 hover:shadow-lg transition-shadow"
+                    className={`be-card flex items-center justify-center p-3 hover:shadow-lg transition-shadow ${cardWidth}`}
                   >
                     {company.logo_url ? (
                       <img
