@@ -44,8 +44,8 @@ export async function POST(
     return NextResponse.json({ error: "Company not found" }, { status: 404 })
   }
 
-  // Get domain
-  const domain = company.domain || extractDomain(company.website)
+  // Get domain (normalize both fields through extractDomain to ensure bare domain)
+  const domain = extractDomain(company.domain) || extractDomain(company.website)
   if (!domain) {
     return NextResponse.json(
       { error: "Company has no domain or website. Please add a website URL first." },
@@ -57,16 +57,15 @@ export async function POST(
     console.log(`[find-contacts] Running Hunter.io search for domain: ${domain}`)
 
     const hunterData = await hunterService.domainSearch(domain, {
-      type: "personal",
       limit: 50,
     })
 
     let contactsCreated = 0
     let contactsSkipped = 0
 
-    // Create contacts from Hunter emails (80%+ confidence)
+    // Create contacts from Hunter emails (50%+ confidence)
     for (const email of hunterData.emails) {
-      if (!email.email || email.confidence < 80) {
+      if (!email.email || email.confidence < 50) {
         contactsSkipped++
         continue
       }
@@ -86,18 +85,20 @@ export async function POST(
       const firstName = email.firstName || "Unknown"
       const lastName = email.lastName || ""
 
-      // Also check by name within the same company
-      const { data: existingByName } = await supabase
-        .from("contacts")
-        .select("id")
-        .eq("company_id", companyId)
-        .ilike("first_name", firstName)
-        .ilike("last_name", lastName || firstName)
-        .single()
+      // Also check by name within the same company (only if we have a real name)
+      if (firstName !== "Unknown" && lastName) {
+        const { data: existingByName } = await supabase
+          .from("contacts")
+          .select("id")
+          .eq("company_id", companyId)
+          .ilike("first_name", firstName)
+          .ilike("last_name", lastName)
+          .single()
 
-      if (existingByName) {
-        contactsSkipped++
-        continue
+        if (existingByName) {
+          contactsSkipped++
+          continue
+        }
       }
 
       // Create new contact
