@@ -165,6 +165,7 @@ export async function POST(
       // Create new contact
       const insertData = {
         company_id: companyId,
+        name: `${firstName} ${lastName}`.trim(),
         email: emailAddr,
         first_name: firstName,
         last_name: lastName,
