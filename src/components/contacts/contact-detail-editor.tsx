@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -157,6 +157,18 @@ export function ContactDetailEditor({
 
   // Form data for editing
   const [formData, setFormData] = useState({ ...initialContact })
+
+  // Sync local state when server data changes (e.g. after AI enhancement + router.refresh)
+  useEffect(() => {
+    setContact(initialContact)
+    if (editingSection === null) {
+      setFormData({ ...initialContact })
+    }
+  }, [initialContact])
+
+  useEffect(() => {
+    setCompany(initialCompany)
+  }, [initialCompany])
 
   // Highlights/expertise editing
   const [newHighlight, setNewHighlight] = useState("")
