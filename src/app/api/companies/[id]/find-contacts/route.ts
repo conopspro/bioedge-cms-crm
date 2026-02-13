@@ -61,24 +61,51 @@ export async function POST(
     })
 
     let contactsCreated = 0
+    let contactsLinked = 0
     let contactsSkipped = 0
+
+    console.log(`[find-contacts] Hunter returned ${hunterData.emails.length} emails for ${domain}`)
 
     // Create contacts from Hunter emails (50%+ confidence)
     for (const email of hunterData.emails) {
       if (!email.email || email.confidence < 50) {
+        console.log(`[find-contacts] Skipping ${email.email || "(no email)"}: confidence ${email.confidence}`)
         contactsSkipped++
         continue
       }
 
-      // Check if contact exists by email
+      // Check if contact with this email already exists
       const { data: existingByEmail } = await supabase
         .from("contacts")
-        .select("id")
+        .select("id, company_id")
         .eq("email", email.email)
         .single()
 
       if (existingByEmail) {
-        contactsSkipped++
+        // If the contact exists but is NOT linked to this company, link them
+        if (existingByEmail.company_id !== companyId) {
+          // Only update if the contact has no company (don't steal from another company)
+          if (!existingByEmail.company_id) {
+            const { error: linkError } = await supabase
+              .from("contacts")
+              .update({ company_id: companyId })
+              .eq("id", existingByEmail.id)
+
+            if (!linkError) {
+              contactsLinked++
+              console.log(`[find-contacts] Linked existing contact ${email.email} to company`)
+            } else {
+              console.error("Failed to link contact:", linkError)
+              contactsSkipped++
+            }
+          } else {
+            console.log(`[find-contacts] Skipping ${email.email}: belongs to another company`)
+            contactsSkipped++
+          }
+        } else {
+          // Already linked to this company
+          contactsSkipped++
+        }
         continue
       }
 
@@ -127,14 +154,26 @@ export async function POST(
       }
     }
 
+    const totalAdded = contactsCreated + contactsLinked
+    let message = ""
+    if (totalAdded > 0) {
+      const parts: string[] = []
+      if (contactsCreated > 0) parts.push(`${contactsCreated} new`)
+      if (contactsLinked > 0) parts.push(`${contactsLinked} linked`)
+      message = `Found ${parts.join(" and ")} contact${totalAdded !== 1 ? "s" : ""}`
+    } else {
+      message = "No new contacts found (may already exist)"
+    }
+
+    console.log(`[find-contacts] Done: ${contactsCreated} created, ${contactsLinked} linked, ${contactsSkipped} skipped out of ${hunterData.emails.length} total`)
+
     return NextResponse.json({
       success: true,
       contactsCreated,
+      contactsLinked,
       contactsSkipped,
       totalFound: hunterData.emails.length,
-      message: contactsCreated > 0
-        ? `Found ${contactsCreated} new contact${contactsCreated !== 1 ? "s" : ""}`
-        : "No new contacts found (may already exist)",
+      message,
     })
   } catch (error) {
     console.error("[find-contacts] Hunter.io error:", error)
