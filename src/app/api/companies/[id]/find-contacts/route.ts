@@ -143,11 +143,14 @@ export async function POST(
         continue
       }
 
-      const firstName = hunterEmail.firstName || "Unknown"
+      // Use email prefix as fallback name (e.g. "support@hapbee.com" → "Support")
+      const emailPrefix = emailAddr.split("@")[0]
+      const capitalizedPrefix = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1)
+      const firstName = hunterEmail.firstName || capitalizedPrefix
       const lastName = hunterEmail.lastName || ""
 
-      // Check by name within the same company (only if we have a real name)
-      if (firstName !== "Unknown" && lastName) {
+      // Check by name within the same company (only if we have a real first + last name from Hunter)
+      if (hunterEmail.firstName && lastName) {
         const { data: nameMatches } = await db
           .from("contacts")
           .select("id")

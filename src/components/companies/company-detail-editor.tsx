@@ -897,32 +897,38 @@ export function CompanyDetailEditor({
           <CardContent>
             {contacts.length > 0 ? (
               <div className="space-y-2">
-                {contacts.slice(0, 5).map((contact) => (
-                  <Link
-                    key={contact.id}
-                    href={`/dashboard/contacts/${contact.id}`}
-                    className="flex items-center justify-between rounded-lg border p-2 hover:bg-muted/50 transition-colors"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-sm truncate">
-                        {contact.first_name} {contact.last_name}
-                      </p>
-                      {contact.title && (
-                        <p className="text-xs text-muted-foreground truncate">{contact.title}</p>
+                <div className="space-y-1 max-h-[400px] overflow-y-auto">
+                  {[...contacts]
+                    .sort((a, b) => {
+                      // Contacts with real last names first, then alphabetical
+                      const aHasLast = a.last_name && a.last_name.length > 0
+                      const bHasLast = b.last_name && b.last_name.length > 0
+                      if (aHasLast && !bHasLast) return -1
+                      if (!aHasLast && bHasLast) return 1
+                      return `${a.first_name} ${a.last_name}`.localeCompare(`${b.first_name} ${b.last_name}`)
+                    })
+                    .map((contact) => (
+                    <Link
+                      key={contact.id}
+                      href={`/dashboard/contacts/${contact.id}`}
+                      className="flex items-center justify-between rounded-lg border p-2 hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm truncate">
+                          {contact.first_name} {contact.last_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {contact.title || contact.email || ""}
+                        </p>
+                      </div>
+                      {contact.show_on_articles ? (
+                        <Eye className="h-4 w-4 text-green-600 flex-shrink-0 ml-2" />
+                      ) : (
+                        <EyeOff className="h-4 w-4 text-muted-foreground flex-shrink-0 ml-2" />
                       )}
-                    </div>
-                    {contact.show_on_articles ? (
-                      <Eye className="h-4 w-4 text-green-600 flex-shrink-0 ml-2" />
-                    ) : (
-                      <EyeOff className="h-4 w-4 text-muted-foreground flex-shrink-0 ml-2" />
-                    )}
-                  </Link>
-                ))}
-                {contacts.length > 5 && (
-                  <p className="text-xs text-center text-muted-foreground pt-1">
-                    +{contacts.length - 5} more contacts
-                  </p>
-                )}
+                    </Link>
+                  ))}
+                </div>
                 <div className="pt-2 space-y-2">
                   <FindContactsButton
                     companyId={company.id}
