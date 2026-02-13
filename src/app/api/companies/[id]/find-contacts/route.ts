@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { hunterService } from "@/lib/services/hunter"
 
 function extractDomain(website: string | null): string | null {
@@ -8,6 +9,15 @@ function extractDomain(website: string | null): string | null {
     const url = new URL(website.startsWith("http") ? website : `https://${website}`)
     return url.hostname.replace(/^www\./, "")
   } catch {
+    return null
+  }
+}
+
+function getDbClient() {
+  try {
+    return createAdminClient()
+  } catch {
+    // Fall back to regular client if service role key is not available (local dev)
     return null
   }
 }
@@ -33,14 +43,18 @@ export async function POST(
     )
   }
 
+  // Use admin client if available, otherwise fall back to auth client
+  const db = getDbClient() || supabase
+
   // Get company
-  const { data: company, error: fetchError } = await supabase
+  const { data: company, error: fetchError } = await db
     .from("companies")
     .select("id, name, domain, website")
     .eq("id", companyId)
     .single()
 
   if (fetchError || !company) {
+    console.error("[find-contacts] Company fetch error:", fetchError)
     return NextResponse.json({ error: "Company not found" }, { status: 404 })
   }
 
@@ -54,102 +68,127 @@ export async function POST(
   }
 
   try {
-    console.log(`[find-contacts] Running Hunter.io search for domain: ${domain}`)
+    console.log(`[find-contacts] Searching Hunter.io for domain: ${domain}, companyId: ${companyId}`)
 
     const hunterData = await hunterService.domainSearch(domain, {
       limit: 50,
     })
 
+    console.log(`[find-contacts] Hunter returned ${hunterData.emails.length} emails (totalResults: ${hunterData.totalResults})`)
+
+    if (hunterData.emails.length === 0) {
+      return NextResponse.json({
+        success: true,
+        contactsCreated: 0,
+        contactsLinked: 0,
+        contactsSkipped: 0,
+        totalFound: 0,
+        message: "Hunter.io returned no emails for this domain",
+      })
+    }
+
     let contactsCreated = 0
     let contactsLinked = 0
     let contactsSkipped = 0
 
-    console.log(`[find-contacts] Hunter returned ${hunterData.emails.length} emails for ${domain}`)
+    for (const hunterEmail of hunterData.emails) {
+      const emailAddr = hunterEmail.email
+      console.log(`[find-contacts] Processing: ${emailAddr} (confidence: ${hunterEmail.confidence}, name: ${hunterEmail.firstName || "?"} ${hunterEmail.lastName || "?"})`)
 
-    // Create contacts from Hunter emails (50%+ confidence)
-    for (const email of hunterData.emails) {
-      if (!email.email || email.confidence < 50) {
-        console.log(`[find-contacts] Skipping ${email.email || "(no email)"}: confidence ${email.confidence}`)
+      if (!emailAddr || hunterEmail.confidence < 50) {
+        console.log(`[find-contacts]   → Skipped: below confidence threshold`)
         contactsSkipped++
         continue
       }
 
       // Check if contact with this email already exists
-      const { data: existingByEmail } = await supabase
+      const { data: existingContacts, error: lookupError } = await db
         .from("contacts")
         .select("id, company_id")
-        .eq("email", email.email)
-        .single()
+        .eq("email", emailAddr)
+
+      if (lookupError) {
+        console.error(`[find-contacts]   → Lookup error for ${emailAddr}:`, lookupError)
+        contactsSkipped++
+        continue
+      }
+
+      const existingByEmail = existingContacts && existingContacts.length > 0 ? existingContacts[0] : null
 
       if (existingByEmail) {
-        // If the contact exists but is NOT linked to this company, link them
+        console.log(`[find-contacts]   → Found existing contact ${existingByEmail.id}, company_id: ${existingByEmail.company_id}`)
         if (existingByEmail.company_id !== companyId) {
-          // Only update if the contact has no company (don't steal from another company)
           if (!existingByEmail.company_id) {
-            const { error: linkError } = await supabase
+            // Contact exists but has no company — link them
+            const { error: linkError } = await db
               .from("contacts")
               .update({ company_id: companyId })
               .eq("id", existingByEmail.id)
 
             if (!linkError) {
               contactsLinked++
-              console.log(`[find-contacts] Linked existing contact ${email.email} to company`)
+              console.log(`[find-contacts]   → Linked to company`)
             } else {
-              console.error("Failed to link contact:", linkError)
+              console.error(`[find-contacts]   → Failed to link:`, linkError)
               contactsSkipped++
             }
           } else {
-            console.log(`[find-contacts] Skipping ${email.email}: belongs to another company`)
+            console.log(`[find-contacts]   → Skipped: belongs to another company (${existingByEmail.company_id})`)
             contactsSkipped++
           }
         } else {
-          // Already linked to this company
+          console.log(`[find-contacts]   → Skipped: already linked to this company`)
           contactsSkipped++
         }
         continue
       }
 
-      const firstName = email.firstName || "Unknown"
-      const lastName = email.lastName || ""
+      const firstName = hunterEmail.firstName || "Unknown"
+      const lastName = hunterEmail.lastName || ""
 
-      // Also check by name within the same company (only if we have a real name)
+      // Check by name within the same company (only if we have a real name)
       if (firstName !== "Unknown" && lastName) {
-        const { data: existingByName } = await supabase
+        const { data: nameMatches } = await db
           .from("contacts")
           .select("id")
           .eq("company_id", companyId)
           .ilike("first_name", firstName)
           .ilike("last_name", lastName)
-          .single()
 
-        if (existingByName) {
+        if (nameMatches && nameMatches.length > 0) {
+          console.log(`[find-contacts]   → Skipped: name match found (${firstName} ${lastName})`)
           contactsSkipped++
           continue
         }
       }
 
       // Create new contact
-      const { error: contactError } = await supabase
+      const insertData = {
+        company_id: companyId,
+        email: emailAddr,
+        first_name: firstName,
+        last_name: lastName,
+        title: hunterEmail.position || null,
+        linkedin_url: hunterEmail.linkedin || null,
+        phone: hunterEmail.phone || null,
+        source: "hunter",
+        outreach_status: "not_contacted",
+        show_on_articles: false,
+        hunter_confidence: hunterEmail.confidence,
+        seniority: hunterEmail.seniority || null,
+      }
+
+      console.log(`[find-contacts]   → Inserting new contact: ${firstName} ${lastName} <${emailAddr}>`)
+
+      const { error: contactError } = await db
         .from("contacts")
-        .insert({
-          company_id: companyId,
-          email: email.email,
-          first_name: firstName,
-          last_name: lastName,
-          title: email.position || null,
-          linkedin_url: email.linkedin || null,
-          phone: email.phone || null,
-          source: "hunter",
-          outreach_status: "not_contacted",
-          show_on_articles: false,
-          hunter_confidence: email.confidence,
-          seniority: email.seniority || null,
-        })
+        .insert(insertData)
 
       if (!contactError) {
         contactsCreated++
+        console.log(`[find-contacts]   → Created successfully`)
       } else {
-        console.error("Failed to create contact:", contactError)
+        console.error(`[find-contacts]   → Insert failed:`, contactError)
         contactsSkipped++
       }
     }
@@ -176,7 +215,7 @@ export async function POST(
       message,
     })
   } catch (error) {
-    console.error("[find-contacts] Hunter.io error:", error)
+    console.error("[find-contacts] Error:", error)
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Hunter.io search failed" },
       { status: 500 }
