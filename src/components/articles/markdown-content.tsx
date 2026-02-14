@@ -72,7 +72,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
 
         // Paragraphs
         p: ({ children }) => (
-          <p className="text-slate-700 leading-relaxed mb-4">{children}</p>
+          <p className="body-text mb-4">{children}</p>
         ),
 
         // Links
@@ -99,7 +99,7 @@ export function MarkdownContent({ content }: MarkdownContentProps) {
           </ol>
         ),
         li: ({ children }) => (
-          <li className="text-slate-700 leading-relaxed">{children}</li>
+          <li className="body-text">{children}</li>
         ),
 
         // Blockquotes

@@ -225,7 +225,7 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                 )}
                 {company.edge_categories && company.edge_categories.length > 0 && (
                   <p className="text-sm text-white/80 mt-2">
-                    <span className="font-semibold text-white">EDGE Framework:</span>{" "}
+                    <Link href="/framework" className="font-semibold text-white hover:text-gold transition-colors">EDGE Framework:</Link>{" "}
                     {company.edge_categories
                       .map((ec: string) => ec.charAt(0).toUpperCase() + ec.slice(1))
                       .join(", ")}
@@ -243,14 +243,16 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Description */}
           {company.description && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                About
-              </h2>
-              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
-                <p className="body-text whitespace-pre-wrap">{company.description}</p>
+              <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+                <h2 className="font-heading font-bold text-2xl text-navy">About</h2>
+              </div>
+              <div className="mt-6 space-y-4">
+                {company.description.split(/\n\n+/).map((paragraph: string, idx: number) => (
+                  <p key={idx} className="body-text">{paragraph.trim()}</p>
+                ))}
                 {/* Show sources if available */}
                 {company.description_sources && Array.isArray(company.description_sources) && company.description_sources.length > 0 && (
-                  <div className="mt-6 pt-4 border-t border-gray-100">
+                  <div className="mt-6 pt-4 border-t border-border">
                     <p className="text-xs text-text-light font-medium mb-2">Sources</p>
                     <div className="flex flex-wrap gap-2">
                       {(company.description_sources as { title: string; url: string }[]).map((source, idx) => (
@@ -275,10 +277,10 @@ export default async function CompanyDetailPage({ params }: PageProps) {
           {/* Key Differentiators */}
           {company.differentiators && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Longevity Contribution
-              </h2>
-              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
+              <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+                <h2 className="font-heading font-bold text-2xl text-navy">Longevity Contribution</h2>
+              </div>
+              <div className="mt-6">
                 {(() => {
                   const items = company.differentiators
                     .split(/\n/)
@@ -287,17 +289,14 @@ export default async function CompanyDetailPage({ params }: PageProps) {
 
                   if (items.length > 1) {
                     return (
-                      <ul className="space-y-2.5">
+                      <ul className="list-disc pl-6 space-y-2">
                         {items.map((item: string, idx: number) => (
-                          <li key={idx} className="flex gap-3 body-text">
-                            <span className="h-2 w-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: "#017ab2" }} />
-                            <span>{item}</span>
-                          </li>
+                          <li key={idx} className="body-text">{item}</li>
                         ))}
                       </ul>
                     )
                   }
-                  return <p className="body-text whitespace-pre-wrap">{company.differentiators}</p>
+                  return <p className="body-text">{company.differentiators}</p>
                 })()}
               </div>
             </section>

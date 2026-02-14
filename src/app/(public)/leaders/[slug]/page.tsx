@@ -341,7 +341,7 @@ export default async function LeaderProfilePage({ params }: PageProps) {
 
       {/* Content */}
       <div className="be-container py-12">
-        <div className="max-w-4xl mx-auto space-y-10">
+        <div className="max-w-3xl mx-auto space-y-10">
 
           {/* Upcoming Events */}
           {upcomingEvents.length > 0 && (
@@ -484,41 +484,39 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Bio */}
           {contact.bio && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                About
-              </h2>
-              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
-                <div className="space-y-4">
-                  {(() => {
-                    const cleanBio = contact.bio.replace(/\[\d+\]/g, "").trim()
-                    // If already has paragraph breaks, use them
-                    if (cleanBio.includes("\n\n")) {
-                      return cleanBio.split(/\n\n+/).map((paragraph: string, i: number) => (
-                        <p key={i} className="body-text">{paragraph.trim()}</p>
-                      ))
-                    }
-                    // Otherwise, split long text into paragraphs of ~3-4 sentences each
-                    const sentences = cleanBio.split(/(?<=[.!?])\s+/)
-                    const paragraphs: string[] = []
-                    let currentParagraph: string[] = []
-                    sentences.forEach((sentence: string) => {
-                      currentParagraph.push(sentence)
-                      if (currentParagraph.length >= 3) {
-                        paragraphs.push(currentParagraph.join(" "))
-                        currentParagraph = []
-                      }
-                    })
-                    if (currentParagraph.length > 0) {
-                      paragraphs.push(currentParagraph.join(" "))
-                    }
-                    return paragraphs.map((paragraph, i) => (
-                      <p key={i} className="body-text">{paragraph}</p>
+              <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+                <h2 className="font-heading font-bold text-2xl text-navy">About</h2>
+              </div>
+              <div className="mt-6 space-y-4">
+                {(() => {
+                  const cleanBio = contact.bio.replace(/\[\d+\]/g, "").trim()
+                  // If already has paragraph breaks, use them
+                  if (cleanBio.includes("\n\n")) {
+                    return cleanBio.split(/\n\n+/).map((paragraph: string, i: number) => (
+                      <p key={i} className="body-text">{paragraph.trim()}</p>
                     ))
-                  })()}
-                </div>
+                  }
+                  // Otherwise, split long text into paragraphs of ~3-4 sentences each
+                  const sentences = cleanBio.split(/(?<=[.!?])\s+/)
+                  const paragraphs: string[] = []
+                  let currentParagraph: string[] = []
+                  sentences.forEach((sentence: string) => {
+                    currentParagraph.push(sentence)
+                    if (currentParagraph.length >= 3) {
+                      paragraphs.push(currentParagraph.join(" "))
+                      currentParagraph = []
+                    }
+                  })
+                  if (currentParagraph.length > 0) {
+                    paragraphs.push(currentParagraph.join(" "))
+                  }
+                  return paragraphs.map((paragraph, i) => (
+                    <p key={i} className="body-text">{paragraph}</p>
+                  ))
+                })()}
                 {/* Sources */}
                 {bioSources.length > 0 && (
-                  <div className="mt-6 pt-4 border-t border-gray-100">
+                  <div className="mt-6 pt-4 border-t border-border">
                     <p className="text-xs text-text-light font-medium mb-2">Sources</p>
                     <div className="flex flex-wrap gap-2">
                       {bioSources.map((source: { title: string; url: string }, i: number) => (
@@ -543,47 +541,104 @@ export default async function LeaderProfilePage({ params }: PageProps) {
           {/* Career Highlights */}
           {highlights.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Career Highlights
-              </h2>
-              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
-                <ul className="space-y-2.5">
-                  {highlights.map((highlight: string, i: number) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="h-2 w-2 rounded-full flex-shrink-0 mt-2" style={{ backgroundColor: "#017ab2" }} />
-                      <span className="body-text">{highlight.replace(/\[\d+\]/g, "").trim()}</span>
-                    </li>
-                  ))}
-                </ul>
+              <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+                <h2 className="font-heading font-bold text-2xl text-navy">Career Highlights</h2>
+              </div>
+              <ul className="mt-6 list-disc pl-6 space-y-2">
+                {highlights.map((highlight: string, i: number) => (
+                  <li key={i} className="body-text">{highlight.replace(/\[\d+\]/g, "").trim()}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {/* Books */}
+          {books.length > 0 && (
+            <section>
+              <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+                <h2 className="font-heading font-bold text-2xl text-navy">Books</h2>
+              </div>
+              <div className="mt-6 space-y-4">
+                {books.map((book: any) => (
+                  <a
+                    key={book.id}
+                    href={book.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex gap-4 hover:bg-gray-50 px-2 py-2 rounded-lg transition-colors"
+                  >
+                    {book.metadata?.thumbnail && (
+                      <img
+                        src={book.metadata.thumbnail}
+                        alt={book.title}
+                        className="w-16 h-24 object-cover rounded flex-shrink-0"
+                        loading="lazy"
+                      />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors line-clamp-2">
+                        {book.title}
+                      </h3>
+                      {book.metadata?.authors && (
+                        <p className="text-sm text-text-light mt-1">
+                          {book.metadata.authors.join(", ")}
+                        </p>
+                      )}
+                      {book.metadata?.rating && (
+                        <p className="text-sm mt-1" style={{ color: "#017ab2" }}>
+                          ★ {book.metadata.rating}
+                        </p>
+                      )}
+                    </div>
+                  </a>
+                ))}
               </div>
             </section>
           )}
 
-          {/* Company */}
-          {company && (
+          {/* Academic Papers */}
+          {papers.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                About {company.name}
-              </h2>
-              <CompanyCard
-                id={company.id}
-                name={company.name}
-                slug={company.slug || company.domain}
-                logoUrl={company.logo_url}
-                description={company.description}
-                variant="horizontal"
-                showCategory={false}
-              />
+              <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+                <h2 className="font-heading font-bold text-2xl text-navy">Research & Publications</h2>
+              </div>
+              <div className="mt-6 space-y-4">
+                {papers.map((paper: any) => (
+                  <a
+                    key={paper.id}
+                    href={paper.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block hover:bg-gray-50 px-2 py-3 rounded-lg transition-colors"
+                  >
+                    <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors">
+                      {paper.title}
+                    </h3>
+                    {paper.metadata?.authors && (
+                      <p className="text-sm text-text-light mt-1">
+                        {paper.metadata.authors.join(", ")}
+                      </p>
+                    )}
+                    <div className="flex items-center gap-4 mt-2 text-xs text-text-light">
+                      {paper.metadata?.journal && <span>{paper.metadata.journal}</span>}
+                      {paper.metadata?.year && <span>{paper.metadata.year}</span>}
+                      {paper.metadata?.citedBy && (
+                        <span style={{ color: "#017ab2" }}>{paper.metadata.citedBy} citations</span>
+                      )}
+                    </div>
+                  </a>
+                ))}
+              </div>
             </section>
           )}
 
           {/* YouTube Videos */}
           {youtubeVideos.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Videos
-              </h2>
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+                <h2 className="font-heading font-bold text-2xl text-navy">Videos</h2>
+              </div>
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
                 {youtubeVideos.map((video: any) => (
                   <a
                     key={video.id}
@@ -622,86 +677,19 @@ export default async function LeaderProfilePage({ params }: PageProps) {
             </section>
           )}
 
-          {/* Academic Papers */}
-          {papers.length > 0 && (
-            <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Research & Publications
-              </h2>
-              <div className="space-y-4">
-                {papers.map((paper: any) => (
-                  <a
-                    key={paper.id}
-                    href={paper.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="be-card block hover:shadow-lg transition-shadow"
-                  >
-                    <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors">
-                      {paper.title}
-                    </h3>
-                    {paper.metadata?.authors && (
-                      <p className="text-sm text-text-light mt-1">
-                        {paper.metadata.authors.join(", ")}
-                      </p>
-                    )}
-                    <div className="flex items-center gap-4 mt-2 text-xs text-text-light">
-                      {paper.metadata?.journal && <span>{paper.metadata.journal}</span>}
-                      {paper.metadata?.year && <span>{paper.metadata.year}</span>}
-                      {paper.metadata?.citedBy && (
-                        <span style={{ color: "#017ab2" }}>{paper.metadata.citedBy} citations</span>
-                      )}
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Books */}
-          {books.length > 0 && (
-            <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Books
-              </h2>
-              <div className="be-card" style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}>
-                <div className="space-y-4">
-                  {books.map((book: any) => (
-                    <a
-                      key={book.id}
-                      href={book.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex gap-4 hover:bg-gray-50 -mx-2 px-2 py-2 rounded-lg transition-colors"
-                    >
-                      {book.metadata?.thumbnail && (
-                        <img
-                          src={book.metadata.thumbnail}
-                          alt={book.title}
-                          className="w-16 h-24 object-cover rounded flex-shrink-0"
-                          loading="lazy"
-                        />
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-heading font-semibold text-navy hover:text-electric-blue transition-colors line-clamp-2">
-                          {book.title}
-                        </h3>
-                        {book.metadata?.authors && (
-                          <p className="text-sm text-text-light mt-1">
-                            {book.metadata.authors.join(", ")}
-                          </p>
-                        )}
-                        {book.metadata?.rating && (
-                          <p className="text-sm mt-1" style={{ color: "#017ab2" }}>
-                            ★ {book.metadata.rating}
-                          </p>
-                        )}
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            </section>
+          {/* Company */}
+          {company && (
+            <div className="border-t border-border pt-10">
+              <CompanyCard
+                id={company.id}
+                name={company.name}
+                slug={company.slug || company.domain}
+                logoUrl={company.logo_url}
+                description={company.description}
+                variant="horizontal"
+                showCategory={false}
+              />
+            </div>
           )}
 
         </div>

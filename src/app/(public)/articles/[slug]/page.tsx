@@ -183,7 +183,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <article className="max-w-3xl mx-auto space-y-10">
           {/* Article Content */}
           <section>
-            <div className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:text-navy prose-a:text-electric-blue hover:prose-a:text-gold prose-strong:text-navy">
+            <div className="max-w-none prose-headings:font-heading prose-headings:text-navy prose-a:text-electric-blue hover:prose-a:text-gold prose-strong:text-navy">
               <MarkdownContent content={article.content || ""} />
             </div>
           </section>
@@ -191,9 +191,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
           {/* Article Enhancements */}
           {enhancements.length > 0 && (
             <section>
-              <h2 className="font-heading font-bold text-navy text-xl mb-4">
-                Learn More
-              </h2>
               <ArticleEnhancements
                 enhancements={enhancements}
                 title=""

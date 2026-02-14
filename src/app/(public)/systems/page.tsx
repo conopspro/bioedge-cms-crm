@@ -169,9 +169,9 @@ export default function SystemsIndexPage() {
         {/* EDGE Framework */}
         <div className="mb-12">
           <div className="be-card">
-            <h2 className="font-heading font-bold text-xl mb-4" style={{ color: "#0d2840" }}>
+            <Link href="/framework" className="font-heading font-bold text-xl mb-4 block hover:text-electric-blue transition-colors" style={{ color: "#0d2840" }}>
               The EDGE Framework
-            </h2>
+            </Link>
             <p className="body-text mb-6">
               Each system report follows the same structure, guiding you through a process of discovery:
             </p>
@@ -204,26 +204,6 @@ export default function SystemsIndexPage() {
                   <p className="text-sm text-text-light">Take action with patience and consistency</p>
                 </div>
               </div>
-            </div>
-            <div className="flex flex-wrap gap-3 mt-6 pt-6 border-t border-gray-100">
-              <a
-                href="https://www.bioedgedecoder.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-5 py-2 rounded-full text-white font-heading font-medium text-sm hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: "#0d2840" }}
-              >
-                bioEDGE Decoder
-              </a>
-              <a
-                href="http://bioedgecoach.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center px-5 py-2 rounded-full text-white font-heading font-medium text-sm hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: "#017ab2" }}
-              >
-                bioEDGE Coach
-              </a>
             </div>
           </div>
         </div>

@@ -66,9 +66,9 @@ export function ArticleEnhancements({
       {youtubeVideos.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4">
-              Videos
-            </h2>
+            <div className="border-l-4 pl-6 py-2 mb-6" style={{ borderColor: "#0d2840" }}>
+              <h2 className="font-heading font-bold text-2xl text-navy">Videos</h2>
+            </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
             {youtubeVideos.map((video) => (
@@ -91,9 +91,9 @@ export function ArticleEnhancements({
       {scholarPapers.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4">
-              Research Papers
-            </h2>
+            <div className="border-l-4 pl-6 py-2 mb-6" style={{ borderColor: "#0d2840" }}>
+              <h2 className="font-heading font-bold text-2xl text-navy">Research Papers</h2>
+            </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
             {scholarPapers.map((paper) => (
@@ -115,9 +115,9 @@ export function ArticleEnhancements({
       {books.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4">
-              Related Books
-            </h2>
+            <div className="border-l-4 pl-6 py-2 mb-6" style={{ borderColor: "#0d2840" }}>
+              <h2 className="font-heading font-bold text-2xl text-navy">Related Books</h2>
+            </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
             {books.map((book) => (
@@ -139,9 +139,9 @@ export function ArticleEnhancements({
       {links.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4">
-              Additional Resources
-            </h2>
+            <div className="border-l-4 pl-6 py-2 mb-6" style={{ borderColor: "#0d2840" }}>
+              <h2 className="font-heading font-bold text-2xl text-navy">Additional Resources</h2>
+            </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2">
             {links.map((link) => (
@@ -158,11 +158,13 @@ export function ArticleEnhancements({
         </section>
       )}
 
-      {/* Images - Simple display for now */}
+      {/* Images */}
       {images.length > 0 && (
         <section>
           {showHeaders && (
-            <h2 className="font-heading font-bold text-navy text-xl mb-4">Images</h2>
+            <div className="border-l-4 pl-6 py-2 mb-6" style={{ borderColor: "#0d2840" }}>
+              <h2 className="font-heading font-bold text-2xl text-navy">Images</h2>
+            </div>
           )}
           <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
             {images.map((image) => (
