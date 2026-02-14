@@ -9,18 +9,11 @@ interface Category {
   name: string
 }
 
-interface EdgeFilter {
-  value: string
-  label: string
-  color: string
-  activeColor: string
-}
-
-const EDGE_FILTERS: EdgeFilter[] = [
-  { value: "eliminate", label: "Eliminate", color: "bg-red-50 text-red-700 hover:bg-red-100", activeColor: "bg-red-600 text-white" },
-  { value: "decode", label: "Decode", color: "bg-blue-50 text-blue-700 hover:bg-blue-100", activeColor: "bg-blue-600 text-white" },
-  { value: "gain", label: "Gain", color: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100", activeColor: "bg-emerald-600 text-white" },
-  { value: "execute", label: "Execute", color: "bg-amber-50 text-amber-700 hover:bg-amber-100", activeColor: "bg-amber-600 text-white" },
+const EDGE_FILTERS = [
+  { value: "eliminate", label: "Eliminate" },
+  { value: "decode", label: "Decode" },
+  { value: "gain", label: "Gain" },
+  { value: "execute", label: "Execute" },
 ]
 
 interface DirectoryFiltersProps {
@@ -141,13 +134,13 @@ export function DirectoryFilters({
       {/* EDGE Framework Filter Pills */}
       {showEdgeFilters && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">EDGE</span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">EDGE Framework</span>
           <button
             onClick={() => handleEdgeClick(null)}
             className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
               !activeEdge
-                ? "bg-navy text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                ? "bg-electric-blue text-white"
+                : "bg-white text-navy hover:bg-gray-100"
             }`}
           >
             All
@@ -158,8 +151,8 @@ export function DirectoryFilters({
               onClick={() => handleEdgeClick(filter.value)}
               className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                 activeEdge === filter.value
-                  ? filter.activeColor
-                  : filter.color
+                  ? "bg-electric-blue text-white"
+                  : "bg-white text-navy hover:bg-gray-100"
               }`}
             >
               {filter.label}
