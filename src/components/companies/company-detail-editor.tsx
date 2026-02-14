@@ -32,7 +32,7 @@ import { ResearchCompanyButton } from "@/components/companies/research-company-b
 import { FindContactsButton } from "@/components/companies/find-contacts-button"
 import { ContactsEnhanceButton } from "@/components/contacts/contacts-enhance-button"
 import { ArticlesEnhanceButton } from "@/components/articles/articles-enhance-button"
-import type { BiologicalSystem, CompanyCategory } from "@/types/database"
+import type { BiologicalSystem, CompanyCategory, EdgeCategory, AccessLevel } from "@/types/database"
 
 interface Company {
   id: string
@@ -50,6 +50,9 @@ interface Company {
   is_draft: boolean | null
   category: CompanyCategory | null
   systems_supported: BiologicalSystem[]
+  edge_categories: EdgeCategory[]
+  access_levels: AccessLevel[]
+  has_affiliate: boolean
   events: string[]
   logo_url: string | null
   slug: string | null
@@ -90,6 +93,19 @@ const ALL_SYSTEMS: BiologicalSystem[] = [
   "Detoxification", "Digestive", "Emotional", "Energy Production",
   "Hormonal", "Hydration", "Nervous System", "Regeneration",
   "Stress Response", "Structure & Movement", "Temperature"
+]
+
+const ALL_EDGE_CATEGORIES: { value: EdgeCategory; label: string }[] = [
+  { value: "eliminate", label: "Eliminate" },
+  { value: "decode", label: "Decode" },
+  { value: "gain", label: "Gain" },
+  { value: "execute", label: "Execute" },
+]
+
+const ALL_ACCESS_LEVELS: { value: AccessLevel; label: string }[] = [
+  { value: "consumer", label: "Consumer" },
+  { value: "practitioner_facilitated", label: "Practitioner-Facilitated" },
+  { value: "practitioner_only", label: "Practitioner Only" },
 ]
 
 const statusColors: Record<string, "default" | "secondary" | "success" | "warning" | "info"> = {
@@ -313,6 +329,22 @@ export function CompanyDetailEditor({
       ? current.filter((s) => s !== system)
       : [...current, system]
     setFormData({ ...formData, systems_supported: updated })
+  }
+
+  const toggleEdgeCategory = (cat: EdgeCategory) => {
+    const current = formData.edge_categories || []
+    const updated = current.includes(cat)
+      ? current.filter((c) => c !== cat)
+      : [...current, cat]
+    setFormData({ ...formData, edge_categories: updated })
+  }
+
+  const toggleAccessLevel = (level: AccessLevel) => {
+    const current = formData.access_levels || []
+    const updated = current.includes(level)
+      ? current.filter((l) => l !== level)
+      : [...current, level]
+    setFormData({ ...formData, access_levels: updated })
   }
 
   // Helper to render bullet list or paragraph
@@ -850,6 +882,103 @@ export function CompanyDetailEditor({
                 {system}
               </Badge>
             ))}
+          </div>
+        </EditableCard>
+
+        {/* EDGE Classification */}
+        <EditableCard
+          title="EDGE Classification"
+          description="Framework category, access levels, affiliate"
+          isEditing={editingSection === "edge"}
+          isSaving={isSaving}
+          hasContent={hasFieldContent(["edge_categories", "access_levels"]) || !!company.has_affiliate}
+          onEdit={() => startEditing("edge")}
+          onCancel={cancelEditing}
+          onSave={() => saveSection(["edge_categories", "access_levels", "has_affiliate"])}
+          editContent={
+            <div className="space-y-4">
+              <div>
+                <Label className="text-xs text-muted-foreground mb-2 block">EDGE Framework</Label>
+                <div className="flex flex-wrap gap-2">
+                  {ALL_EDGE_CATEGORIES.map((cat) => (
+                    <Badge
+                      key={cat.value}
+                      variant={formData.edge_categories?.includes(cat.value) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => toggleEdgeCategory(cat.value)}
+                    >
+                      {cat.label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-2 block">Access Levels</Label>
+                <div className="flex flex-wrap gap-2">
+                  {ALL_ACCESS_LEVELS.map((level) => (
+                    <Badge
+                      key={level.value}
+                      variant={formData.access_levels?.includes(level.value) ? "default" : "outline"}
+                      className="cursor-pointer"
+                      onClick={() => toggleAccessLevel(level.value)}
+                    >
+                      {level.label}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={formData.has_affiliate || false}
+                  onCheckedChange={(checked) => setFormData({ ...formData, has_affiliate: checked })}
+                />
+                <Label className="text-sm">Affiliate Program</Label>
+              </div>
+            </div>
+          }
+          emptyState={
+            <div className="text-center py-4">
+              <p className="text-sm text-muted-foreground mb-2">No EDGE classification yet</p>
+              <Button variant="outline" size="sm" onClick={() => startEditing("edge")}>
+                Add Classification
+              </Button>
+            </div>
+          }
+        >
+          <div className="space-y-3">
+            {company.edge_categories && company.edge_categories.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1.5">EDGE Framework</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {company.edge_categories.map((cat) => (
+                    <Badge key={cat} variant="secondary">
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+            {company.access_levels && company.access_levels.length > 0 && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1.5">Access Levels</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {company.access_levels.map((level) => {
+                    const label = ALL_ACCESS_LEVELS.find(l => l.value === level)?.label || level
+                    return (
+                      <Badge key={level} variant="secondary">
+                        {label}
+                      </Badge>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+            {company.has_affiliate && (
+              <div>
+                <p className="text-xs font-medium text-muted-foreground mb-1.5">Affiliate</p>
+                <Badge variant="secondary">Affiliate Program</Badge>
+              </div>
+            )}
           </div>
         </EditableCard>
 

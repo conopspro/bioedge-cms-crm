@@ -55,8 +55,11 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [draftFilter, setDraftFilter] = useState<string>("all")
+  const [edgeFilter, setEdgeFilter] = useState<string>("all")
+  const [accessFilter, setAccessFilter] = useState<string>("all")
+  const [affiliateFilter, setAffiliateFilter] = useState<string>("all")
 
-  // Filter companies based on search, status, and draft mode
+  // Filter companies based on search, status, draft mode, and EDGE classifications
   // Use derivedStatus if available (computed from articles), otherwise fall back to status
   const filteredCompanies = companies.filter((company) => {
     const effectiveStatus = (company as any).derivedStatus || company.status
@@ -69,7 +72,15 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
       draftFilter === "all" ||
       (draftFilter === "draft" && company.is_draft !== false) ||
       (draftFilter === "published" && company.is_draft === false)
-    return matchesSearch && matchesStatus && matchesDraft
+    const matchesEdge =
+      edgeFilter === "all" || (company.edge_categories || []).includes(edgeFilter as any)
+    const matchesAccess =
+      accessFilter === "all" || (company.access_levels || []).includes(accessFilter as any)
+    const matchesAffiliate =
+      affiliateFilter === "all" ||
+      (affiliateFilter === "yes" && company.has_affiliate === true) ||
+      (affiliateFilter === "no" && !company.has_affiliate)
+    return matchesSearch && matchesStatus && matchesDraft && matchesEdge && matchesAccess && matchesAffiliate
   })
 
   // Handle delete with confirmation
@@ -97,7 +108,7 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <Input
           placeholder="Search companies..."
           value={search}
@@ -124,6 +135,36 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
           <option value="all">All Visibility</option>
           <option value="draft">Draft Only</option>
           <option value="published">Published Only</option>
+        </select>
+        <select
+          value={edgeFilter}
+          onChange={(e) => setEdgeFilter(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">All EDGE</option>
+          <option value="eliminate">Eliminate</option>
+          <option value="decode">Decode</option>
+          <option value="gain">Gain</option>
+          <option value="execute">Execute</option>
+        </select>
+        <select
+          value={accessFilter}
+          onChange={(e) => setAccessFilter(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">All Access</option>
+          <option value="consumer">Consumer</option>
+          <option value="practitioner_facilitated">Practitioner-Facilitated</option>
+          <option value="practitioner_only">Practitioner Only</option>
+        </select>
+        <select
+          value={affiliateFilter}
+          onChange={(e) => setAffiliateFilter(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">All Affiliate</option>
+          <option value="yes">Has Affiliate</option>
+          <option value="no">No Affiliate</option>
         </select>
       </div>
 
