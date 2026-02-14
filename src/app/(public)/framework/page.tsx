@@ -33,6 +33,18 @@ export default function EdgeFrameworkPage() {
         </div>
       </div>
 
+      {/* In-page navigation */}
+      <nav className="border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-20">
+        <div className="be-container">
+          <div className="max-w-3xl mx-auto flex flex-wrap gap-x-6 gap-y-2 py-3 text-sm">
+            <a href="#eliminate" className="text-text-light hover:text-navy transition-colors">Eliminate</a>
+            <a href="#decode" className="text-text-light hover:text-navy transition-colors">Decode</a>
+            <a href="#gain" className="text-text-light hover:text-navy transition-colors">Gain</a>
+            <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
+          </div>
+        </div>
+      </nav>
+
       {/* Content */}
       <div className="be-container py-12">
         <div className="max-w-3xl mx-auto">
@@ -78,7 +90,7 @@ export default function EdgeFrameworkPage() {
 
             {/* --- Eliminate --- */}
 
-            <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+            <div id="eliminate" className="border-l-4 pl-6 py-2 scroll-mt-16" style={{ borderColor: "#0d2840" }}>
               <h2 className="font-heading font-bold text-2xl text-navy">
                 Eliminate
               </h2>
@@ -111,7 +123,7 @@ export default function EdgeFrameworkPage() {
 
             {/* --- Decode --- */}
 
-            <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+            <div id="decode" className="border-l-4 pl-6 py-2 scroll-mt-16" style={{ borderColor: "#0d2840" }}>
               <h2 className="font-heading font-bold text-2xl text-navy">
                 Decode
               </h2>
@@ -148,7 +160,7 @@ export default function EdgeFrameworkPage() {
 
             {/* --- Gain --- */}
 
-            <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+            <div id="gain" className="border-l-4 pl-6 py-2 scroll-mt-16" style={{ borderColor: "#0d2840" }}>
               <h2 className="font-heading font-bold text-2xl text-navy">
                 Gain
               </h2>
@@ -177,7 +189,7 @@ export default function EdgeFrameworkPage() {
 
             {/* --- Execute --- */}
 
-            <div className="border-l-4 pl-6 py-2" style={{ borderColor: "#0d2840" }}>
+            <div id="execute" className="border-l-4 pl-6 py-2 scroll-mt-16" style={{ borderColor: "#0d2840" }}>
               <h2 className="font-heading font-bold text-2xl text-navy">
                 Execute
               </h2>
