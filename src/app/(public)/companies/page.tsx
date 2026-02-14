@@ -18,7 +18,7 @@ interface Category {
 }
 
 interface PageProps {
-  searchParams: Promise<{ category?: string; q?: string }>
+  searchParams: Promise<{ category?: string; q?: string; edge?: string }>
 }
 
 const PAGE_SIZE = 12
@@ -27,6 +27,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
   const params = await searchParams
   const activeCategory = params.category
   const searchQuery = params.q
+  const activeEdge = params.edge
   const supabase = await createClient()
 
   // Fetch company categories for filter
@@ -40,7 +41,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
   // Fetch initial companies (exclude drafts - include NULL and false)
   let query = supabase
     .from("companies")
-    .select("id, name, slug, domain, logo_url, category")
+    .select("id, name, slug, domain, logo_url, category, edge_categories, access_levels, has_affiliate")
     .or("is_draft.is.null,is_draft.eq.false")
     .order("name", { ascending: true })
     .range(0, PAGE_SIZE - 1)
@@ -51,6 +52,10 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
 
   if (activeCategory) {
     query = query.eq("category", activeCategory)
+  }
+
+  if (activeEdge) {
+    query = query.contains("edge_categories", [activeEdge])
   }
 
   const { data } = await query
@@ -83,8 +88,8 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
             <DirectoryFilters
               categories={categories}
               basePath="/companies"
-
               allLabel="All Categories"
+              showEdgeFilters
             />
           </Suspense>
         </div>

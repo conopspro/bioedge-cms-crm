@@ -853,6 +853,9 @@ Only return the JSON object, no other text. If you cannot find information about
     differentiators: string
     evidence: string
     systems_supported: string[]
+    edge_categories: string[]
+    access_levels: string[]
+    has_affiliate: boolean
     discovered_contacts: Array<{
       name: string
       title?: string
@@ -888,7 +891,20 @@ Please research this health/longevity company and provide:
 
 5. **Key People**: Founders, executives, or leadership team members. Include name, title, and LinkedIn URL if available.
 
-6. **Sources**: List the URLs you used to gather this information.
+6. **EDGE Classification**: Based on the EDGE Framework for longevity optimization, classify this company's primary role(s). A company can fit multiple categories:
+   - Eliminate: Identifies and removes interference (toxin testing, EMF shielding, digital wellness, food quality analysis, environmental testing)
+   - Decode: Reads biological signals (lab testing, wearables, imaging, diagnostics, monitoring, assessments, biomarker tracking)
+   - Gain: Provides solutions and interventions (supplements, devices, therapies, treatments, health services, equipment, light therapy)
+   - Execute: Helps sustain protocols (habit tracking, coaching platforms, accountability tools, scheduling, practice management)
+
+7. **Access Levels**: How can clients access this company's products/services? A company can have multiple levels. Return as an array:
+   - "consumer" — Client can order/use directly
+   - "practitioner_facilitated" — Requires a practitioner account to order
+   - "practitioner_only" — Requires a licensed provider
+
+8. **Affiliate Program**: Does this company offer an affiliate or referral program? (true/false)
+
+9. **Sources**: List the URLs you used to gather this information.
 
 IMPORTANT: Write description as clean prose WITHOUT citation numbers like [1], [2]. For differentiators and evidence, use bullet format with "- " prefix. List your sources separately.
 
@@ -898,6 +914,9 @@ Format your response as JSON:
   "differentiators": "- First differentiator\n- Second differentiator\n- Third differentiator",
   "evidence": "- First evidence item\n- Second evidence item\n- Third evidence item",
   "systems_supported": ["System 1", "System 2"],
+  "edge_categories": ["decode", "gain"],
+  "access_levels": ["consumer"],
+  "has_affiliate": false,
   "discovered_contacts": [
     {"name": "Full Name", "title": "CEO", "linkedin_url": "https://linkedin.com/in/..."}
   ],
@@ -993,6 +1012,9 @@ Only return the JSON object, no other text.`
     differentiators: string
     evidence: string
     systems_supported: string[]
+    edge_categories: string[]
+    access_levels: string[]
+    has_affiliate: boolean
     discovered_contacts: Array<{
       name: string
       title?: string
@@ -1098,11 +1120,29 @@ Only return the JSON object, no other text.`
             }))
         : []
 
+      // Validate EDGE categories
+      const validEdgeCategories = ["eliminate", "decode", "gain", "execute"]
+      const edgeCategories = Array.isArray(parsed.edge_categories)
+        ? parsed.edge_categories.filter((c: string) => validEdgeCategories.includes(c?.toLowerCase())).map((c: string) => c.toLowerCase())
+        : []
+
+      // Validate access levels
+      const validAccessLevels = ["consumer", "practitioner_facilitated", "practitioner_only"]
+      const accessLevels = Array.isArray(parsed.access_levels)
+        ? parsed.access_levels.filter((l: string) => validAccessLevels.includes(l?.toLowerCase())).map((l: string) => l.toLowerCase())
+        : []
+
+      // Parse affiliate flag
+      const hasAffiliate = parsed.has_affiliate === true
+
       return {
         description: cleanCitations(String(parsed.description || "")),
         differentiators: formatBulletList(String(parsed.differentiators || "")),
         evidence: formatBulletList(String(parsed.evidence || "")),
         systems_supported: systems,
+        edge_categories: edgeCategories,
+        access_levels: accessLevels,
+        has_affiliate: hasAffiliate,
         discovered_contacts: contacts,
         sources,
       }

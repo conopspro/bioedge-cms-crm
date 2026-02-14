@@ -178,6 +178,18 @@ We're putting together bioEDGE Longevity Summit and I think there could be some 
 - WARM: "I'd love to hear how [Event] went"
 - COLD: "We noticed you participated at [Event]"
 
+## EDGE Framework Classification
+
+Classify the company's role in the EDGE Framework. A company may fit multiple categories:
+- **eliminate**: Identifies and removes interference — environmental testing, toxin identification, EMF assessment, digital interference reduction, food quality analysis
+- **decode**: Reads biological signals — lab testing, wearables, imaging, diagnostics, monitoring, cognitive assessments, biological age testing
+- **gain**: Provides solutions — supplements, devices, therapies, treatments, light therapy, sauna, cold plunge, peptides, IV therapy, regenerative medicine
+- **execute**: Sustains protocols — habit tracking, coaching software, data platforms, accountability tools, practice management
+
+Also determine:
+- **access_levels**: How clients access products/services. Array of: "consumer" (direct purchase), "practitioner_facilitated" (needs practitioner account), "practitioner_only" (licensed provider required)
+- **has_affiliate**: Whether the company offers an affiliate or referral program (true/false)
+
 ## Output Format
 
 Return your response as a JSON object with this structure:
@@ -186,6 +198,9 @@ Return your response as a JSON object with this structure:
   "category": "string (use one of the category slugs provided)",
   "description": "string (2-3 sentences)",
   "systems_supported": ["array of system names from the 15 systems"],
+  "edge_categories": ["array of: eliminate, decode, gain, execute"],
+  "access_levels": ["array of: consumer, practitioner_facilitated, practitioner_only"],
+  "has_affiliate": false,
   "differentiators": "string",
   "evidence": "string",
   "bioedge_fit": "string",

@@ -113,6 +113,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Update EDGE categories - merge existing with new
+    if (research.edge_categories && research.edge_categories.length > 0) {
+      const existingEdge = company.edge_categories || []
+      const mergedEdge = [...new Set([...existingEdge, ...research.edge_categories])]
+      updateData.edge_categories = mergedEdge
+      fieldsUpdated.push("edge_categories")
+    }
+
+    // Update access levels - merge existing with new
+    if (research.access_levels && research.access_levels.length > 0) {
+      const existingAccess = company.access_levels || []
+      const mergedAccess = [...new Set([...existingAccess, ...research.access_levels])]
+      updateData.access_levels = mergedAccess
+      fieldsUpdated.push("access_levels")
+    }
+
+    // Update affiliate flag (true wins)
+    if (research.has_affiliate === true) {
+      updateData.has_affiliate = true
+      fieldsUpdated.push("has_affiliate")
+    }
+
     // Always update sources if we have them
     if (research.sources && research.sources.length > 0) {
       updateData.description_sources = research.sources

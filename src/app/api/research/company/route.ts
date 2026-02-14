@@ -115,12 +115,27 @@ export async function POST(request: NextRequest) {
         ? categories.map(c => c.slug)
         : ["supplement", "device", "service", "clinic", "lab_testing", "platform", "other"]
 
+      // Validate EDGE categories
+      const validEdgeCategories = ["eliminate", "decode", "gain", "execute"]
+      const edgeCategories = Array.isArray(parsed.edge_categories)
+        ? parsed.edge_categories.filter((c: string) => validEdgeCategories.includes(c?.toLowerCase())).map((c: string) => c.toLowerCase())
+        : []
+
+      // Validate access levels
+      const validAccessLevels = ["consumer", "practitioner_facilitated", "practitioner_only"]
+      const accessLevels = Array.isArray(parsed.access_levels)
+        ? parsed.access_levels.filter((l: string) => validAccessLevels.includes(l?.toLowerCase())).map((l: string) => l.toLowerCase())
+        : []
+
       // Validate and transform the response
       researchOutput = {
         company_name: parsed.company_name || body.company_name,
         category: validateCategory(parsed.category, validCategorySlugs),
         description: parsed.description || "",
         systems_supported: validateSystems(parsed.systems_supported),
+        edge_categories: edgeCategories,
+        access_levels: accessLevels,
+        has_affiliate: parsed.has_affiliate === true,
         differentiators: parsed.differentiators || "",
         evidence: parsed.evidence || "",
         bioedge_fit: parsed.bioedge_fit || "",

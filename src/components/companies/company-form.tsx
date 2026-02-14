@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { X, Plus, Sparkles, Loader2, ExternalLink } from "lucide-react"
-import type { Company, CompanyInsert, BiologicalSystem } from "@/types/database"
+import type { Company, CompanyInsert, BiologicalSystem, EdgeCategory, AccessLevel } from "@/types/database"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -28,6 +28,19 @@ const ALL_SYSTEMS: BiologicalSystem[] = [
   "Detoxification", "Digestive", "Emotional", "Energy Production",
   "Hormonal", "Hydration", "Nervous System", "Regeneration",
   "Stress Response", "Structure & Movement", "Temperature"
+]
+
+const ALL_EDGE_CATEGORIES: { value: EdgeCategory; label: string; color: string }[] = [
+  { value: "eliminate", label: "Eliminate", color: "bg-red-100 text-red-800 border-red-300 hover:bg-red-200" },
+  { value: "decode", label: "Decode", color: "bg-blue-100 text-blue-800 border-blue-300 hover:bg-blue-200" },
+  { value: "gain", label: "Gain", color: "bg-green-100 text-green-800 border-green-300 hover:bg-green-200" },
+  { value: "execute", label: "Execute", color: "bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200" },
+]
+
+const ALL_ACCESS_LEVELS: { value: AccessLevel; label: string; emoji: string }[] = [
+  { value: "consumer", label: "Consumer", emoji: "🟢" },
+  { value: "practitioner_facilitated", label: "Practitioner-Facilitated", emoji: "🟡" },
+  { value: "practitioner_only", label: "Practitioner Only", emoji: "🔴" },
 ]
 
 /**
@@ -82,6 +95,9 @@ export function CompanyForm({ company, mode }: CompanyFormProps) {
     events: company?.events || [],
     category: company?.category || null,
     systems_supported: company?.systems_supported || [],
+    edge_categories: company?.edge_categories || [],
+    access_levels: company?.access_levels || [],
+    has_affiliate: company?.has_affiliate ?? false,
     differentiators: company?.differentiators || null,
     evidence: company?.evidence || null,
     bioedge_fit: company?.bioedge_fit || null,
@@ -148,6 +164,28 @@ export function CompanyForm({ company, mode }: CompanyFormProps) {
         ? current.filter((s) => s !== system)
         : [...current, system]
       return { ...prev, systems_supported: updated }
+    })
+  }
+
+  // Handle toggling an EDGE category
+  const toggleEdgeCategory = (category: EdgeCategory) => {
+    setFormData((prev) => {
+      const current = prev.edge_categories || []
+      const updated = current.includes(category)
+        ? current.filter((c) => c !== category)
+        : [...current, category]
+      return { ...prev, edge_categories: updated }
+    })
+  }
+
+  // Handle toggling an access level
+  const toggleAccessLevel = (level: AccessLevel) => {
+    setFormData((prev) => {
+      const current = prev.access_levels || []
+      const updated = current.includes(level)
+        ? current.filter((l) => l !== level)
+        : [...current, level]
+      return { ...prev, access_levels: updated }
     })
   }
 
@@ -237,6 +275,9 @@ export function CompanyForm({ company, mode }: CompanyFormProps) {
           differentiators: data.updatedCompany.differentiators || prev.differentiators,
           evidence: data.updatedCompany.evidence || prev.evidence,
           systems_supported: data.updatedCompany.systems_supported || prev.systems_supported,
+          edge_categories: data.updatedCompany.edge_categories || prev.edge_categories,
+          access_levels: data.updatedCompany.access_levels || prev.access_levels,
+          has_affiliate: data.updatedCompany.has_affiliate ?? prev.has_affiliate,
         }))
       } else {
         console.log(`[company-form] No updatedCompany in response - form fields won't be updated`)
@@ -504,6 +545,74 @@ export function CompanyForm({ company, mode }: CompanyFormProps) {
                 {system}
               </Badge>
             ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* EDGE Classification */}
+      <Card>
+        <CardHeader>
+          <CardTitle>EDGE Classification</CardTitle>
+          <CardDescription>
+            Classify this company&apos;s role in the EDGE Framework, access level, and affiliate status.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label>EDGE Categories</Label>
+            <p className="text-xs text-muted-foreground">
+              Eliminate (remove interference) · Decode (read signals) · Gain (solutions) · Execute (sustain protocols)
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {ALL_EDGE_CATEGORIES.map(({ value, label, color }) => {
+                const isSelected = formData.edge_categories?.includes(value)
+                return (
+                  <Badge
+                    key={value}
+                    variant="outline"
+                    className={`cursor-pointer border ${isSelected ? color : "opacity-50 hover:opacity-75"}`}
+                    onClick={() => toggleEdgeCategory(value)}
+                  >
+                    {label}
+                  </Badge>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Access Levels</Label>
+            <div className="flex flex-wrap gap-2">
+              {ALL_ACCESS_LEVELS.map(({ value, label, emoji }) => {
+                const isSelected = formData.access_levels?.includes(value)
+                return (
+                  <Badge
+                    key={value}
+                    variant={isSelected ? "default" : "outline"}
+                    className={`cursor-pointer ${!isSelected ? "opacity-50 hover:opacity-75" : ""}`}
+                    onClick={() => toggleAccessLevel(value)}
+                  >
+                    {emoji} {label}
+                  </Badge>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="has_affiliate">Affiliate Program</Label>
+              <p className="text-sm text-muted-foreground">
+                Does this company offer an affiliate or referral program?
+              </p>
+            </div>
+            <Switch
+              id="has_affiliate"
+              checked={formData.has_affiliate ?? false}
+              onCheckedChange={(checked) => {
+                setFormData((prev) => ({ ...prev, has_affiliate: checked }))
+              }}
+            />
           </div>
         </CardContent>
       </Card>

@@ -186,6 +186,12 @@ export type PaymentStatus = "unpaid" | "paid" | "complimentary"
 /** Company category types - now dynamic, stored as string slugs in database */
 export type CompanyCategory = string
 
+/** EDGE Framework classification */
+export type EdgeCategory = "eliminate" | "decode" | "gain" | "execute"
+
+/** Access level for company products/services */
+export type AccessLevel = "consumer" | "practitioner_facilitated" | "practitioner_only"
+
 /** The 15 biological systems framework */
 export type BiologicalSystem =
   | "Breath"
@@ -219,6 +225,9 @@ export interface Company {
   events: string[] // Events where we noticed this company
   category: CompanyCategory | null
   systems_supported: BiologicalSystem[] // Which of the 15 biological systems
+  edge_categories: EdgeCategory[] // EDGE Framework: Eliminate, Decode, Gain, Execute
+  access_levels: AccessLevel[] // Consumer, Practitioner-Facilitated, Practitioner Only
+  has_affiliate: boolean // Whether they offer affiliate/referral programs
   differentiators: string | null // Key differentiators
   evidence: string | null // Evidence/credibility
   bioedge_fit: string | null // Why this fits bioEDGE
@@ -1423,6 +1432,9 @@ export interface CompanyResearchOutput {
   category: CompanyCategory
   description: string // 2-3 sentence description
   systems_supported: BiologicalSystem[]
+  edge_categories: EdgeCategory[] // EDGE Framework classification
+  access_levels: AccessLevel[] // How clients access products/services
+  has_affiliate: boolean // Affiliate/referral program available
   differentiators: string
   evidence: string
   bioedge_fit: string
