@@ -223,6 +223,14 @@ export default async function CompanyDetailPage({ params }: PageProps) {
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 )}
+                {company.edge_categories && company.edge_categories.length > 0 && (
+                  <p className="text-sm text-white/80 mt-2">
+                    <span className="font-semibold text-white">EDGE Framework:</span>{" "}
+                    {company.edge_categories
+                      .map((ec: string) => ec.charAt(0).toUpperCase() + ec.slice(1))
+                      .join(", ")}
+                  </p>
+                )}
               </div>
             </div>
           </div>

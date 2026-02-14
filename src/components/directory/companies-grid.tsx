@@ -6,26 +6,6 @@ import Link from "next/link"
 import { Building2 } from "lucide-react"
 import { InfiniteScrollTrigger } from "@/components/infinite-scroll/infinite-scroll-trigger"
 
-const EDGE_BADGE_STYLES: Record<string, string> = {
-  eliminate: "bg-red-100 text-red-700",
-  decode: "bg-blue-100 text-blue-700",
-  gain: "bg-emerald-100 text-emerald-700",
-  execute: "bg-amber-100 text-amber-700",
-}
-
-const EDGE_LABELS: Record<string, string> = {
-  eliminate: "E",
-  decode: "D",
-  gain: "G",
-  execute: "X",
-}
-
-const ACCESS_DOTS: Record<string, { color: string; label: string }> = {
-  consumer: { color: "bg-green-500", label: "Consumer" },
-  practitioner_facilitated: { color: "bg-yellow-500", label: "Practitioner-Facilitated" },
-  practitioner_only: { color: "bg-red-500", label: "Practitioner Only" },
-}
-
 interface Company {
   id: string
   name: string
@@ -104,74 +84,32 @@ export function CompaniesGrid({ initialCompanies, initialHasMore }: CompaniesGri
   return (
     <>
       <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {companies.map((company) => {
-          const edgeCategories = company.edge_categories || []
-          const accessLevels = company.access_levels || []
-          const hasAffiliate = company.has_affiliate || false
-          const hasMetadata = edgeCategories.length > 0 || accessLevels.length > 0
-
-          return (
-            <Link
-              key={company.id}
-              href={`/companies/${company.slug || company.domain || company.id}`}
-              className="group overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
-            >
-              <div className="px-2.5 py-4 text-center">
-                <div className="mb-3 flex h-28 items-center justify-center">
-                  {company.logo_url ? (
-                    <img
-                      src={company.logo_url}
-                      alt={company.name}
-                      className="max-h-28 max-w-full object-contain"
-                    />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
-                      <Building2 className="h-7 w-7 text-white" />
-                    </div>
-                  )}
-                </div>
-                <h3 className="font-semibold text-sm text-navy transition-colors group-hover:text-electric-blue">
-                  {company.name}
-                </h3>
-                {hasMetadata && (
-                  <div className="mt-2 flex flex-wrap items-center justify-center gap-1">
-                    {edgeCategories.map((ec) => (
-                      <span
-                        key={ec}
-                        className={`inline-flex h-5 w-5 items-center justify-center rounded text-[10px] font-bold ${EDGE_BADGE_STYLES[ec] || "bg-gray-100 text-gray-600"}`}
-                        title={ec.charAt(0).toUpperCase() + ec.slice(1)}
-                      >
-                        {EDGE_LABELS[ec] || ec[0]?.toUpperCase()}
-                      </span>
-                    ))}
-                    {accessLevels.length > 0 && edgeCategories.length > 0 && (
-                      <span className="mx-0.5" />
-                    )}
-                    {accessLevels.map((al) => {
-                      const dot = ACCESS_DOTS[al]
-                      if (!dot) return null
-                      return (
-                        <span
-                          key={al}
-                          className={`inline-block h-2 w-2 rounded-full ${dot.color}`}
-                          title={dot.label}
-                        />
-                      )
-                    })}
-                    {hasAffiliate && (
-                      <span
-                        className="text-[10px]"
-                        title="Affiliate program"
-                      >
-                        💰
-                      </span>
-                    )}
+        {companies.map((company) => (
+          <Link
+            key={company.id}
+            href={`/companies/${company.slug || company.domain || company.id}`}
+            className="group overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+          >
+            <div className="px-2.5 py-4 text-center">
+              <div className="mb-3 flex h-28 items-center justify-center">
+                {company.logo_url ? (
+                  <img
+                    src={company.logo_url}
+                    alt={company.name}
+                    className="max-h-28 max-w-full object-contain"
+                  />
+                ) : (
+                  <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
+                    <Building2 className="h-7 w-7 text-white" />
                   </div>
                 )}
               </div>
-            </Link>
-          )
-        })}
+              <h3 className="font-semibold text-sm text-navy transition-colors group-hover:text-electric-blue">
+                {company.name}
+              </h3>
+            </div>
+          </Link>
+        ))}
       </div>
 
       <InfiniteScrollTrigger
