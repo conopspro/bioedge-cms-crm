@@ -1,14 +1,16 @@
 import { createClient } from "@/lib/supabase/server"
 import { DirectoryFilters } from "@/components/filters/directory-filters"
-import { CompaniesGrid } from "@/components/directory/companies-grid"
+import { ConsumerDirectory } from "@/components/directory/consumer-directory"
 import { Suspense } from "react"
 
 export const metadata = {
-  title: "Longevity Solutions",
-  description: "Organizations and solutions that support longevity and health optimization.",
+  title: "Consumer Directory",
+  description:
+    "Browse consumer-accessible longevity solutions: supplements, wearables, diagnostics, and more.",
   openGraph: {
-    title: "Longevity Solutions",
-    description: "Organizations and solutions that support longevity and health optimization.",
+    title: "Consumer Directory",
+    description:
+      "Browse consumer-accessible longevity solutions: supplements, wearables, diagnostics, and more.",
   },
 }
 
@@ -21,16 +23,16 @@ interface PageProps {
   searchParams: Promise<{ category?: string; q?: string; edge?: string }>
 }
 
-const PAGE_SIZE = 12
+const PAGE_SIZE = 20
 
-export default async function CompaniesDirectoryPage({ searchParams }: PageProps) {
+export default async function ConsumerDirectoryPage({ searchParams }: PageProps) {
   const params = await searchParams
   const activeCategory = params.category
   const searchQuery = params.q
   const activeEdge = params.edge
   const supabase = await createClient()
 
-  // Fetch company categories for filter
+  // Fetch company categories for filter pills
   const { data: categoriesData } = await supabase
     .from("company_categories")
     .select("slug, name, display_order")
@@ -38,14 +40,12 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
 
   const categories = (categoriesData || []) as Category[]
 
-  // Fetch initial companies (exclude drafts, only those with logos)
+  // Fetch initial consumer companies (SSR)
   let query = supabase
     .from("companies")
-    .select("id, name, slug, domain, logo_url, category, edge_categories, access_levels, has_affiliate")
+    .select("id, name, slug, domain, logo_url, category, edge_categories, access_levels")
+    .contains("access_levels", ["consumer"])
     .or("is_draft.is.null,is_draft.eq.false")
-    .not("logo_url", "is", null)
-    .order("name", { ascending: true })
-    .range(0, PAGE_SIZE - 1)
 
   if (searchQuery) {
     query = query.ilike("name", `%${searchQuery}%`)
@@ -61,8 +61,16 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
 
   const { data } = await query
 
-  const companies = data || []
-  const hasMore = data?.length === PAGE_SIZE
+  // Sort: companies with logos first, then alphabetical within each group
+  const sorted = (data || []).sort((a, b) => {
+    const aHasLogo = a.logo_url ? 0 : 1
+    const bHasLogo = b.logo_url ? 0 : 1
+    if (aHasLogo !== bHasLogo) return aHasLogo - bHasLogo
+    return a.name.localeCompare(b.name)
+  })
+
+  const companies = sorted.slice(0, PAGE_SIZE)
+  const hasMore = sorted.length > PAGE_SIZE
 
   return (
     <div className="min-h-screen bg-off-white">
@@ -73,10 +81,10 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
             Directory
           </span>
           <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
-            Longevity Solutions
+            Consumer Directory
           </h1>
           <p className="max-w-2xl text-lg text-white/90">
-            Companies and organizations that support longevity and health optimization.
+            Products and solutions you can access directly. No prescription or practitioner required.
           </p>
         </div>
       </section>
@@ -88,18 +96,19 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
           <Suspense fallback={<div className="h-24" />}>
             <DirectoryFilters
               categories={categories}
-              basePath="/companies"
+              basePath="/directory"
               allLabel="All Categories"
               showEdgeFilters
             />
           </Suspense>
         </div>
 
-        {/* Grid */}
+        {/* List */}
         <Suspense fallback={<div className="h-96" />}>
-          <CompaniesGrid
+          <ConsumerDirectory
             initialCompanies={companies}
             initialHasMore={hasMore}
+            initialTotalCount={sorted.length}
           />
         </Suspense>
       </section>

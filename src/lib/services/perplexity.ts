@@ -849,6 +849,7 @@ Only return the JSON object, no other text. If you cannot find information about
     website?: string | null
     category?: string | null
   }): Promise<{
+    category: string
     description: string
     differentiators: string
     evidence: string
@@ -856,6 +857,7 @@ Only return the JSON object, no other text. If you cannot find information about
     edge_categories: string[]
     access_levels: string[]
     has_affiliate: boolean
+    bioedge_fit: string
     discovered_contacts: Array<{
       name: string
       title?: string
@@ -871,8 +873,11 @@ Only return the JSON object, no other text. If you cannot find information about
     const { companyName, website, category } = options
 
     let searchContext = `Research the company "${companyName}"`
-    if (website) searchContext += ` (website: ${website})`
-    if (category) searchContext += `. They are in the ${category} category.`
+    if (website) {
+      searchContext += ` using ONLY information found on their website: ${website}`
+      searchContext += `\n\nIMPORTANT: Base your research ENTIRELY on the company's own website content. DO NOT use third-party reviews, news articles, or external commentary. Only reference the company's website as a source.`
+    }
+    if (category) searchContext += `\nThey are in the ${category} category.`
 
     const searchPrompt = `${searchContext}
 
@@ -880,36 +885,61 @@ Please research this health/longevity company and provide:
 
 1. **Description**: 2-3 paragraphs describing what the company does, their products/services, and their approach to health optimization or longevity. Write this as clean prose WITHOUT citation markers.
 
-2. **Key Differentiators**: What sets this company apart from competitors? List exactly 4 specific, concrete differentiators. Format as a bullet list with each item on a new line starting with "- ".
+**Description voice guidelines:**
+- Grounded, not breathless: Be skeptical of hype. Present what the company actually does.
+- Direct, not clinical: Write for smart people who don't need jargon to feel respected.
+- Aspirational, not fear-based: Focus on possibility, not problems.
+- Evidence-informed, not evidence-dependent: Respect research AND lived experience.
+- NO em dashes. Use colons, periods, or commas instead.
+- Paragraphs 3-4 sentences max.
+- AVOID these words: Revolutionary, Breakthrough, Game-changing, Transform/Transformative, Supercharge, Miracle, Secret, Hack, Anti-aging (prefer "longevity" or "health optimization")
+- PREFER these words: Evidence-based, Personalized, Sustainable, Measured, Strategic, Optimized, Precise, Integrated
 
-3. **Evidence & Credibility**: Clinical studies, expert endorsements, certifications, patents, funding rounds, partnerships, notable investors, or other credibility markers. List exactly 4 specific items. Format as a bullet list with each item on a new line starting with "- ".
+2. **Category**: Assign exactly ONE of these category slugs that best describes this company:
+   - "diagnostics_testing" (Diagnostics & Testing: lab tests, biomarker panels, imaging, screening)
+   - "energy_light_therapy" (Energy & Light Therapy: red light, infrared, PEMF, laser therapy)
+   - "environment" (Environment: air quality, water filtration, EMF, toxin testing)
+   - "fitness" (Fitness: exercise equipment, training systems, movement)
+   - "mind_neurotech" (Mind & Neurotech: neurofeedback, brain training, cognitive devices)
+   - "recovery" (Recovery: cryotherapy, sauna, compression, regeneration devices)
+   - "sleep_technology" (Sleep Technology: sleep tracking, sleep optimization devices)
+   - "supplements_compounds" (Supplements & Compounds: vitamins, peptides, nootropics, functional foods)
+   - "wearables_monitoring" (Wearables & Monitoring: wearable devices, continuous monitoring)
+   - "longevity_clinics" (Longevity Clinics: clinics, medical practices, health optimization centers)
 
-4. **Biological Systems**: Which of these 15 biological systems do their products/services support?
+3. **Key Differentiators**: What sets this company apart from competitors? List exactly 4 specific, concrete differentiators. Format as a bullet list with each item on a new line starting with "- ".
+
+4. **Evidence & Credibility**: Clinical studies, expert endorsements, certifications, patents, funding rounds, partnerships, notable investors, or other credibility markers. List exactly 4 specific items. Format as a bullet list with each item on a new line starting with "- ".
+
+5. **Biological Systems**: Which of these 15 biological systems do their products/services support?
    - Breath, Circulation, Consciousness, Defense, Detoxification
    - Digestive, Emotional, Energy Production, Hormonal, Hydration
    - Nervous System, Regeneration, Stress Response, Structure & Movement, Temperature
 
-5. **Key People**: Founders, executives, or leadership team members. Include name, title, and LinkedIn URL if available.
+6. **Key People**: Founders, executives, or leadership team members. Include name, title, and LinkedIn URL if available.
 
-6. **EDGE Classification**: Based on the EDGE Framework for longevity optimization, classify this company's primary role(s). A company can fit multiple categories:
+7. **EDGE Classification**: Based on the EDGE Framework for longevity optimization, classify this company's primary role(s). A company can fit multiple categories:
    - Eliminate: Identifies and removes interference (toxin testing, EMF shielding, digital wellness, food quality analysis, environmental testing)
    - Decode: Reads biological signals (lab testing, wearables, imaging, diagnostics, monitoring, assessments, biomarker tracking)
    - Gain: Provides solutions and interventions (supplements, devices, therapies, treatments, health services, equipment, light therapy)
    - Execute: Helps sustain protocols (habit tracking, coaching platforms, accountability tools, scheduling, practice management)
 
-7. **Access Levels**: How can clients access this company's products/services? A company can have multiple levels. Return as an array:
+8. **Access Levels**: How can clients access this company's products/services? A company can have multiple levels. Return as an array:
    - "consumer" — Client can order/use directly
    - "practitioner_facilitated" — Requires a practitioner account to order
    - "practitioner_only" — Requires a licensed provider
 
-8. **Affiliate Program**: Does this company offer an affiliate or referral program? (true/false)
+9. **Affiliate Program**: Does this company offer an affiliate or referral program? (true/false)
 
-9. **Sources**: List the URLs you used to gather this information.
+10. **bioEDGE Fit**: In 2-3 sentences, explain why this company aligns with the bioEDGE audience of health optimizers, longevity practitioners, and biohackers. What makes them relevant to people pursuing evidence-based longevity?
+
+11. **Sources**: List the URLs you used to gather this information. These should be pages from the company's own website.
 
 IMPORTANT: Write description as clean prose WITHOUT citation numbers like [1], [2]. For differentiators and evidence, use bullet format with "- " prefix. List your sources separately.
 
 Format your response as JSON:
 {
+  "category": "string (one of the category slugs listed above)",
   "description": "Detailed company description as paragraphs...",
   "differentiators": "- First differentiator\n- Second differentiator\n- Third differentiator",
   "evidence": "- First evidence item\n- Second evidence item\n- Third evidence item",
@@ -917,6 +947,7 @@ Format your response as JSON:
   "edge_categories": ["decode", "gain"],
   "access_levels": ["consumer"],
   "has_affiliate": false,
+  "bioedge_fit": "string (2-3 sentences on alignment with bioEDGE audience)",
   "discovered_contacts": [
     {"name": "Full Name", "title": "CEO", "linkedin_url": "https://linkedin.com/in/..."}
   ],
@@ -930,7 +961,7 @@ Only return the JSON object, no other text.`
     const messages: PerplexityMessage[] = [
       {
         role: "system",
-        content: "You are a business research assistant specializing in health, wellness, and longevity companies. Provide thorough, accurate research with proper source attribution."
+        content: "You are a research assistant for bioEDGE Longevity Magazine specializing in health, wellness, and longevity companies. Research companies using ONLY their own website content. Write descriptions in a grounded, direct, aspirational tone. Never use hype words. Provide accurate source attribution from the company's website."
       },
       {
         role: "user",
@@ -1008,6 +1039,7 @@ Only return the JSON object, no other text.`
    * Parse JSON response for company research
    */
   private parseCompanyResponse(content: string): {
+    category: string
     description: string
     differentiators: string
     evidence: string
@@ -1015,6 +1047,7 @@ Only return the JSON object, no other text.`
     edge_categories: string[]
     access_levels: string[]
     has_affiliate: boolean
+    bioedge_fit: string
     discovered_contacts: Array<{
       name: string
       title?: string
@@ -1132,10 +1165,20 @@ Only return the JSON object, no other text.`
         ? parsed.access_levels.filter((l: string) => validAccessLevels.includes(l?.toLowerCase())).map((l: string) => l.toLowerCase())
         : []
 
+      // Validate category
+      const validCategories = [
+        "diagnostics_testing", "energy_light_therapy", "environment", "fitness",
+        "mind_neurotech", "recovery", "sleep_technology", "supplements_compounds",
+        "wearables_monitoring", "longevity_clinics"
+      ]
+      const rawCategory = String(parsed.category || "").toLowerCase().trim()
+      const category = validCategories.includes(rawCategory) ? rawCategory : ""
+
       // Parse affiliate flag
       const hasAffiliate = parsed.has_affiliate === true
 
       return {
+        category,
         description: cleanCitations(String(parsed.description || "")),
         differentiators: formatBulletList(String(parsed.differentiators || "")),
         evidence: formatBulletList(String(parsed.evidence || "")),
@@ -1143,6 +1186,7 @@ Only return the JSON object, no other text.`
         edge_categories: edgeCategories,
         access_levels: accessLevels,
         has_affiliate: hasAffiliate,
+        bioedge_fit: cleanCitations(String(parsed.bioedge_fit || "")),
         discovered_contacts: contacts,
         sources,
       }

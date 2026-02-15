@@ -88,6 +88,12 @@ export async function POST(request: NextRequest) {
       fieldsUpdated.push("description")
     }
 
+    // Update category if AI assigned one (always overwrite with fresh research)
+    if (research.category) {
+      updateData.category = research.category
+      fieldsUpdated.push("category")
+    }
+
     // Always update differentiators with fresh research
     if (research.differentiators) {
       updateData.differentiators = research.differentiators
@@ -133,6 +139,12 @@ export async function POST(request: NextRequest) {
     if (research.has_affiliate === true) {
       updateData.has_affiliate = true
       fieldsUpdated.push("has_affiliate")
+    }
+
+    // Always update bioedge_fit with fresh research
+    if (research.bioedge_fit) {
+      updateData.bioedge_fit = research.bioedge_fit
+      fieldsUpdated.push("bioedge_fit")
     }
 
     // Always update sources if we have them
