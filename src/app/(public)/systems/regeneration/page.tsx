@@ -1,5 +1,7 @@
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { Suspense } from "react"
+import { SystemDirectory } from "@/components/directory/system-solutions"
 
 /**
  * Regeneration System Page
@@ -44,6 +46,7 @@ export default function RegenerationSystemPage() {
             <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
             <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
             <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
+            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -518,6 +521,11 @@ export default function RegenerationSystemPage() {
               <strong className="text-navy">Circulation System</strong> — Blood flow delivers regeneration resources to tissues. Poor circulation impairs healing. Slow wound healing may involve either Circulation (delivery problem) or Regeneration (repair process impaired).
             </p>
 
+
+            <Suspense fallback={null}>
+              <SystemDirectory system="Regeneration" label="Regeneration" />
+            </Suspense>
+
             {/* Closing */}
 
             <div className="border-t border-border pt-10 mt-10">
@@ -548,7 +556,7 @@ export default function RegenerationSystemPage() {
             </Link>
             <Link
               href="/systems/stress-response"
-              className="inline-flex items-center gap-2 text-sm text-gold hover:text-pink-accent transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-[#017ab2] hover:text-navy transition-colors font-medium"
             >
               Next: Stress Response
               <ArrowLeft className="h-4 w-4 rotate-180" />

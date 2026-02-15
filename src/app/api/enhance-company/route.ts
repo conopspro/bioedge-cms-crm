@@ -106,17 +106,10 @@ export async function POST(request: NextRequest) {
       fieldsUpdated.push("evidence")
     }
 
-    // Update systems supported - merge existing with new, keeping unique values
+    // Update systems supported - always replace with fresh AI classification
     if (research.systems_supported && research.systems_supported.length > 0) {
-      if (company.systems_supported && company.systems_supported.length > 0) {
-        // Merge systems, keeping unique values
-        const mergedSystems = [...new Set([...company.systems_supported, ...research.systems_supported])]
-        updateData.systems_supported = mergedSystems
-        fieldsUpdated.push("systems_supported (merged)")
-      } else {
-        updateData.systems_supported = research.systems_supported
-        fieldsUpdated.push("systems_supported")
-      }
+      updateData.systems_supported = research.systems_supported
+      fieldsUpdated.push("systems_supported")
     }
 
     // Update EDGE categories - merge existing with new

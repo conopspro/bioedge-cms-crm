@@ -1,5 +1,7 @@
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { Suspense } from "react"
+import { SystemDirectory } from "@/components/directory/system-solutions"
 
 /**
  * Temperature System Page
@@ -44,6 +46,7 @@ export default function TemperatureSystemPage() {
             <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
             <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
             <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
+            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -495,6 +498,11 @@ export default function TemperatureSystemPage() {
             <p>
               <strong className="text-navy">Hydration System</strong> — Adequate hydration supports sweating—the body&apos;s primary cooling mechanism. Dehydration can impair heat dissipation and worsen heat intolerance. When heat-related temperature signals accompany signs of dehydration, both systems may be involved.
             </p>
+
+
+            <Suspense fallback={null}>
+              <SystemDirectory system="Temperature" label="Temperature" />
+            </Suspense>
 
             {/* Closing */}
 

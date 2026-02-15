@@ -1,5 +1,7 @@
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { Suspense } from "react"
+import { SystemDirectory } from "@/components/directory/system-solutions"
 
 /**
  * Hydration System Page
@@ -44,6 +46,7 @@ export default function HydrationSystemPage() {
             <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
             <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
             <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
+            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -472,6 +475,11 @@ export default function HydrationSystemPage() {
               <strong className="text-navy">Digestive System</strong> — Constipation can involve both systems. If bowel movements improve with increased water intake, Hydration is likely contributing. If constipation persists despite adequate hydration, the Digestive system may require separate attention.
             </p>
 
+
+            <Suspense fallback={null}>
+              <SystemDirectory system="Hydration" label="Hydration" />
+            </Suspense>
+
             {/* Closing */}
 
             <div className="border-t border-border pt-10 mt-10">
@@ -493,7 +501,7 @@ export default function HydrationSystemPage() {
             </Link>
             <Link
               href="/systems/nervous-system"
-              className="inline-flex items-center gap-2 text-sm text-gold hover:text-pink-accent transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-[#017ab2] hover:text-navy transition-colors font-medium"
             >
               Next: Nervous System
               <ArrowLeft className="h-4 w-4 rotate-180" />

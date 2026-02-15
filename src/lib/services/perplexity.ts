@@ -911,10 +911,39 @@ Please research this health/longevity company and provide:
 
 4. **Evidence & Credibility**: Clinical studies, expert endorsements, certifications, patents, funding rounds, partnerships, notable investors, or other credibility markers. List exactly 4 specific items. Format as a bullet list with each item on a new line starting with "- ".
 
-5. **Biological Systems**: Which of these 15 biological systems do their products/services support?
-   - Breath, Circulation, Consciousness, Defense, Detoxification
-   - Digestive, Emotional, Energy Production, Hormonal, Hydration
-   - Nervous System, Regeneration, Stress Response, Structure & Movement, Temperature
+5. **Biological Systems**: Which of these 15 biological systems do the company's products/services DIRECTLY support? Be conservative: only select systems where there is a clear, direct connection between the product/service and the system's function. Most companies support 1-4 systems, rarely more. Use the descriptions below to understand what each system covers:
+
+   - **Breath**: Oxygen delivery, CO2 removal, blood pH regulation, breathing patterns, respiratory function. Relevant products: breathwork devices, nasal breathing aids, respiratory training, pulse oximeters, CO2 tolerance training, CPAP alternatives, air quality monitors that specifically address breathing.
+
+   - **Circulation**: Blood flow, heart function, vascular health, blood pressure, oxygen delivery to tissues. Relevant products: blood flow monitoring, cardiovascular fitness devices, compression therapy, nitric oxide supplements, blood pressure monitors, cold/heat therapy for circulation, infrared therapy targeting blood flow.
+
+   - **Consciousness**: Mental clarity, attention quality, cognitive function, focus, thought quality, awareness. Relevant products: neurofeedback devices, brain training apps, nootropics, meditation technology, cognitive assessment tools, focus-enhancing devices, brain-computer interfaces.
+
+   - **Defense**: Immune function, inflammation management, pathogen protection, allergic response, autoimmune patterns. Relevant products: immune support supplements, inflammation testing, allergy testing, microbiome testing for immunity, immune monitoring, antimicrobial technologies.
+
+   - **Detoxification**: Liver function, kidney filtration, lymphatic drainage, toxin clearance, toxic load management. Relevant products: liver support supplements, water filtration, air purifiers, sauna/sweat therapy, heavy metal testing, mycotoxin testing, binders, glutathione, detox protocols.
+
+   - **Digestive**: Nutrient absorption, gut motility, microbiome health, gut-brain axis, food processing. Relevant products: probiotics, digestive enzymes, microbiome testing, gut barrier support, food sensitivity testing, GI mapping, fiber supplements, fermented foods.
+
+   - **Emotional**: Emotional processing, mood regulation, emotional resilience, felt experience. Relevant products: mood tracking, emotional wellness apps, adaptogens for mood, counseling platforms, heart rate variability for emotional regulation, journaling tools.
+
+   - **Energy Production**: Cellular energy (ATP), mitochondrial function, metabolic efficiency, blood sugar regulation. Relevant products: mitochondrial support supplements (CoQ10, NAD+, PQQ), red light therapy, metabolic testing, continuous glucose monitors, B vitamins, creatine, metabolic health platforms.
+
+   - **Hormonal**: Hormone balance, thyroid function, adrenal health, sex hormones, insulin regulation, circadian rhythm. Relevant products: hormone testing panels, thyroid support, testosterone/estrogen optimization, cortisol testing, HRT support, seed cycling, hormone monitoring devices.
+
+   - **Hydration**: Fluid balance, electrolyte distribution, cellular hydration, mineral transport. Relevant products: electrolyte supplements, mineral drops, hydration monitoring, water quality testing, structured water, intracellular hydration support.
+
+   - **Nervous System**: Nerve signal transmission, sensory processing, pain modulation, nerve health, autonomic function. Relevant products: TENS/neurostimulation devices, nerve support supplements (B12, alpha lipoic acid), vagus nerve stimulators, peripheral neuropathy support, neurological testing.
+
+   - **Regeneration**: Tissue repair, cellular renewal, sleep-based recovery, wound healing, growth and repair processes. Relevant products: sleep optimization devices, collagen supplements, peptides (BPC-157, TB-500), stem cell therapies, hyperbaric oxygen, growth hormone support, recovery monitoring.
+
+   - **Stress Response**: Autonomic nervous system regulation, fight-flight-freeze balance, stress recovery, HRV, resilience. Relevant products: HRV monitors, biofeedback devices, adaptogens (ashwagandha, rhodiola), vagus nerve stimulators, stress tracking, breathwork for stress, cold exposure for resilience.
+
+   - **Structure & Movement**: Musculoskeletal health, posture, joint function, fascia, lymphatic pumping through movement. Relevant products: fitness equipment, movement tracking, posture correctors, joint supplements (glucosamine, collagen), foam rollers, physical therapy tools, bone density support.
+
+   - **Temperature**: Thermoregulation, cold tolerance, heat adaptation, metabolic heat production, fever response. Relevant products: cold plunge/ice baths, sauna, infrared therapy, thermogenesis supplements, temperature tracking, cryotherapy chambers, heat acclimation protocols.
+
+   IMPORTANT: A supplement company that sells general vitamins might support Energy Production, Defense, and perhaps one or two others — but NOT all 15 systems. A red light therapy device primarily supports Energy Production and Regeneration, possibly Circulation. Be specific and conservative. Only list systems where the company's core products have a DIRECT, primary effect.
 
 6. **Key People**: Founders, executives, or leadership team members. Include name, title, and LinkedIn URL if available.
 

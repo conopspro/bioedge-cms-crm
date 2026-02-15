@@ -1,5 +1,7 @@
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { Suspense } from "react"
+import { SystemDirectory } from "@/components/directory/system-solutions"
 
 /**
  * Digestive System Page
@@ -43,6 +45,7 @@ export default function DigestiveSystemPage() {
             <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
             <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
             <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
+            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -489,6 +492,11 @@ export default function DigestiveSystemPage() {
               <strong className="text-navy">Consciousness</strong> — Brain fog may originate from gut inflammation, food reactions, or nutrient malabsorption. When cognitive symptoms consistently follow eating, the gut-brain axis deserves exploration.
             </p>
 
+
+            <Suspense fallback={null}>
+              <SystemDirectory system="Digestive" label="Digestive" />
+            </Suspense>
+
             {/* Closing */}
 
             <div className="border-t border-border pt-10 mt-10">
@@ -513,7 +521,7 @@ export default function DigestiveSystemPage() {
             </Link>
             <Link
               href="/systems/emotional"
-              className="inline-flex items-center gap-2 text-sm text-gold hover:text-pink-accent transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-[#017ab2] hover:text-navy transition-colors font-medium"
             >
               Next: Emotional
               <ArrowLeft className="h-4 w-4 rotate-180" />

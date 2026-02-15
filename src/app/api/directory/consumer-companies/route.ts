@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get("category")
   const search = searchParams.get("q")
   const edge = searchParams.get("edge")
+  const system = searchParams.get("system")
 
   const supabase = await createClient()
 
@@ -32,6 +33,11 @@ export async function GET(request: NextRequest) {
   // Apply EDGE category filter
   if (edge) {
     query = query.contains("edge_categories", [edge])
+  }
+
+  // Apply biological system filter
+  if (system) {
+    query = query.contains("systems_supported", [system])
   }
 
   const { data, error } = await query

@@ -20,7 +20,7 @@ interface Category {
 }
 
 interface PageProps {
-  searchParams: Promise<{ category?: string; q?: string; edge?: string }>
+  searchParams: Promise<{ category?: string; q?: string; edge?: string; system?: string }>
 }
 
 const PAGE_SIZE = 20
@@ -30,6 +30,7 @@ export default async function ConsumerDirectoryPage({ searchParams }: PageProps)
   const activeCategory = params.category
   const searchQuery = params.q
   const activeEdge = params.edge
+  const activeSystem = params.system
   const supabase = await createClient()
 
   // Fetch company categories for filter pills
@@ -43,7 +44,7 @@ export default async function ConsumerDirectoryPage({ searchParams }: PageProps)
   // Fetch initial consumer companies (SSR)
   let query = supabase
     .from("companies")
-    .select("id, name, slug, domain, logo_url, category, edge_categories, access_levels")
+    .select("id, name, slug, domain, logo_url, category, edge_categories, access_levels, systems_supported")
     .contains("access_levels", ["consumer"])
     .or("is_draft.is.null,is_draft.eq.false")
 
@@ -57,6 +58,10 @@ export default async function ConsumerDirectoryPage({ searchParams }: PageProps)
 
   if (activeEdge) {
     query = query.contains("edge_categories", [activeEdge])
+  }
+
+  if (activeSystem) {
+    query = query.contains("systems_supported", [activeSystem])
   }
 
   const { data } = await query
@@ -93,12 +98,15 @@ export default async function ConsumerDirectoryPage({ searchParams }: PageProps)
       <section className="mx-auto max-w-[1200px] px-8 py-12">
         {/* Filters */}
         <div className="mb-8">
-          <Suspense fallback={<div className="h-24" />}>
+          <Suspense fallback={<div className="h-12" />}>
             <DirectoryFilters
               categories={categories}
               basePath="/directory"
+              searchPlaceholder="Search companies..."
               allLabel="All Categories"
               showEdgeFilters
+              showSystemFilters
+              variant="dropdowns"
             />
           </Suspense>
         </div>

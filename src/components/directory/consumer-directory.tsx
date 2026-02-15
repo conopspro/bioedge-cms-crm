@@ -45,6 +45,7 @@ export function ConsumerDirectory({
   const category = searchParams.get("category")
   const search = searchParams.get("q")
   const edge = searchParams.get("edge")
+  const system = searchParams.get("system")
 
   const [companies, setCompanies] = useState<Company[]>(initialCompanies)
   const [page, setPage] = useState(0)
@@ -71,6 +72,7 @@ export function ConsumerDirectory({
       if (category) params.set("category", category)
       if (search) params.set("q", search)
       if (edge) params.set("edge", edge)
+      if (system) params.set("system", system)
 
       const res = await fetch(`/api/directory/consumer-companies?${params}`)
       const data = await res.json()
@@ -86,17 +88,17 @@ export function ConsumerDirectory({
     } finally {
       setIsLoading(false)
     }
-  }, [page, hasMore, isLoading, category, search, edge])
+  }, [page, hasMore, isLoading, category, search, edge, system])
 
   if (companies.length === 0) {
     return (
       <div className="py-16 text-center">
         <Building2 className="mx-auto mb-4 h-16 w-16 text-navy/20" />
         <p className="mb-2 text-xl font-body font-semibold text-navy">
-          {category || search || edge ? "No companies found" : "No companies yet"}
+          {category || search || edge || system ? "No companies found" : "No companies yet"}
         </p>
         <p className="font-body text-gray-600">
-          {category || search || edge
+          {category || search || edge || system
             ? "Try adjusting your filters."
             : "Check back soon!"}
         </p>
@@ -117,8 +119,10 @@ export function ConsumerDirectory({
           const categoryLabel = company.category
             ? CATEGORY_LABELS[company.category] || company.category
             : null
+          const EDGE_ORDER = ["eliminate", "decode", "gain", "execute"]
           const edgeLabel = company.edge_categories?.length
-            ? company.edge_categories
+            ? EDGE_ORDER
+                .filter((e) => company.edge_categories!.includes(e))
                 .map((ec) => ec.charAt(0).toUpperCase() + ec.slice(1))
                 .join(", ")
             : null
@@ -130,18 +134,14 @@ export function ConsumerDirectory({
               className="group flex items-center gap-4 px-4 py-3 transition-colors hover:bg-white rounded-lg"
             >
               {/* Logo */}
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
-                {company.logo_url ? (
+              <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg${company.logo_url ? " bg-white" : ""}`}>
+                {company.logo_url && (
                   <img
                     src={company.logo_url}
                     alt={company.name}
-                    className="max-h-10 max-w-[40px] object-contain"
+                    className="max-h-8 max-w-[32px] object-contain"
                     loading="lazy"
                   />
-                ) : (
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
-                    <Building2 className="h-5 w-5 text-white" />
-                  </div>
                 )}
               </div>
 

@@ -1,5 +1,7 @@
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { Suspense } from "react"
+import { SystemDirectory } from "@/components/directory/system-solutions"
 
 /**
  * Nervous System Page
@@ -44,6 +46,7 @@ export default function NervousSystemPage() {
             <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
             <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
             <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
+            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -525,6 +528,11 @@ export default function NervousSystemPage() {
               <strong className="text-navy">Energy Production</strong> — Both systems can cause weakness and tremor. Distinguishing factor: Nervous System weakness follows nerve distribution and may include wasting; Energy weakness is generalized and improves with rest.
             </p>
 
+
+            <Suspense fallback={null}>
+              <SystemDirectory system="Nervous System" label="Nervous System" />
+            </Suspense>
+
             {/* Closing */}
 
             <div className="border-t border-border pt-10 mt-10">
@@ -552,7 +560,7 @@ export default function NervousSystemPage() {
             </Link>
             <Link
               href="/systems/regeneration"
-              className="inline-flex items-center gap-2 text-sm text-gold hover:text-pink-accent transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-[#017ab2] hover:text-navy transition-colors font-medium"
             >
               Next: Regeneration
               <ArrowLeft className="h-4 w-4 rotate-180" />

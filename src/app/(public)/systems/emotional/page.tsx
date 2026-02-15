@@ -1,5 +1,7 @@
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { Suspense } from "react"
+import { SystemDirectory } from "@/components/directory/system-solutions"
 
 /**
  * Emotional System Page
@@ -43,6 +45,7 @@ export default function EmotionalSystemPage() {
             <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
             <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
             <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
+            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -497,6 +500,11 @@ export default function EmotionalSystemPage() {
               <strong className="text-navy">Regeneration System</strong> — Sleep deprivation reliably affects emotional regulation. When the Regeneration System is compromised, emotional volatility, irritability, and overwhelm often increase. Improving sleep sometimes resolves what appeared to be primary emotional difficulties.
             </p>
 
+
+            <Suspense fallback={null}>
+              <SystemDirectory system="Emotional" label="Emotional" />
+            </Suspense>
+
             {/* Closing */}
 
             <div className="border-t border-border pt-10 mt-10">
@@ -521,7 +529,7 @@ export default function EmotionalSystemPage() {
             </Link>
             <Link
               href="/systems/energy-production"
-              className="inline-flex items-center gap-2 text-sm text-gold hover:text-pink-accent transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-[#017ab2] hover:text-navy transition-colors font-medium"
             >
               Next: Energy Production
               <ArrowLeft className="h-4 w-4 rotate-180" />
