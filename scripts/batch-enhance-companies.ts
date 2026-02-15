@@ -15,6 +15,7 @@
  *   --total-chunks <N>   Total number of parallel agents (default: 1)
  *   --delay <ms>         Delay between companies in ms (default: 2000)
  *   --dry-run            List companies without processing
+ *   --all                Process ALL companies, not just "researching" status
  *   --skip-enhanced      Skip companies that already have a description
  *   --skip-complete      Skip companies that already have both category AND bioedge_fit
  *   --base-url <URL>     API base URL (default: http://localhost:3000)
@@ -44,6 +45,7 @@ const delayMs = parseInt(getArg("delay", "2000"), 10)
 const dryRun = hasFlag("dry-run")
 const skipEnhanced = hasFlag("skip-enhanced")
 const skipComplete = hasFlag("skip-complete")
+const allCompaniesFlag = hasFlag("all")
 const baseUrl = getArg("base-url", "http://localhost:3000")
 
 // ---------------------------------------------------------------------------
@@ -101,17 +103,22 @@ async function main() {
   console.log(`  Delay: ${delayMs}ms`)
   console.log(`  Base URL: ${baseUrl}`)
   console.log(`  Dry run: ${dryRun}`)
+  console.log(`  All companies: ${allCompaniesFlag}`)
   console.log(`  Skip enhanced: ${skipEnhanced}`)
   console.log(`  Skip complete: ${skipComplete}`)
   console.log("=".repeat(60))
   console.log()
 
-  // Fetch all researching companies
+  // Fetch companies
   let query = supabase
     .from("companies")
     .select("id, name, website, domain, description, category, bioedge_fit")
-    .eq("status", "researching")
     .order("created_at", { ascending: true })
+
+  // Unless --all flag is set, only process "researching" companies
+  if (!allCompaniesFlag) {
+    query = query.eq("status", "researching")
+  }
 
   if (skipEnhanced) {
     query = query.is("description", null)
@@ -125,11 +132,11 @@ async function main() {
   }
 
   if (!allCompanies || allCompanies.length === 0) {
-    console.log("No companies with 'researching' status found.")
+    console.log(allCompaniesFlag ? "No companies found." : "No companies with 'researching' status found.")
     process.exit(0)
   }
 
-  console.log(`Total researching companies: ${allCompanies.length}`)
+  console.log(`Total companies to process: ${allCompanies.length}`)
 
   // Filter out companies that already have both category and bioedge_fit
   let companies = allCompanies as CompanyRow[]
