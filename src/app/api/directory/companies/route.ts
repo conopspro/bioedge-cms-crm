@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const category = searchParams.get("category")
   const search = searchParams.get("q")
   const edge = searchParams.get("edge")
+  const audience = searchParams.get("audience")
 
   const supabase = await createClient()
 
@@ -33,14 +34,27 @@ export async function GET(request: NextRequest) {
     query = query.contains("edge_categories", [edge])
   }
 
+  // Apply audience filter (consumer = has "consumer" in access_levels)
+  if (audience === "consumer") {
+    query = query.contains("access_levels", ["consumer"])
+  }
+
   const { data, error } = await query
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Apply practitioner filter post-query (companies without "consumer" in access_levels)
+  let filtered = data || []
+  if (audience === "practitioner") {
+    filtered = filtered.filter(
+      (c: any) => !c.access_levels || !c.access_levels.includes("consumer")
+    )
+  }
+
   // Sort: companies with logos first, then alphabetical within each group
-  const sorted = (data || []).sort((a, b) => {
+  const sorted = filtered.sort((a: any, b: any) => {
     const aHasLogo = a.logo_url ? 0 : 1
     const bHasLogo = b.logo_url ? 0 : 1
     if (aHasLogo !== bHasLogo) return aHasLogo - bHasLogo
@@ -55,5 +69,6 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     items,
     hasMore: end < sorted.length,
+    totalCount: sorted.length,
   })
 }

@@ -18,7 +18,7 @@ interface Category {
 }
 
 interface PageProps {
-  searchParams: Promise<{ category?: string; q?: string; edge?: string }>
+  searchParams: Promise<{ category?: string; q?: string; edge?: string; audience?: string }>
 }
 
 const PAGE_SIZE = 12
@@ -28,6 +28,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
   const activeCategory = params.category
   const searchQuery = params.q
   const activeEdge = params.edge
+  const activeAudience = params.audience
   const supabase = await createClient()
 
   // Fetch company categories for filter
@@ -56,16 +57,29 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
     query = query.contains("edge_categories", [activeEdge])
   }
 
+  if (activeAudience === "consumer") {
+    query = query.contains("access_levels", ["consumer"])
+  }
+
   const { data } = await query
 
+  // Apply practitioner filter post-query (companies without "consumer" in access_levels)
+  let filtered = data || []
+  if (activeAudience === "practitioner") {
+    filtered = filtered.filter(
+      (c) => !c.access_levels || !c.access_levels.includes("consumer")
+    )
+  }
+
   // Sort: companies with logos first, then alphabetical within each group
-  const sorted = (data || []).sort((a, b) => {
+  const sorted = filtered.sort((a, b) => {
     const aHasLogo = a.logo_url ? 0 : 1
     const bHasLogo = b.logo_url ? 0 : 1
     if (aHasLogo !== bHasLogo) return aHasLogo - bHasLogo
     return a.name.localeCompare(b.name)
   })
 
+  const totalCount = sorted.length
   const companies = sorted.slice(0, PAGE_SIZE)
   const hasMore = sorted.length > PAGE_SIZE
 
@@ -96,6 +110,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
               basePath="/companies"
               allLabel="All Categories"
               showEdgeFilters
+              showAudienceFilter
             />
           </Suspense>
         </div>
@@ -105,6 +120,7 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
           <CompaniesGrid
             initialCompanies={companies}
             initialHasMore={hasMore}
+            initialTotalCount={totalCount}
           />
         </Suspense>
       </section>

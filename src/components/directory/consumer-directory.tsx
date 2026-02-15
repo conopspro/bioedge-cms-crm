@@ -114,7 +114,7 @@ export function ConsumerDirectory({
     <>
       {/* Count */}
       <p className="mb-4 font-body text-sm text-text-light">
-        {totalCount} {totalCount === 1 ? "company" : "companies"}
+        Showing {companies.length} of {totalCount} {totalCount === 1 ? "company" : "companies"}
       </p>
 
       {/* Cards grid for companies with logos */}

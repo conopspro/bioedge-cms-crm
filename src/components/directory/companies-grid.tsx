@@ -21,6 +21,7 @@ interface Company {
 interface CompaniesGridProps {
   initialCompanies: Company[]
   initialHasMore: boolean
+  initialTotalCount: number
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -36,23 +37,26 @@ const CATEGORY_LABELS: Record<string, string> = {
   longevity_clinics: "Longevity Clinics",
 }
 
-export function CompaniesGrid({ initialCompanies, initialHasMore }: CompaniesGridProps) {
+export function CompaniesGrid({ initialCompanies, initialHasMore, initialTotalCount }: CompaniesGridProps) {
   const searchParams = useSearchParams()
   const category = searchParams.get("category")
   const search = searchParams.get("q")
   const edge = searchParams.get("edge")
+  const audience = searchParams.get("audience")
 
   const [companies, setCompanies] = useState<Company[]>(initialCompanies)
   const [page, setPage] = useState(0)
   const [hasMore, setHasMore] = useState(initialHasMore)
   const [isLoading, setIsLoading] = useState(false)
+  const [totalCount, setTotalCount] = useState(initialTotalCount)
 
   // Reset when filters change
   useEffect(() => {
     setCompanies(initialCompanies)
     setPage(0)
     setHasMore(initialHasMore)
-  }, [initialCompanies, initialHasMore])
+    setTotalCount(initialTotalCount)
+  }, [initialCompanies, initialHasMore, initialTotalCount])
 
   const loadMore = useCallback(async () => {
     if (isLoading || !hasMore) return
@@ -66,6 +70,7 @@ export function CompaniesGrid({ initialCompanies, initialHasMore }: CompaniesGri
       if (category) params.set("category", category)
       if (search) params.set("q", search)
       if (edge) params.set("edge", edge)
+      if (audience) params.set("audience", audience)
 
       const res = await fetch(`/api/directory/companies?${params}`)
       const data = await res.json()
@@ -73,12 +78,15 @@ export function CompaniesGrid({ initialCompanies, initialHasMore }: CompaniesGri
       setCompanies((prev) => [...prev, ...data.items])
       setPage(nextPage)
       setHasMore(data.hasMore)
+      if (data.totalCount !== undefined) {
+        setTotalCount(data.totalCount)
+      }
     } catch (error) {
       console.error("Failed to load more companies:", error)
     } finally {
       setIsLoading(false)
     }
-  }, [page, hasMore, isLoading, category, search, edge])
+  }, [page, hasMore, isLoading, category, search, edge, audience])
 
   if (companies.length === 0) {
     return (
@@ -100,6 +108,11 @@ export function CompaniesGrid({ initialCompanies, initialHasMore }: CompaniesGri
 
   return (
     <>
+      {/* Count */}
+      <p className="mb-4 font-body text-sm text-text-light">
+        Showing {companies.length} of {totalCount} {totalCount === 1 ? "company" : "companies"}
+      </p>
+
       {/* Cards grid for companies with logos */}
       {withLogos.length > 0 && (
         <div className="mb-8 grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
