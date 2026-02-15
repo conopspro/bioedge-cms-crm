@@ -38,14 +38,11 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
 
   const categories = (categoriesData || []) as Category[]
 
-  // Fetch initial companies (exclude drafts, only those with logos)
+  // Fetch initial companies (exclude drafts)
   let query = supabase
     .from("companies")
     .select("id, name, slug, domain, logo_url, category, edge_categories, access_levels, has_affiliate")
     .or("is_draft.is.null,is_draft.eq.false")
-    .not("logo_url", "is", null)
-    .order("name", { ascending: true })
-    .range(0, PAGE_SIZE - 1)
 
   if (searchQuery) {
     query = query.ilike("name", `%${searchQuery}%`)
@@ -61,8 +58,16 @@ export default async function CompaniesDirectoryPage({ searchParams }: PageProps
 
   const { data } = await query
 
-  const companies = data || []
-  const hasMore = data?.length === PAGE_SIZE
+  // Sort: companies with logos first, then alphabetical within each group
+  const sorted = (data || []).sort((a, b) => {
+    const aHasLogo = a.logo_url ? 0 : 1
+    const bHasLogo = b.logo_url ? 0 : 1
+    if (aHasLogo !== bHasLogo) return aHasLogo - bHasLogo
+    return a.name.localeCompare(b.name)
+  })
+
+  const companies = sorted.slice(0, PAGE_SIZE)
+  const hasMore = sorted.length > PAGE_SIZE
 
   return (
     <div className="min-h-screen bg-off-white">

@@ -12,14 +12,11 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createClient()
 
-  // Build query (exclude drafts, only those with logos)
+  // Build query (exclude drafts)
   let query = supabase
     .from("companies")
     .select("id, name, slug, domain, logo_url, category, edge_categories, access_levels, has_affiliate")
     .or("is_draft.is.null,is_draft.eq.false")
-    .not("logo_url", "is", null)
-    .order("name", { ascending: true })
-    .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
 
   // Apply search filter
   if (search) {
@@ -42,8 +39,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
+  // Sort: companies with logos first, then alphabetical within each group
+  const sorted = (data || []).sort((a, b) => {
+    const aHasLogo = a.logo_url ? 0 : 1
+    const bHasLogo = b.logo_url ? 0 : 1
+    if (aHasLogo !== bHasLogo) return aHasLogo - bHasLogo
+    return a.name.localeCompare(b.name)
+  })
+
+  // Paginate after sorting
+  const start = page * PAGE_SIZE
+  const end = start + PAGE_SIZE
+  const items = sorted.slice(start, end)
+
   return NextResponse.json({
-    items: data || [],
-    hasMore: data?.length === PAGE_SIZE
+    items,
+    hasMore: end < sorted.length,
   })
 }
