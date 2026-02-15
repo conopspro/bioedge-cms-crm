@@ -99,10 +99,10 @@ const SECTION_TO_CATEGORY: Record<string, string> = {
   // Specialty sections
   "food & nutrition products": "supplements_compounds",
   "longevity marketplace & platforms": "supplements_compounds",
-  "longevity clinics & comprehensive programs": "longevity_clinics",
-  "hormone therapy clinics & networks": "longevity_clinics",
-  "regenerative medicine clinics & biologics": "longevity_clinics",
-  "aesthetic procedures for structural restoration": "longevity_clinics",
+  "longevity clinics & comprehensive programs": "longevity_services",
+  "hormone therapy clinics & networks": "longevity_services",
+  "regenerative medicine clinics & biologics": "longevity_services",
+  "aesthetic procedures for structural restoration": "longevity_services",
   "additional tools & technology": "wearables_monitoring",
 }
 

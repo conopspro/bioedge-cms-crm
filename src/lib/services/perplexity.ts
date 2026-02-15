@@ -905,7 +905,7 @@ Please research this health/longevity company and provide:
    - "sleep_technology" (Sleep Technology: sleep tracking, sleep optimization devices)
    - "supplements_compounds" (Supplements & Compounds: vitamins, peptides, nootropics, functional foods)
    - "wearables_monitoring" (Wearables & Monitoring: wearable devices, continuous monitoring)
-   - "longevity_clinics" (Longevity Clinics: clinics, medical practices, health optimization centers)
+   - "longevity_services" (Longevity Services: clinics, medical practices, health optimization centers)
 
 3. **Key Differentiators**: What sets this company apart from competitors? List exactly 4 specific, concrete differentiators. Format as a bullet list with each item on a new line starting with "- ".
 
@@ -1198,7 +1198,7 @@ Only return the JSON object, no other text.`
       const validCategories = [
         "diagnostics_testing", "energy_light_therapy", "environment", "fitness",
         "mind_neurotech", "recovery", "sleep_technology", "supplements_compounds",
-        "wearables_monitoring", "longevity_clinics"
+        "wearables_monitoring", "longevity_services"
       ]
       const rawCategory = String(parsed.category || "").toLowerCase().trim()
       const category = validCategories.includes(rawCategory) ? rawCategory : ""

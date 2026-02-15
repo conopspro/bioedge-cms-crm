@@ -34,7 +34,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   sleep_technology: "Sleep Technology",
   supplements_compounds: "Supplements & Compounds",
   wearables_monitoring: "Wearables & Monitoring",
-  longevity_clinics: "Longevity Clinics",
+  longevity_services: "Longevity Services",
 }
 
 export function CompaniesGrid({ initialCompanies, initialHasMore, initialTotalCount }: CompaniesGridProps) {
