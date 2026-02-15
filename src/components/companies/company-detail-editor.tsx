@@ -30,7 +30,6 @@ import { Switch } from "@/components/ui/switch"
 import { AIEnhanceButton } from "@/components/companies/ai-enhance-button"
 import { ResearchCompanyButton } from "@/components/companies/research-company-button"
 import { FindContactsButton } from "@/components/companies/find-contacts-button"
-import { ContactsEnhanceButton } from "@/components/contacts/contacts-enhance-button"
 import { ArticlesEnhanceButton } from "@/components/articles/articles-enhance-button"
 import type { BiologicalSystem, CompanyCategory, EdgeCategory, AccessLevel } from "@/types/database"
 
@@ -817,11 +816,6 @@ export function CompanyDetailEditor({
               companyName={company.name}
               variant="outline"
             />
-            <ContactsEnhanceButton
-              companyId={company.id}
-              label="Enhance Contacts"
-              variant="outline"
-            />
             <ArticlesEnhanceButton
               companyId={company.id}
               label="Enhance Articles"
@@ -832,12 +826,6 @@ export function CompanyDetailEditor({
               <Link href={`/dashboard/articles/new?company=${company.id}`}>
                 <FileText className="h-4 w-4 mr-2" />
                 New Article
-              </Link>
-            </Button>
-            <Button variant="outline" asChild className="w-full">
-              <Link href={`/dashboard/contacts/new?company=${company.id}`}>
-                <Users className="h-4 w-4 mr-2" />
-                Add Contact
               </Link>
             </Button>
           </CardContent>

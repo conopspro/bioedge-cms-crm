@@ -122,7 +122,7 @@ export function ResearchCompanyButton({
         className={`w-full ${className}`}
       >
         <Search className="h-4 w-4 mr-2" />
-        Research Company
+        Research with Claude
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>

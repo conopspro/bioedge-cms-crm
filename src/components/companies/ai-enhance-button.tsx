@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Sparkles, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -27,7 +26,6 @@ export function AIEnhanceButton({
   size = "default",
   className = "",
 }: AIEnhanceButtonProps) {
-  const router = useRouter()
   const [isEnhancing, setIsEnhancing] = useState(false)
   const [result, setResult] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -64,8 +62,8 @@ export function AIEnhanceButton({
 
       setResult(parts.length > 0 ? parts.join(". ") : "No new information found")
 
-      // Refresh the page to show updated data
-      router.refresh()
+      // Hard reload to show updated data (router.refresh() doesn't re-initialize client state)
+      window.location.reload()
     } catch (err) {
       console.error(`[ai-enhance] Error:`, err)
       setError(err instanceof Error ? err.message : "Enhancement failed")
@@ -91,7 +89,7 @@ export function AIEnhanceButton({
         ) : (
           <>
             <Sparkles className="h-4 w-4 mr-2" />
-            Enhance with AI
+            Enhance with Perplexity
           </>
         )}
       </Button>
