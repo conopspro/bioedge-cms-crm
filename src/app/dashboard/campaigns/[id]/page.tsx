@@ -697,9 +697,11 @@ export default function CampaignDetailPage() {
           <RefreshCw className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
           <div className="text-sm text-blue-700 dark:text-blue-300">
             <span className="font-medium">
-              Sending {sendProgress.sent + 1} of {sendProgress.total}
+              {sendProgress.sent < sendProgress.total
+                ? `Sending ${sendProgress.sent + 1} of ${sendProgress.total}…`
+                : `Sent ${sendProgress.sent} of ${sendProgress.total} — finishing up…`}
             </span>
-            {sendProgress.current && (
+            {sendProgress.current && sendProgress.sent < sendProgress.total && (
               <span className="text-blue-600 dark:text-blue-400">
                 {" "}— {sendProgress.current}
               </span>
