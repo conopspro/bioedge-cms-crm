@@ -1,11 +1,21 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { Pencil, Trash2, Eye, EyeOff, Mail, Linkedin, Star, Building2, User, AlertTriangle } from "lucide-react"
+import {
+  Pencil,
+  Trash2,
+  Eye,
+  EyeOff,
+  Mail,
+  Linkedin,
+  Star,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react"
 import { FeaturedToggle } from "@/components/ui/featured-toggle"
-import type { Contact, Company } from "@/types/database"
+import type { Contact } from "@/types/database"
 import {
   Table,
   TableBody,
@@ -35,52 +45,45 @@ const statusLabels: Record<string, string> = {
   converted: "Converted",
 }
 
-interface ContactWithCompany extends Contact {
+export interface ContactWithCompany extends Contact {
   company?: { id: string; name: string; is_draft?: boolean | null } | null
 }
 
 interface ContactsTableProps {
   contacts: ContactWithCompany[]
+  total: number
+  page: number
+  pageSize: number
+  search: string
+  statusFilter: string
+  visibilityFilter: string
+  loading: boolean
+  onSearchChange: (search: string) => void
+  onStatusChange: (status: string) => void
+  onVisibilityChange: (visibility: string) => void
+  onPageChange: (page: number) => void
+  onRefresh: () => void
 }
 
 /**
- * Contacts Table Component
+ * Contacts Table Component — server-side paginated
  */
-export function ContactsTable({ contacts }: ContactsTableProps) {
-  const router = useRouter()
-  const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [visibilityFilter, setVisibilityFilter] = useState<string>("all")
-
-  // Filter contacts
-  const filteredContacts = contacts.filter((contact) => {
-    const searchLower = search.toLowerCase()
-    const fullName = `${contact.first_name} ${contact.last_name}`.toLowerCase()
-    const matchesSearch =
-      fullName.includes(searchLower) ||
-      contact.first_name?.toLowerCase().includes(searchLower) ||
-      contact.last_name?.toLowerCase().includes(searchLower) ||
-      contact.email?.toLowerCase().includes(searchLower) ||
-      contact.company?.name?.toLowerCase().includes(searchLower)
-    const matchesStatus =
-      statusFilter === "all" || contact.outreach_status === statusFilter
-
-    // Visibility filter logic
-    const isKeyPerson = contact.show_on_articles === true
-    const companyPublished = contact.company?.is_draft === false
-    const hasCompany = !!contact.company
-
-    let matchesVisibility = true
-    if (visibilityFilter === "published") {
-      matchesVisibility = isKeyPerson && companyPublished
-    } else if (visibilityFilter === "warning") {
-      matchesVisibility = isKeyPerson && (!companyPublished || !hasCompany)
-    } else if (visibilityFilter === "hidden") {
-      matchesVisibility = !isKeyPerson
-    }
-
-    return matchesSearch && matchesStatus && matchesVisibility
-  })
+export function ContactsTable({
+  contacts,
+  total,
+  page,
+  pageSize,
+  search,
+  statusFilter,
+  visibilityFilter,
+  loading,
+  onSearchChange,
+  onStatusChange,
+  onVisibilityChange,
+  onPageChange,
+  onRefresh,
+}: ContactsTableProps) {
+  const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
   // Handle delete
   const handleDelete = async (id: string, name: string) => {
@@ -94,7 +97,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
       })
 
       if (response.ok) {
-        router.refresh()
+        onRefresh()
       } else {
         alert("Failed to delete contact")
       }
@@ -111,12 +114,12 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
         <Input
           placeholder="Search contacts..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => onSearchChange(e.target.value)}
           className="max-w-sm"
         />
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => onStatusChange(e.target.value)}
           className="h-9 rounded-md border border-input bg-background px-3 text-sm"
         >
           <option value="all">All Statuses</option>
@@ -127,7 +130,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
         </select>
         <select
           value={visibilityFilter}
-          onChange={(e) => setVisibilityFilter(e.target.value)}
+          onChange={(e) => onVisibilityChange(e.target.value)}
           className="h-9 rounded-md border border-input bg-background px-3 text-sm"
         >
           <option value="all">All Visibility</option>
@@ -135,11 +138,16 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
           <option value="warning">Needs Attention</option>
           <option value="hidden">Hidden</option>
         </select>
+        {loading && (
+          <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
+        )}
       </div>
 
       {/* Results count */}
       <p className="text-sm text-muted-foreground">
-        Showing {filteredContacts.length} of {contacts.length} contacts
+        {total === 0
+          ? "No contacts found"
+          : `Showing ${(page - 1) * pageSize + 1}–${Math.min(page * pageSize, total)} of ${total.toLocaleString()} contacts`}
       </p>
 
       {/* Table */}
@@ -159,10 +167,12 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredContacts.length === 0 ? (
+            {contacts.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center">
-                  {contacts.length === 0 ? (
+                  {loading ? (
+                    <div className="text-muted-foreground">Loading...</div>
+                  ) : total === 0 && !search && statusFilter === "all" && visibilityFilter === "all" ? (
                     <div className="text-muted-foreground">
                       No contacts yet.{" "}
                       <Link
@@ -180,8 +190,8 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredContacts.map((contact) => (
-                <TableRow key={contact.id}>
+              contacts.map((contact) => (
+                <TableRow key={contact.id} className={loading ? "opacity-50" : ""}>
                   <TableCell>
                     <FeaturedToggle
                       entityType="contacts"
@@ -225,13 +235,17 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
                     )}
                   </TableCell>
                   <TableCell>
-                    <a
-                      href={`mailto:${contact.email}`}
-                      className="flex items-center gap-1 text-sm hover:underline"
-                    >
-                      <Mail className="h-3 w-3" />
-                      {contact.email}
-                    </a>
+                    {contact.email ? (
+                      <a
+                        href={`mailto:${contact.email}`}
+                        className="flex items-center gap-1 text-sm hover:underline"
+                      >
+                        <Mail className="h-3 w-3" />
+                        {contact.email}
+                      </a>
+                    ) : (
+                      <span className="text-muted-foreground">—</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     {(() => {
@@ -332,6 +346,35 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">
+            Page {page} of {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page - 1)}
+              disabled={page <= 1 || loading}
+            >
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onPageChange(page + 1)}
+              disabled={page >= totalPages || loading}
+            >
+              Next
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

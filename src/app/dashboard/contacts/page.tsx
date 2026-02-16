@@ -1,51 +1,70 @@
+"use client"
+
+import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import { Plus } from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
 import { Button } from "@/components/ui/button"
-import { ContactsTable } from "@/components/contacts/contacts-table"
+import { ContactsTable, type ContactWithCompany } from "@/components/contacts/contacts-table"
 
 /**
  * Contacts List Page
  *
- * Displays all contacts with company associations.
+ * Server-side paginated contacts with search and filtering.
  */
-export default async function ContactsPage() {
-  const supabase = await createClient()
+export default function ContactsPage() {
+  const [contacts, setContacts] = useState<ContactWithCompany[]>([])
+  const [total, setTotal] = useState(0)
+  const [page, setPage] = useState(1)
+  const [pageSize] = useState(50)
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState("all")
+  const [visibilityFilter, setVisibilityFilter] = useState("all")
+  const [loading, setLoading] = useState(true)
 
-  // Fetch all contacts (sorted alphabetically by last name, then first name)
-  // Supabase defaults to 1000 rows — fetch up to 10,000 to ensure search works across all contacts
-  const { data: contactsData, error } = await supabase
-    .from("contacts")
-    .select("*")
-    .order("last_name", { ascending: true })
-    .order("first_name", { ascending: true })
-    .limit(10000)
+  // Debounce search
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search)
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
-  if (error) {
-    console.error("Error fetching contacts:", error)
-  }
+  const fetchContacts = useCallback(async () => {
+    setLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: String(page),
+        pageSize: String(pageSize),
+      })
+      if (debouncedSearch) params.set("search", debouncedSearch)
+      if (statusFilter !== "all") params.set("status", statusFilter)
+      if (visibilityFilter !== "all") params.set("visibility", visibilityFilter)
 
-  // Fetch companies separately to avoid join issues - include is_draft status
-  const companyIds = [...new Set((contactsData || []).map(c => c.company_id).filter(Boolean))]
-  let companiesMap: Record<string, { id: string; name: string; is_draft: boolean | null }> = {}
+      const res = await fetch(`/api/contacts?${params}`)
+      if (res.ok) {
+        const data = await res.json()
+        setContacts(data.contacts || [])
+        setTotal(data.total || 0)
+      }
+    } catch (error) {
+      console.error("Failed to fetch contacts:", error)
+    } finally {
+      setLoading(false)
+    }
+  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter])
 
-  if (companyIds.length > 0) {
-    const { data: companiesData } = await supabase
-      .from("companies")
-      .select("id, name, is_draft")
-      .in("id", companyIds)
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPage(1)
+  }, [statusFilter, visibilityFilter])
 
-    companiesMap = (companiesData || []).reduce((acc, c) => {
-      acc[c.id] = c
-      return acc
-    }, {} as Record<string, { id: string; name: string; is_draft: boolean | null }>)
-  }
-
-  // Combine contacts with company data
-  const contacts = (contactsData || []).map(contact => ({
-    ...contact,
-    company: contact.company_id ? companiesMap[contact.company_id] || null : null,
-  }))
+  // Fetch when debounced search or other params change
+  useEffect(() => {
+    fetchContacts()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter])
 
   return (
     <div className="space-y-6">
@@ -66,7 +85,21 @@ export default async function ContactsPage() {
       </div>
 
       {/* Contacts Table */}
-      <ContactsTable contacts={contacts || []} />
+      <ContactsTable
+        contacts={contacts}
+        total={total}
+        page={page}
+        pageSize={pageSize}
+        search={search}
+        statusFilter={statusFilter}
+        visibilityFilter={visibilityFilter}
+        loading={loading}
+        onSearchChange={setSearch}
+        onStatusChange={setStatusFilter}
+        onVisibilityChange={setVisibilityFilter}
+        onPageChange={setPage}
+        onRefresh={fetchContacts}
+      />
     </div>
   )
 }

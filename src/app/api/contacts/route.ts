@@ -5,52 +5,135 @@ import type { ContactInsert } from "@/types/database"
 /**
  * GET /api/contacts
  *
- * Fetch all contacts with optional filtering.
+ * Fetch contacts with server-side search, filtering, and pagination.
  *
  * Query params:
+ * - page: Page number (default 1)
+ * - pageSize: Results per page (default 50, max 200)
+ * - search: Search by name, email, or company name
+ * - status: Filter by outreach status (not_contacted, contacted, responded, converted)
+ * - visibility: Filter by visibility (published, warning, hidden)
  * - company_id: Filter by company
- * - status: Filter by outreach status
- * - search: Search by name or email
+ * - show_on_articles: Legacy filter for published contacts
  */
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
-    const companyId = searchParams.get("company_id")
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1"))
+    const pageSize = Math.min(200, Math.max(1, parseInt(searchParams.get("pageSize") || "50")))
+    const search = searchParams.get("search")?.trim() || ""
     const status = searchParams.get("status")
-    const search = searchParams.get("search")
+    const visibility = searchParams.get("visibility")
+    const companyId = searchParams.get("company_id")
     const showOnArticles = searchParams.get("show_on_articles")
 
-    // Build query with company join
-    // Note: Must specify foreign key due to multiple relationships between contacts and companies
+    // If searching by company name, find matching company IDs first
+    let companySearchIds: string[] | null = null
+    if (search) {
+      const { data: matchingCompanies } = await supabase
+        .from("companies")
+        .select("id")
+        .ilike("name", `%${search}%`)
+        .limit(500)
+
+      if (matchingCompanies && matchingCompanies.length > 0) {
+        companySearchIds = matchingCompanies.map((c) => c.id)
+      }
+    }
+
+    // Build the main query with company join and exact count
     let query = supabase
       .from("contacts")
       .select(`
         *,
-        company:companies!contacts_company_id_fkey(id, name)
-      `)
+        company:companies!contacts_company_id_fkey(id, name, is_draft)
+      `, { count: "exact" })
 
+    // Company filter
     if (companyId) {
       query = query.eq("company_id", companyId)
     }
 
-    if (status) {
+    // Status filter
+    if (status && status !== "all") {
       query = query.eq("outreach_status", status)
     }
 
-    // Filter for published/visible contacts (leaders)
+    // Legacy show_on_articles filter
     if (showOnArticles === "true") {
       query = query.eq("show_on_articles", true)
     }
 
+    // Text search: name, email, or company name
     if (search) {
-      query = query.or(`first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`)
+      if (companySearchIds && companySearchIds.length > 0) {
+        // Search across contact fields OR matching company IDs
+        query = query.or(
+          `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%,company_id.in.(${companySearchIds.join(",")})`
+        )
+      } else {
+        query = query.or(
+          `first_name.ilike.%${search}%,last_name.ilike.%${search}%,email.ilike.%${search}%`
+        )
+      }
     }
 
-    query = query.order("created_at", { ascending: false })
+    // Visibility filter (requires show_on_articles + company is_draft)
+    // "published" = show_on_articles true (post-filter for company.is_draft = false)
+    // "warning" = show_on_articles true (post-filter for company.is_draft != false or no company)
+    // "hidden" = show_on_articles false or null
+    if (visibility === "published" || visibility === "warning") {
+      query = query.eq("show_on_articles", true)
+    } else if (visibility === "hidden") {
+      query = query.or("show_on_articles.is.null,show_on_articles.eq.false")
+    }
 
-    const { data, error } = await query
+    // Order
+    query = query.order("last_name", { ascending: true })
+      .order("first_name", { ascending: true })
+
+    // For published/warning visibility, we need post-filtering on joined company data,
+    // so over-fetch and paginate in JS
+    if (visibility === "published" || visibility === "warning") {
+      // Fetch all matching (already filtered to show_on_articles=true)
+      const { data: allMatching, error, count } = await query.limit(10000)
+
+      if (error) {
+        console.error("Error fetching contacts:", error)
+        return NextResponse.json(
+          { error: "Failed to fetch contacts" },
+          { status: 500 }
+        )
+      }
+
+      // Post-filter by visibility
+      const filtered = (allMatching || []).filter((c) => {
+        const companyPublished = c.company?.is_draft === false
+        const hasCompany = !!c.company
+        if (visibility === "published") return companyPublished
+        if (visibility === "warning") return !companyPublished || !hasCompany
+        return true
+      })
+
+      const total = filtered.length
+      const offset = (page - 1) * pageSize
+      const paged = filtered.slice(offset, offset + pageSize)
+
+      return NextResponse.json({
+        contacts: paged,
+        total,
+        page,
+        pageSize,
+      })
+    }
+
+    // Standard pagination with Supabase range
+    const offset = (page - 1) * pageSize
+    query = query.range(offset, offset + pageSize - 1)
+
+    const { data, error, count } = await query
 
     if (error) {
       console.error("Error fetching contacts:", error)
@@ -60,7 +143,12 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json({
+      contacts: data || [],
+      total: count || 0,
+      page,
+      pageSize,
+    })
   } catch (error) {
     console.error("Unexpected error:", error)
     return NextResponse.json(
