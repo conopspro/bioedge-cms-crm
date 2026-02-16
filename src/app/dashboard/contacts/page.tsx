@@ -42,7 +42,10 @@ export default function ContactsPage() {
       if (debouncedSearch) params.set("search", debouncedSearch)
       if (statusFilter !== "all") params.set("status", statusFilter)
       if (visibilityFilter !== "all") params.set("visibility", visibilityFilter)
-      if (outreachFilter !== "all") params.set("outreach", outreachFilter)
+      // Time range only applies when a time-relevant status is selected
+      if (outreachFilter !== "all" && (statusFilter === "contacted" || statusFilter === "responded" || statusFilter === "converted")) {
+        params.set("outreach", outreachFilter)
+      }
 
       const res = await fetch(`/api/contacts?${params}`)
       if (res.ok) {
@@ -98,7 +101,13 @@ export default function ContactsPage() {
         outreachFilter={outreachFilter}
         loading={loading}
         onSearchChange={setSearch}
-        onStatusChange={setStatusFilter}
+        onStatusChange={(status) => {
+          setStatusFilter(status)
+          // Reset time range when switching to a status that doesn't support it
+          if (status !== "contacted" && status !== "responded" && status !== "converted") {
+            setOutreachFilter("all")
+          }
+        }}
         onVisibilityChange={setVisibilityFilter}
         onOutreachChange={setOutreachFilter}
         onPageChange={setPage}

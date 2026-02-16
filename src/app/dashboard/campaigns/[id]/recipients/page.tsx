@@ -89,7 +89,7 @@ export default function AddRecipientsPage() {
   const [titleFilter, setTitleFilter] = useState("")
   const [hasEmail, setHasEmail] = useState(true)
   const [eventFilter, setEventFilter] = useState<string>("all")
-  const [outreachRecencyFilter, setOutreachRecencyFilter] = useState<string>("all")
+  const [outreachTimeRange, setOutreachTimeRange] = useState<string>("all")
 
   // Data state
   const [contacts, setContacts] = useState<ContactResult[]>([])
@@ -184,8 +184,8 @@ export default function AddRecipientsPage() {
       if (hasEmail) params.set("has_email", "true")
       if (eventFilter && eventFilter !== "all")
         params.set("event_id", eventFilter)
-      if (outreachRecencyFilter && outreachRecencyFilter !== "all")
-        params.set("outreach", outreachRecencyFilter)
+      if (outreachTimeRange !== "all" && (outreachFilter === "contacted" || outreachFilter === "responded"))
+        params.set("outreach", outreachTimeRange)
 
       const res = await fetch(
         `/api/campaigns/${campaignId}/available-contacts?${params.toString()}`
@@ -210,7 +210,7 @@ export default function AddRecipientsPage() {
     titleFilter,
     hasEmail,
     eventFilter,
-    outreachRecencyFilter,
+    outreachTimeRange,
     campaignId,
   ])
 
@@ -435,7 +435,12 @@ export default function AddRecipientsPage() {
               <Label>Outreach Status</Label>
               <Select
                 value={outreachFilter}
-                onValueChange={setOutreachFilter}
+                onValueChange={(v) => {
+                  setOutreachFilter(v)
+                  if (v !== "contacted" && v !== "responded") {
+                    setOutreachTimeRange("all")
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Not Contacted" />
@@ -449,26 +454,27 @@ export default function AddRecipientsPage() {
               </Select>
             </div>
 
-            {/* Last Outreach */}
-            <div className="space-y-2">
-              <Label>Last Outreach</Label>
-              <Select
-                value={outreachRecencyFilter}
-                onValueChange={setOutreachRecencyFilter}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="All" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="never">Never Contacted</SelectItem>
-                  <SelectItem value="7d">Last 7 Days</SelectItem>
-                  <SelectItem value="30d">Last 30 Days</SelectItem>
-                  <SelectItem value="90d">Last 90 Days</SelectItem>
-                  <SelectItem value="90d_plus">Stale (90+ Days)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            {/* When — only shows for contacted/responded */}
+            {(outreachFilter === "contacted" || outreachFilter === "responded") && (
+              <div className="space-y-2">
+                <Label>When</Label>
+                <Select
+                  value={outreachTimeRange}
+                  onValueChange={setOutreachTimeRange}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Any time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Any Time</SelectItem>
+                    <SelectItem value="7d">Last 7 Days</SelectItem>
+                    <SelectItem value="30d">Last 30 Days</SelectItem>
+                    <SelectItem value="90d">Last 90 Days</SelectItem>
+                    <SelectItem value="90d_plus">90+ Days Ago (Stale)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Seniority */}
             <div className="space-y-2">

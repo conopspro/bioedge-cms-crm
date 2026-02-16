@@ -142,18 +142,19 @@ export function ContactsTable({
           <option value="warning">Needs Attention</option>
           <option value="hidden">Hidden</option>
         </select>
-        <select
-          value={outreachFilter}
-          onChange={(e) => onOutreachChange(e.target.value)}
-          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-        >
-          <option value="all">All Outreach</option>
-          <option value="never">Never Contacted</option>
-          <option value="7d">Last 7 Days</option>
-          <option value="30d">Last 30 Days</option>
-          <option value="90d">Last 90 Days</option>
-          <option value="90d_plus">Stale (90+ Days)</option>
-        </select>
+        {(statusFilter === "contacted" || statusFilter === "responded" || statusFilter === "converted") && (
+          <select
+            value={outreachFilter}
+            onChange={(e) => onOutreachChange(e.target.value)}
+            className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+          >
+            <option value="all">Any Time</option>
+            <option value="7d">Last 7 Days</option>
+            <option value="30d">Last 30 Days</option>
+            <option value="90d">Last 90 Days</option>
+            <option value="90d_plus">90+ Days Ago (Stale)</option>
+          </select>
+        )}
         {loading && (
           <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
         )}
