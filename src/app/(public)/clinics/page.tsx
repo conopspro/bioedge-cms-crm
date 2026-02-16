@@ -235,7 +235,7 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
 
   // Fetch all tags with counts via RPC
   const { data: tagsData } = await supabase.rpc("get_clinic_tags_count")
-  const allTags = (tagsData || []) as { tag: string; count: number }[]
+  const allTags = ((tagsData || []) as { tag: string; count: number }[]).sort((a, b) => a.tag.localeCompare(b.tag))
 
   const hasFilters = params.state || params.tag || params.q || params.city || params.zip || params.radius || params.near
 
