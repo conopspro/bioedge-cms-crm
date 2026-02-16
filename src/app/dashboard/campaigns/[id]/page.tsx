@@ -842,6 +842,18 @@ export default function CampaignDetailPage() {
                 </div>
               </div>
 
+              {/* Signature preview (appended automatically at send time) */}
+              {campaign.sender_profile?.signature && (
+                <div className="border-t pt-2">
+                  <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
+                    Signature (auto-appended)
+                  </div>
+                  <div className="text-sm text-muted-foreground whitespace-pre-line">
+                    {campaign.sender_profile.signature}
+                  </div>
+                </div>
+              )}
+
               {selectedRecipient.suppression_reason && (
                 <div className="rounded-md bg-orange-50 dark:bg-orange-900/20 px-4 py-3 text-sm">
                   <div className="flex items-center gap-2 text-orange-700 dark:text-orange-300">
