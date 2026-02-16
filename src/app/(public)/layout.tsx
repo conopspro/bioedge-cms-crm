@@ -39,14 +39,14 @@ export default async function PublicLayout({
       .limit(3),
     supabase
       .from("navigation_items")
-      .select("id, label, href, is_external, display_order, parent_id")
+      .select("id, label, href, is_external, display_order")
       .eq("location", "main_header")
       .is("event_id", null)
       .eq("is_visible", true)
       .order("display_order", { ascending: true }),
     supabase
       .from("navigation_items")
-      .select("id, label, href, is_external, display_order, parent_id")
+      .select("id, label, href, is_external, display_order")
       .eq("location", "main_footer")
       .is("event_id", null)
       .eq("is_visible", true)

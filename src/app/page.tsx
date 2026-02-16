@@ -65,7 +65,7 @@ export default async function HomePage() {
     // Navigation items for header
     supabase
       .from("navigation_items")
-      .select("id, label, href, is_external, display_order, parent_id")
+      .select("id, label, href, is_external, display_order")
       .eq("location", "main_header")
       .is("event_id", null)
       .eq("is_visible", true)
@@ -74,7 +74,7 @@ export default async function HomePage() {
     // Navigation items for footer
     supabase
       .from("navigation_items")
-      .select("id, label, href, is_external, display_order, parent_id")
+      .select("id, label, href, is_external, display_order")
       .eq("location", "main_footer")
       .is("event_id", null)
       .eq("is_visible", true)
