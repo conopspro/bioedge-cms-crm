@@ -135,6 +135,7 @@ export default function NewCampaignPage() {
   const [contactSeniority, setContactSeniority] = useState("all")
   const [contactTitleSearch, setContactTitleSearch] = useState("")
   const [contactHasEmail, setContactHasEmail] = useState(true)
+  const [contactOutreachRecency, setContactOutreachRecency] = useState("all")
 
   const [searchResults, setSearchResults] = useState<ContactResult[]>([])
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(
@@ -310,6 +311,7 @@ export default function NewCampaignPage() {
       if (contactSeniority !== "all") params.set("seniority", contactSeniority)
       if (contactTitleSearch) params.set("title_search", contactTitleSearch)
       if (contactHasEmail) params.set("has_email", "true")
+      if (contactOutreachRecency !== "all") params.set("outreach", contactOutreachRecency)
 
       // Pass selected company IDs
       const companyIds = Array.from(selectedCompanyIds)
@@ -336,6 +338,7 @@ export default function NewCampaignPage() {
     contactSeniority,
     contactTitleSearch,
     contactHasEmail,
+    contactOutreachRecency,
   ])
 
   useEffect(() => {
@@ -1279,6 +1282,26 @@ export default function NewCampaignPage() {
                             </SelectItem>
                             <SelectItem value="contacted">Contacted</SelectItem>
                             <SelectItem value="responded">Responded</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs">Last Outreach</Label>
+                        <Select
+                          value={contactOutreachRecency}
+                          onValueChange={setContactOutreachRecency}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="never">Never Contacted</SelectItem>
+                            <SelectItem value="7d">Last 7 Days</SelectItem>
+                            <SelectItem value="30d">Last 30 Days</SelectItem>
+                            <SelectItem value="90d">Last 90 Days</SelectItem>
+                            <SelectItem value="90d_plus">Stale (90+ Days)</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
