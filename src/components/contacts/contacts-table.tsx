@@ -55,12 +55,14 @@ interface ContactsTableProps {
   page: number
   pageSize: number
   search: string
-  statusFilter: string
+  notWithinFilter: string
+  convertedFilter: string
   visibilityFilter: string
   outreachFilter: string
   loading: boolean
   onSearchChange: (search: string) => void
-  onStatusChange: (status: string) => void
+  onNotWithinChange: (notWithin: string) => void
+  onConvertedChange: (converted: string) => void
   onVisibilityChange: (visibility: string) => void
   onOutreachChange: (outreach: string) => void
   onPageChange: (page: number) => void
@@ -76,12 +78,14 @@ export function ContactsTable({
   page,
   pageSize,
   search,
-  statusFilter,
+  notWithinFilter,
+  convertedFilter,
   visibilityFilter,
   outreachFilter,
   loading,
   onSearchChange,
-  onStatusChange,
+  onNotWithinChange,
+  onConvertedChange,
   onVisibilityChange,
   onOutreachChange,
   onPageChange,
@@ -122,15 +126,23 @@ export function ContactsTable({
           className="max-w-sm"
         />
         <select
-          value={statusFilter}
-          onChange={(e) => onStatusChange(e.target.value)}
+          value={notWithinFilter}
+          onChange={(e) => onNotWithinChange(e.target.value)}
           className="h-9 rounded-md border border-input bg-background px-3 text-sm"
         >
-          <option value="all">All Statuses</option>
-          <option value="not_contacted">Not Contacted</option>
-          <option value="contacted">Contacted</option>
-          <option value="responded">Responded</option>
-          <option value="converted">Converted</option>
+          <option value="all">Not Contacted Within: Any</option>
+          <option value="7d">Not Within 7 Days</option>
+          <option value="30d">Not Within 30 Days</option>
+          <option value="90d">Not Within 90 Days</option>
+        </select>
+        <select
+          value={convertedFilter}
+          onChange={(e) => onConvertedChange(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">Converted: Any</option>
+          <option value="only">Converted Only</option>
+          <option value="exclude">Exclude Converted</option>
         </select>
         <select
           value={visibilityFilter}
@@ -188,7 +200,7 @@ export function ContactsTable({
                 <TableCell colSpan={7} className="h-24 text-center">
                   {loading ? (
                     <div className="text-muted-foreground">Loading...</div>
-                  ) : total === 0 && !search && statusFilter === "all" && visibilityFilter === "all" && outreachFilter === "all" ? (
+                  ) : total === 0 && !search && notWithinFilter === "all" && convertedFilter === "all" && visibilityFilter === "all" && outreachFilter === "all" ? (
                     <div className="text-muted-foreground">
                       No contacts yet.{" "}
                       <Link

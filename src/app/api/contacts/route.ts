@@ -29,6 +29,34 @@ export async function GET(request: NextRequest) {
     const companyId = searchParams.get("company_id")
     const showOnArticles = searchParams.get("show_on_articles")
     const outreach = searchParams.get("outreach") // never, 7d, 30d, 90d, 90d_plus
+    const notWithin = searchParams.get("not_within") // 7d, 30d, 90d — exclude contacts contacted within this window
+    const converted = searchParams.get("converted") // only, exclude — filter by converted status
+
+    // "Not Contacted Within" filter — exclude contacts with outreach_log entries within X days
+    // Uses post-filtering (not inline query) to avoid HTTP 431 with large ID lists
+    let notWithinExcludeSet: Set<string> | null = null
+    if (notWithin && notWithin !== "all") {
+      const now = new Date()
+      let cutoffDate: Date
+      if (notWithin === "7d") {
+        cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      } else if (notWithin === "30d") {
+        cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      } else if (notWithin === "90d") {
+        cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+      } else {
+        cutoffDate = now
+      }
+
+      const cutoffStr = cutoffDate.toISOString().split("T")[0]
+      const { data: recentLogs } = await supabase
+        .from("outreach_log")
+        .select("contact_id")
+        .gte("date", cutoffStr)
+        .limit(50000)
+
+      notWithinExcludeSet = new Set((recentLogs || []).map((r) => r.contact_id))
+    }
 
     // Outreach recency filter — find contact IDs from outreach_log
     let outreachContactIds: string[] | null = null
@@ -140,6 +168,13 @@ export async function GET(request: NextRequest) {
       query = query.eq("outreach_status", status)
     }
 
+    // Converted filter
+    if (converted === "only") {
+      query = query.eq("outreach_status", "converted")
+    } else if (converted === "exclude") {
+      query = query.neq("outreach_status", "converted")
+    }
+
     // Outreach recency filter — apply contact ID list
     if (outreachContactIds && outreachFilterMode === "include") {
       query = query.in("id", outreachContactIds)
@@ -184,11 +219,10 @@ export async function GET(request: NextRequest) {
     query = query.order("last_name", { ascending: true })
       .order("first_name", { ascending: true })
 
-    // For published/warning visibility, we need post-filtering on joined company data,
-    // so over-fetch and paginate in JS
-    if (visibility === "published" || visibility === "warning") {
-      // Fetch all matching (already filtered to show_on_articles=true)
-      const { data: allMatching, error, count } = await query.limit(10000)
+    // When we need post-filtering (visibility or not_within), over-fetch and paginate in JS
+    const needsPostFilter = visibility === "published" || visibility === "warning" || notWithinExcludeSet
+    if (needsPostFilter) {
+      const { data: allMatching, error } = await query.limit(10000)
 
       if (error) {
         console.error("Error fetching contacts:", error)
@@ -198,14 +232,23 @@ export async function GET(request: NextRequest) {
         )
       }
 
+      let filtered = allMatching || []
+
       // Post-filter by visibility
-      const filtered = (allMatching || []).filter((c) => {
-        const companyPublished = c.company?.is_draft === false
-        const hasCompany = !!c.company
-        if (visibility === "published") return companyPublished
-        if (visibility === "warning") return !companyPublished || !hasCompany
-        return true
-      })
+      if (visibility === "published" || visibility === "warning") {
+        filtered = filtered.filter((c) => {
+          const companyPublished = c.company?.is_draft === false
+          const hasCompany = !!c.company
+          if (visibility === "published") return companyPublished
+          if (visibility === "warning") return !companyPublished || !hasCompany
+          return true
+        })
+      }
+
+      // Post-filter: "Not Contacted Within" — exclude contacts with recent outreach
+      if (notWithinExcludeSet && notWithinExcludeSet.size > 0) {
+        filtered = filtered.filter((c) => !notWithinExcludeSet!.has(c.id))
+      }
 
       const total = filtered.length
       const offset = (page - 1) * pageSize

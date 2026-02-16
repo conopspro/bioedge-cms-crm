@@ -17,7 +17,8 @@ export default function ContactsPage() {
   const [page, setPage] = useState(1)
   const [pageSize] = useState(50)
   const [search, setSearch] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
+  const [notWithinFilter, setNotWithinFilter] = useState("all")
+  const [convertedFilter, setConvertedFilter] = useState("all")
   const [visibilityFilter, setVisibilityFilter] = useState("all")
   const [outreachFilter, setOutreachFilter] = useState("all")
   const [loading, setLoading] = useState(true)
@@ -40,7 +41,8 @@ export default function ContactsPage() {
         pageSize: String(pageSize),
       })
       if (debouncedSearch) params.set("search", debouncedSearch)
-      if (statusFilter !== "all") params.set("status", statusFilter)
+      if (notWithinFilter !== "all") params.set("not_within", notWithinFilter)
+      if (convertedFilter !== "all") params.set("converted", convertedFilter)
       if (visibilityFilter !== "all") params.set("visibility", visibilityFilter)
       if (outreachFilter !== "all") params.set("outreach", outreachFilter)
 
@@ -55,18 +57,18 @@ export default function ContactsPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter, outreachFilter])
+  }, [page, pageSize, debouncedSearch, notWithinFilter, convertedFilter, visibilityFilter, outreachFilter])
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1)
-  }, [statusFilter, visibilityFilter, outreachFilter])
+  }, [notWithinFilter, convertedFilter, visibilityFilter, outreachFilter])
 
   // Fetch when debounced search or other params change
   useEffect(() => {
     fetchContacts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter, outreachFilter])
+  }, [page, pageSize, debouncedSearch, notWithinFilter, convertedFilter, visibilityFilter, outreachFilter])
 
   return (
     <div className="space-y-6">
@@ -93,12 +95,14 @@ export default function ContactsPage() {
         page={page}
         pageSize={pageSize}
         search={search}
-        statusFilter={statusFilter}
+        notWithinFilter={notWithinFilter}
+        convertedFilter={convertedFilter}
         visibilityFilter={visibilityFilter}
         outreachFilter={outreachFilter}
         loading={loading}
         onSearchChange={setSearch}
-        onStatusChange={setStatusFilter}
+        onNotWithinChange={setNotWithinFilter}
+        onConvertedChange={setConvertedFilter}
         onVisibilityChange={setVisibilityFilter}
         onOutreachChange={setOutreachFilter}
         onPageChange={setPage}

@@ -84,7 +84,8 @@ export default function AddRecipientsPage() {
   const [companyFilter, setCompanyFilter] = useState<string>("all")
   const [categoryFilter, setCategoryFilter] = useState<string>("all")
   const [edgeFilter, setEdgeFilter] = useState<string>("all")
-  const [outreachFilter, setOutreachFilter] = useState<string>("not_contacted")
+  const [notWithinFilter, setNotWithinFilter] = useState<string>("all")
+  const [convertedFilter, setConvertedFilter] = useState<string>("all")
   const [seniorityFilter, setSeniorityFilter] = useState<string>("all")
   const [titleFilter, setTitleFilter] = useState("")
   const [hasEmail, setHasEmail] = useState(true)
@@ -176,8 +177,10 @@ export default function AddRecipientsPage() {
         params.set("category", categoryFilter)
       if (edgeFilter && edgeFilter !== "all")
         params.set("edge_category", edgeFilter)
-      if (outreachFilter && outreachFilter !== "all")
-        params.set("status", outreachFilter)
+      if (notWithinFilter && notWithinFilter !== "all")
+        params.set("not_within", notWithinFilter)
+      if (convertedFilter && convertedFilter !== "all")
+        params.set("converted", convertedFilter)
       if (seniorityFilter && seniorityFilter !== "all")
         params.set("seniority", seniorityFilter)
       if (titleFilter) params.set("title_search", titleFilter)
@@ -205,7 +208,8 @@ export default function AddRecipientsPage() {
     companyFilter,
     categoryFilter,
     edgeFilter,
-    outreachFilter,
+    notWithinFilter,
+    convertedFilter,
     seniorityFilter,
     titleFilter,
     hasEmail,
@@ -430,21 +434,39 @@ export default function AddRecipientsPage() {
               </Select>
             </div>
 
-            {/* Outreach Status */}
+            {/* Not Contacted Within */}
             <div className="space-y-2">
-              <Label>Outreach Status</Label>
+              <Label>Not Contacted Within</Label>
               <Select
-                value={outreachFilter}
-                onValueChange={setOutreachFilter}
+                value={notWithinFilter}
+                onValueChange={setNotWithinFilter}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Not Contacted" />
+                  <SelectValue placeholder="Any" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All</SelectItem>
-                  <SelectItem value="not_contacted">Not Contacted</SelectItem>
-                  <SelectItem value="contacted">Contacted</SelectItem>
-                  <SelectItem value="responded">Responded</SelectItem>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="7d">7 Days</SelectItem>
+                  <SelectItem value="30d">30 Days</SelectItem>
+                  <SelectItem value="90d">90 Days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Converted */}
+            <div className="space-y-2">
+              <Label>Converted</Label>
+              <Select
+                value={convertedFilter}
+                onValueChange={setConvertedFilter}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="only">Converted Only</SelectItem>
+                  <SelectItem value="exclude">Exclude Converted</SelectItem>
                 </SelectContent>
               </Select>
             </div>

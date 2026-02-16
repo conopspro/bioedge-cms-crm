@@ -39,6 +39,34 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const hasEmail = searchParams.get("has_email") !== "false"
     const eventId = searchParams.get("event_id")
     const outreach = searchParams.get("outreach") // never, 7d, 30d, 90d, 90d_plus
+    const notWithin = searchParams.get("not_within") // 7d, 30d, 90d — exclude contacts contacted within this window
+    const converted = searchParams.get("converted") // only, exclude — filter by converted status
+
+    // "Not Contacted Within" filter — exclude contacts with outreach_log entries within X days
+    // Uses post-filtering (not inline query) to avoid HTTP 431 with large ID lists
+    let notWithinExcludeSet: Set<string> | null = null
+    if (notWithin && notWithin !== "all") {
+      const now = new Date()
+      let cutoffDate: Date
+      if (notWithin === "7d") {
+        cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      } else if (notWithin === "30d") {
+        cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      } else if (notWithin === "90d") {
+        cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+      } else {
+        cutoffDate = now
+      }
+
+      const cutoffStr = cutoffDate.toISOString().split("T")[0]
+      const { data: recentLogs } = await supabase
+        .from("outreach_log")
+        .select("contact_id")
+        .gte("date", cutoffStr)
+        .limit(50000)
+
+      notWithinExcludeSet = new Set((recentLogs || []).map((r) => r.contact_id))
+    }
 
     // Outreach recency filter — find contact IDs from outreach_log
     let outreachContactIds: string[] | null = null
@@ -194,6 +222,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       query = query.eq("outreach_status", outreachStatus)
     }
 
+    // Converted filter
+    if (converted === "only") {
+      query = query.eq("outreach_status", "converted")
+    } else if (converted === "exclude") {
+      query = query.neq("outreach_status", "converted")
+    }
+
     // Apply seniority filter
     if (seniority && seniority !== "all") {
       query = query.eq("seniority", seniority)
@@ -211,7 +246,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       query = query.ilike("title", `%${titleSearch}%`)
     }
 
-    const { data: contacts, error } = await query
+    const { data: rawContacts, error } = await query
 
     if (error) {
       console.error("Error fetching contacts:", error)
@@ -219,6 +254,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         { error: "Failed to fetch contacts" },
         { status: 500 }
       )
+    }
+
+    // Post-filter: "Not Contacted Within" — exclude contacts with recent outreach
+    let contacts = rawContacts || []
+    if (notWithinExcludeSet && notWithinExcludeSet.size > 0) {
+      contacts = contacts.filter((c) => !notWithinExcludeSet!.has(c.id))
     }
 
     // Get campaign's cooldown setting
@@ -233,7 +274,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Check for cooldown warnings: find recently emailed companies
     const contactCompanyIds = [
       ...new Set(
-        (contacts || [])
+        contacts
           .map((c) => c.company_id)
           .filter(Boolean) as string[]
       ),
@@ -281,7 +322,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           }
         }
 
-        cooldownWarnings = (contacts || [])
+        cooldownWarnings = contacts
           .filter((c) => c.company_id && recentCompanyMap.has(c.company_id))
           .map((c) => {
             const info = recentCompanyMap.get(c.company_id!)!
@@ -296,7 +337,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }
 
     return NextResponse.json({
-      contacts: contacts || [],
+      contacts,
       cooldown_warnings: cooldownWarnings,
     })
   } catch (error) {

@@ -131,7 +131,8 @@ export default function NewCampaignPage() {
 
   // Step 2: Contact filter state
   const [contactSearch, setContactSearch] = useState("")
-  const [contactOutreach, setContactOutreach] = useState("all")
+  const [contactNotWithin, setContactNotWithin] = useState("all")
+  const [contactConverted, setContactConverted] = useState("all")
   const [contactSeniority, setContactSeniority] = useState("all")
   const [contactTitleSearch, setContactTitleSearch] = useState("")
   const [contactHasEmail, setContactHasEmail] = useState(true)
@@ -305,19 +306,23 @@ export default function NewCampaignPage() {
 
     setSearchLoading(true)
     try {
-      const params = new URLSearchParams()
-      if (contactSearch) params.set("search", contactSearch)
-      if (contactOutreach !== "all") params.set("status", contactOutreach)
-      if (contactSeniority !== "all") params.set("seniority", contactSeniority)
-      if (contactTitleSearch) params.set("title_search", contactTitleSearch)
-      if (contactHasEmail) params.set("has_email", "true")
-      if (contactOutreachTimeRange !== "all") params.set("outreach", contactOutreachTimeRange)
+      // Use POST to avoid HTTP 431 when many company IDs are selected
+      const body: Record<string, unknown> = {
+        company_ids: Array.from(selectedCompanyIds),
+      }
+      if (contactSearch) body.search = contactSearch
+      if (contactNotWithin !== "all") body.not_within = contactNotWithin
+      if (contactConverted !== "all") body.converted = contactConverted
+      if (contactSeniority !== "all") body.seniority = contactSeniority
+      if (contactTitleSearch) body.title_search = contactTitleSearch
+      if (contactHasEmail) body.has_email = true
+      if (contactOutreachTimeRange !== "all") body.outreach = contactOutreachTimeRange
 
-      // Pass selected company IDs
-      const companyIds = Array.from(selectedCompanyIds)
-      params.set("company_ids", companyIds.join(","))
-
-      const res = await fetch(`/api/contacts/search?${params.toString()}`)
+      const res = await fetch("/api/contacts/search", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      })
       if (res.ok) {
         const data = await res.json()
         setSearchResults(data.contacts || [])
@@ -334,7 +339,8 @@ export default function NewCampaignPage() {
     recipientsOpen,
     selectedCompanyIds,
     contactSearch,
-    contactOutreach,
+    contactNotWithin,
+    contactConverted,
     contactSeniority,
     contactTitleSearch,
     contactHasEmail,
@@ -1267,21 +1273,36 @@ export default function NewCampaignPage() {
                       </div>
 
                       <div className="space-y-1">
-                        <Label className="text-xs">Outreach Status</Label>
+                        <Label className="text-xs">Not Contacted Within</Label>
                         <Select
-                          value={contactOutreach}
-                          onValueChange={setContactOutreach}
+                          value={contactNotWithin}
+                          onValueChange={setContactNotWithin}
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="All" />
+                            <SelectValue placeholder="Any" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="not_contacted">
-                              Not Contacted
-                            </SelectItem>
-                            <SelectItem value="contacted">Contacted</SelectItem>
-                            <SelectItem value="responded">Responded</SelectItem>
+                            <SelectItem value="all">Any</SelectItem>
+                            <SelectItem value="7d">7 Days</SelectItem>
+                            <SelectItem value="30d">30 Days</SelectItem>
+                            <SelectItem value="90d">90 Days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs">Converted</Label>
+                        <Select
+                          value={contactConverted}
+                          onValueChange={setContactConverted}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Any" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Any</SelectItem>
+                            <SelectItem value="only">Converted Only</SelectItem>
+                            <SelectItem value="exclude">Exclude Converted</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
