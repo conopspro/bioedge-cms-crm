@@ -13,11 +13,13 @@ export default async function ContactsPage() {
   const supabase = await createClient()
 
   // Fetch all contacts (sorted alphabetically by last name, then first name)
+  // Supabase defaults to 1000 rows — fetch up to 10,000 to ensure search works across all contacts
   const { data: contactsData, error } = await supabase
     .from("contacts")
     .select("*")
     .order("last_name", { ascending: true })
     .order("first_name", { ascending: true })
+    .limit(10000)
 
   if (error) {
     console.error("Error fetching contacts:", error)
