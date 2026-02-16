@@ -197,7 +197,12 @@ class EmailGeneratorService {
 
     parts.push(`Write a personalized email to this person:`)
     parts.push(`\n**Contact:**`)
-    parts.push(`- Name: ${contact.first_name} ${contact.last_name}`)
+    const hasName = contact.first_name?.trim() || contact.last_name?.trim()
+    if (hasName) {
+      parts.push(`- Name: ${contact.first_name} ${contact.last_name}`)
+    } else {
+      parts.push(`- Name: [Unknown — this is a catch-all/generic email address. Do NOT use "Hi" with any name. Use a greeting like "Hi there," or "Hello," or jump straight into the email without a greeting. Do NOT guess or infer a name from the email address.]`)
+    }
     if (contact.title) parts.push(`- Title: ${contact.title}`)
     if (contact.seniority) parts.push(`- Seniority: ${contact.seniority}`)
     if (contact.ai_expertise?.length) {

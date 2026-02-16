@@ -86,6 +86,7 @@ export default function AddRecipientsPage() {
   const [edgeFilter, setEdgeFilter] = useState<string>("all")
   const [notWithinFilter, setNotWithinFilter] = useState<string>("all")
   const [convertedFilter, setConvertedFilter] = useState<string>("all")
+  const [catchAllFilter, setCatchAllFilter] = useState<string>("all")
   const [seniorityFilter, setSeniorityFilter] = useState<string>("all")
   const [titleFilter, setTitleFilter] = useState("")
   const [hasEmail, setHasEmail] = useState(true)
@@ -181,6 +182,8 @@ export default function AddRecipientsPage() {
         params.set("not_within", notWithinFilter)
       if (convertedFilter && convertedFilter !== "all")
         params.set("converted", convertedFilter)
+      if (catchAllFilter && catchAllFilter !== "all")
+        params.set("catch_all", catchAllFilter)
       if (seniorityFilter && seniorityFilter !== "all")
         params.set("seniority", seniorityFilter)
       if (titleFilter) params.set("title_search", titleFilter)
@@ -210,6 +213,7 @@ export default function AddRecipientsPage() {
     edgeFilter,
     notWithinFilter,
     convertedFilter,
+    catchAllFilter,
     seniorityFilter,
     titleFilter,
     hasEmail,
@@ -467,6 +471,24 @@ export default function AddRecipientsPage() {
                   <SelectItem value="all">Any</SelectItem>
                   <SelectItem value="only">Converted Only</SelectItem>
                   <SelectItem value="exclude">Exclude Converted</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Catch-All */}
+            <div className="space-y-2">
+              <Label>Catch-All</Label>
+              <Select
+                value={catchAllFilter}
+                onValueChange={setCatchAllFilter}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any</SelectItem>
+                  <SelectItem value="only">Catch-All Only</SelectItem>
+                  <SelectItem value="exclude">Exclude Catch-All</SelectItem>
                 </SelectContent>
               </Select>
             </div>

@@ -133,6 +133,7 @@ export default function NewCampaignPage() {
   const [contactSearch, setContactSearch] = useState("")
   const [contactNotWithin, setContactNotWithin] = useState("all")
   const [contactConverted, setContactConverted] = useState("all")
+  const [contactCatchAll, setContactCatchAll] = useState("all")
   const [contactSeniority, setContactSeniority] = useState("all")
   const [contactTitleSearch, setContactTitleSearch] = useState("")
   const [contactHasEmail, setContactHasEmail] = useState(true)
@@ -313,6 +314,7 @@ export default function NewCampaignPage() {
       if (contactSearch) body.search = contactSearch
       if (contactNotWithin !== "all") body.not_within = contactNotWithin
       if (contactConverted !== "all") body.converted = contactConverted
+      if (contactCatchAll !== "all") body.catch_all = contactCatchAll
       if (contactSeniority !== "all") body.seniority = contactSeniority
       if (contactTitleSearch) body.title_search = contactTitleSearch
       if (contactHasEmail) body.has_email = true
@@ -341,6 +343,7 @@ export default function NewCampaignPage() {
     contactSearch,
     contactNotWithin,
     contactConverted,
+    contactCatchAll,
     contactSeniority,
     contactTitleSearch,
     contactHasEmail,
@@ -1303,6 +1306,23 @@ export default function NewCampaignPage() {
                             <SelectItem value="all">Any</SelectItem>
                             <SelectItem value="only">Converted Only</SelectItem>
                             <SelectItem value="exclude">Exclude Converted</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs">Catch-All</Label>
+                        <Select
+                          value={contactCatchAll}
+                          onValueChange={setContactCatchAll}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Any" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Any</SelectItem>
+                            <SelectItem value="only">Catch-All Only</SelectItem>
+                            <SelectItem value="exclude">Exclude Catch-All</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>

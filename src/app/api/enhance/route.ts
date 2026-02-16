@@ -440,6 +440,28 @@ async function enhanceContact(
         updateData.hunter_verified_at = new Date().toISOString()
         fieldsUpdated.push("hunter_confidence", "hunter_verified_at")
 
+        // Set email_type based on Hunter verification status
+        if (verifyResult.status === "accept_all") {
+          updateData.email_type = "catch_all"
+          fieldsUpdated.push("email_type")
+          // Clear generic first_name/last_name on catch-all emails
+          const GENERIC_NAMES = [
+            "admin", "info", "contact", "hello", "support", "sales",
+            "team", "office", "help", "service", "mail", "general",
+            "enquiries", "enquiry", "billing", "accounts", "hr",
+            "marketing", "media", "press", "news", "events",
+          ]
+          const firstName = (contact.first_name || "").toLowerCase().trim()
+          if (GENERIC_NAMES.includes(firstName)) {
+            updateData.first_name = ""
+            updateData.last_name = ""
+            fieldsUpdated.push("first_name", "last_name")
+          }
+        } else if (verifyResult.status === "valid") {
+          updateData.email_type = "personal"
+          fieldsUpdated.push("email_type")
+        }
+
         await logEnhancement(supabase, {
           entityType: "contact",
           entityId: contactId,

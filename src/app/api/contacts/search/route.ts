@@ -18,6 +18,7 @@ interface ContactSearchParams {
   outreach?: string | null // never, 7d, 30d, 90d, 90d_plus
   not_within?: string | null // 7d, 30d, 90d — exclude contacts contacted within this window
   converted?: string | null // only, exclude — filter by converted status
+  catch_all?: string | null // only, exclude — filter by catch-all email type
 }
 
 /**
@@ -40,6 +41,7 @@ async function handleContactSearch(params: ContactSearchParams) {
     outreach,
     not_within: notWithin,
     converted,
+    catch_all: catchAll,
   } = params
 
   // "Not Contacted Within" filter — exclude contacts with outreach_log entries within X days
@@ -202,7 +204,7 @@ async function handleContactSearch(params: ContactSearchParams) {
 
   // Helper: build a query with all non-company filters applied
   const CONTACT_SELECT =
-    "id, first_name, last_name, email, title, seniority, outreach_status, company_id, company:companies!contacts_company_id_fkey(id, name)"
+    "id, first_name, last_name, email, email_type, title, seniority, outreach_status, company_id, company:companies!contacts_company_id_fkey(id, name)"
 
   function applyFilters(q: ReturnType<typeof supabase.from>) {
     let filtered = q
@@ -226,6 +228,11 @@ async function handleContactSearch(params: ContactSearchParams) {
       filtered = filtered.eq("outreach_status", "converted")
     } else if (converted === "exclude") {
       filtered = filtered.neq("outreach_status", "converted")
+    }
+    if (catchAll === "only") {
+      filtered = filtered.eq("email_type", "catch_all")
+    } else if (catchAll === "exclude") {
+      filtered = filtered.neq("email_type", "catch_all")
     }
     if (seniority && seniority !== "all") {
       filtered = filtered.eq("seniority", seniority)
@@ -355,6 +362,7 @@ export async function GET(request: NextRequest) {
       outreach: searchParams.get("outreach"),
       not_within: searchParams.get("not_within"),
       converted: searchParams.get("converted"),
+      catch_all: searchParams.get("catch_all"),
     })
   } catch (error) {
     console.error("Unexpected error:", error)
@@ -404,6 +412,7 @@ export async function POST(request: NextRequest) {
       outreach: body.outreach || null,
       not_within: body.not_within || null,
       converted: body.converted || null,
+      catch_all: body.catch_all || null,
     })
   } catch (error) {
     console.error("Unexpected error:", error)

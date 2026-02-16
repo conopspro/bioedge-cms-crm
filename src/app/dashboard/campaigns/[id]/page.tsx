@@ -19,6 +19,7 @@ import {
   Settings,
   Sparkles,
   UserPlus,
+  Trash2,
   X,
   AlertTriangle,
   Eye,
@@ -49,6 +50,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import type { Campaign, CampaignRecipient } from "@/types/database"
 
 interface EnrichedRecipient extends CampaignRecipient {
@@ -152,6 +154,12 @@ export default function CampaignDetailPage() {
   const [sending, setSending] = useState(false)
   const [sendProgress, setSendProgress] = useState<{ sent: number; total: number; current: string } | null>(null)
   const sendAbortRef = useRef(false)
+
+  // Edit state for preview modal
+  const [isEditing, setIsEditing] = useState(false)
+  const [editSubject, setEditSubject] = useState("")
+  const [editBody, setEditBody] = useState("")
+  const [saving, setSaving] = useState(false)
 
   const fetchCampaign = useCallback(async (retries = 3) => {
     try {
@@ -415,6 +423,45 @@ export default function CampaignDetailPage() {
       setShowPreview(false)
     } catch (error) {
       console.error("Remove failed:", error)
+    }
+  }
+
+  const startEditing = () => {
+    if (!selectedRecipient) return
+    setEditSubject(selectedRecipient.subject || "")
+    setEditBody(selectedRecipient.body || "")
+    setIsEditing(true)
+  }
+
+  const handleSaveEdit = async () => {
+    if (!selectedRecipient) return
+    setSaving(true)
+    try {
+      const bodyHtml = editBody
+        .split("\n\n")
+        .map((para: string) => `<p>${para.replace(/\n/g, "<br>")}</p>`)
+        .join("")
+
+      const res = await fetch(
+        `/api/campaigns/${campaignId}/recipients/${selectedRecipient.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            subject: editSubject,
+            body: editBody,
+            body_html: bodyHtml,
+          }),
+        }
+      )
+      if (res.ok) {
+        await fetchCampaign()
+        setIsEditing(false)
+      }
+    } catch (error) {
+      console.error("Save failed:", error)
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -898,7 +945,10 @@ export default function CampaignDetailPage() {
       </Card>
 
       {/* Email Preview Dialog */}
-      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+      <Dialog open={showPreview} onOpenChange={(open) => {
+        setShowPreview(open)
+        if (!open) setIsEditing(false)
+      }}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Email Preview</DialogTitle>
@@ -918,18 +968,35 @@ export default function CampaignDetailPage() {
                 <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Subject
                 </div>
-                <div className="font-medium">
-                  {selectedRecipient.subject || "No subject"}
-                </div>
+                {isEditing ? (
+                  <Input
+                    value={editSubject}
+                    onChange={(e) => setEditSubject(e.target.value)}
+                    className="font-medium"
+                  />
+                ) : (
+                  <div className="font-medium">
+                    {selectedRecipient.subject || "No subject"}
+                  </div>
+                )}
               </div>
 
               <div>
                 <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">
                   Body
                 </div>
-                <div className="whitespace-pre-wrap text-sm bg-muted/50 rounded-md p-4">
-                  {selectedRecipient.body || "No body generated"}
-                </div>
+                {isEditing ? (
+                  <Textarea
+                    value={editBody}
+                    onChange={(e) => setEditBody(e.target.value)}
+                    rows={12}
+                    className="text-sm font-mono"
+                  />
+                ) : (
+                  <div className="whitespace-pre-wrap text-sm bg-muted/50 rounded-md p-4">
+                    {selectedRecipient.body || "No body generated"}
+                  </div>
+                )}
               </div>
 
               {/* Signature preview (appended automatically at send time) */}
@@ -957,64 +1024,104 @@ export default function CampaignDetailPage() {
               )}
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-2 pt-2 border-t">
-                {selectedRecipient.status === "generated" && (
+              <div className="flex items-center gap-2 pt-2 border-t flex-wrap">
+                {/* Save/Cancel when editing */}
+                {isEditing ? (
                   <>
-                    <Button
-                      onClick={() =>
-                        handleApproveOne(selectedRecipient.id, true)
-                      }
-                      disabled={actionLoading === selectedRecipient.id}
-                    >
-                      {actionLoading === selectedRecipient.id ? (
+                    <Button onClick={handleSaveEdit} disabled={saving}>
+                      {saving ? (
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
                       ) : (
                         <Check className="mr-2 h-4 w-4" />
                       )}
-                      Approve
+                      Save
                     </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() =>
-                        handleRegenerateOne(selectedRecipient.id)
-                      }
-                      disabled={actionLoading === selectedRecipient.id}
-                    >
-                      {actionLoading === selectedRecipient.id ? (
-                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                      ) : (
-                        <RefreshCw className="mr-2 h-4 w-4" />
-                      )}
-                      Regenerate
+                    <Button variant="outline" onClick={() => setIsEditing(false)}>
+                      Cancel
                     </Button>
                   </>
-                )}
-                {selectedRecipient.status === "suppressed" && (
-                  <Button
-                    variant="outline"
-                    onClick={() =>
-                      handleUnsuppress(selectedRecipient.id)
-                    }
-                    disabled={actionLoading === selectedRecipient.id}
-                  >
-                    <Play className="mr-2 h-4 w-4" />
-                    Unsuppress
-                  </Button>
-                )}
+                ) : (
+                  <>
+                    {selectedRecipient.status === "generated" && (
+                      <>
+                        <Button
+                          onClick={() =>
+                            handleApproveOne(selectedRecipient.id, true)
+                          }
+                          disabled={actionLoading === selectedRecipient.id}
+                        >
+                          {actionLoading === selectedRecipient.id ? (
+                            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Check className="mr-2 h-4 w-4" />
+                          )}
+                          Approve
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            handleRegenerateOne(selectedRecipient.id)
+                          }
+                          disabled={actionLoading === selectedRecipient.id}
+                        >
+                          {actionLoading === selectedRecipient.id ? (
+                            <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <RefreshCw className="mr-2 h-4 w-4" />
+                          )}
+                          Regenerate
+                        </Button>
+                      </>
+                    )}
+                    {selectedRecipient.status === "suppressed" && (
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          handleUnsuppress(selectedRecipient.id)
+                        }
+                        disabled={actionLoading === selectedRecipient.id}
+                      >
+                        <Play className="mr-2 h-4 w-4" />
+                        Unsuppress
+                      </Button>
+                    )}
 
-                {/* Send Test — available for any generated/approved email */}
-                {selectedRecipient.body && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setShowTestForm(!showTestForm)
-                      setTestResult(null)
-                    }}
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Send Test
-                  </Button>
+                    {/* Edit button — for emails with content */}
+                    {selectedRecipient.body && (
+                      <Button variant="outline" size="sm" onClick={startEditing}>
+                        <Pencil className="mr-2 h-4 w-4" />
+                        Edit
+                      </Button>
+                    )}
+
+                    {/* Delete button — for pending/generated emails */}
+                    {["pending", "generated"].includes(selectedRecipient.status) && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveRecipient(selectedRecipient.id)}
+                        disabled={actionLoading === selectedRecipient.id}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </Button>
+                    )}
+
+                    {/* Send Test — available for any generated/approved email */}
+                    {selectedRecipient.body && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setShowTestForm(!showTestForm)
+                          setTestResult(null)
+                        }}
+                      >
+                        <Mail className="mr-2 h-4 w-4" />
+                        Send Test
+                      </Button>
+                    )}
+                  </>
                 )}
               </div>
 

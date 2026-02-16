@@ -41,6 +41,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const outreach = searchParams.get("outreach") // never, 7d, 30d, 90d, 90d_plus
     const notWithin = searchParams.get("not_within") // 7d, 30d, 90d — exclude contacts contacted within this window
     const converted = searchParams.get("converted") // only, exclude — filter by converted status
+    const catchAll = searchParams.get("catch_all") // only, exclude — filter by catch-all email type
 
     // "Not Contacted Within" filter — exclude contacts with outreach_log entries within X days
     // Uses post-filtering (not inline query) to avoid HTTP 431 with large ID lists
@@ -190,7 +191,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     let query = supabase
       .from("contacts")
       .select(
-        "id, first_name, last_name, email, title, seniority, outreach_status, company_id, company:companies!contacts_company_id_fkey(id, name)"
+        "id, first_name, last_name, email, email_type, title, seniority, outreach_status, company_id, company:companies!contacts_company_id_fkey(id, name)"
       )
       .order("last_name", { ascending: true })
       .limit(500)
@@ -227,6 +228,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       query = query.eq("outreach_status", "converted")
     } else if (converted === "exclude") {
       query = query.neq("outreach_status", "converted")
+    }
+
+    // Catch-all filter
+    if (catchAll === "only") {
+      query = query.eq("email_type", "catch_all")
+    } else if (catchAll === "exclude") {
+      query = query.neq("email_type", "catch_all")
     }
 
     // Apply seniority filter

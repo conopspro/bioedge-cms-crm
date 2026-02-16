@@ -57,12 +57,14 @@ interface ContactsTableProps {
   search: string
   notWithinFilter: string
   convertedFilter: string
+  catchAllFilter: string
   visibilityFilter: string
   outreachFilter: string
   loading: boolean
   onSearchChange: (search: string) => void
   onNotWithinChange: (notWithin: string) => void
   onConvertedChange: (converted: string) => void
+  onCatchAllChange: (catchAll: string) => void
   onVisibilityChange: (visibility: string) => void
   onOutreachChange: (outreach: string) => void
   onPageChange: (page: number) => void
@@ -80,12 +82,14 @@ export function ContactsTable({
   search,
   notWithinFilter,
   convertedFilter,
+  catchAllFilter,
   visibilityFilter,
   outreachFilter,
   loading,
   onSearchChange,
   onNotWithinChange,
   onConvertedChange,
+  onCatchAllChange,
   onVisibilityChange,
   onOutreachChange,
   onPageChange,
@@ -143,6 +147,15 @@ export function ContactsTable({
           <option value="all">Converted: Any</option>
           <option value="only">Converted Only</option>
           <option value="exclude">Exclude Converted</option>
+        </select>
+        <select
+          value={catchAllFilter}
+          onChange={(e) => onCatchAllChange(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">Catch-All: Any</option>
+          <option value="only">Catch-All Only</option>
+          <option value="exclude">Exclude Catch-All</option>
         </select>
         <select
           value={visibilityFilter}

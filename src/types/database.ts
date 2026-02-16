@@ -310,6 +310,7 @@ export interface Contact {
   ai_highlights: string[] | null // AI-generated highlights for public profile
   ai_expertise: string[] | null // AI-generated areas of expertise
   email_domain: string | null
+  email_type: string | null // 'personal' | 'catch_all' | null
   bio: string | null // Contact biography
   // Image fields
   avatar_url: string | null // Contact profile picture
