@@ -600,6 +600,7 @@ export function ContactForm({ contact, companies, enhancements = [], outreachLog
       <div className="mt-6">
         <OutreachLogEditor
           contactId={contact.id}
+          companyId={contact.company_id}
           entries={outreachLog}
         />
       </div>

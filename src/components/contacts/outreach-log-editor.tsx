@@ -25,6 +25,7 @@ interface OutreachLogEntry {
 
 interface OutreachLogEditorProps {
   contactId: string
+  companyId?: string | null
   entries: OutreachLogEntry[]
 }
 
@@ -45,7 +46,23 @@ const defaultFormState = {
   response_received: false,
 }
 
-export function OutreachLogEditor({ contactId, entries }: OutreachLogEditorProps) {
+/**
+ * Trigger campaign suppression for a company when a response is logged.
+ * Calls the server-side suppression API to pause unsent emails.
+ */
+async function triggerSuppression(companyId: string, contactId: string) {
+  try {
+    await fetch("/api/campaigns/suppress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ company_id: companyId, contact_id: contactId }),
+    })
+  } catch (err) {
+    console.error("Failed to trigger campaign suppression:", err)
+  }
+}
+
+export function OutreachLogEditor({ contactId, companyId, entries }: OutreachLogEditorProps) {
   const router = useRouter()
   const [isAdding, setIsAdding] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -94,6 +111,10 @@ export function OutreachLogEditor({ contactId, entries }: OutreachLogEditorProps
         .eq("id", editingId)
 
       if (!error) {
+        // Trigger campaign suppression if response was marked
+        if (formData.response_received && companyId) {
+          triggerSuppression(companyId, contactId)
+        }
         resetForm()
         router.refresh()
       } else {
@@ -110,6 +131,10 @@ export function OutreachLogEditor({ contactId, entries }: OutreachLogEditorProps
       })
 
       if (!error) {
+        // Trigger campaign suppression if response was marked
+        if (formData.response_received && companyId) {
+          triggerSuppression(companyId, contactId)
+        }
         resetForm()
         router.refresh()
       } else {

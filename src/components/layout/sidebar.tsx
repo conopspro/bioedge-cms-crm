@@ -18,6 +18,8 @@ import {
   Home,
   Navigation,
   Star,
+  Mail,
+  Contact,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -77,6 +79,11 @@ const mainNavItems = [
 
 const toolsNavItems = [
   {
+    label: "Campaigns",
+    href: "/dashboard/campaigns",
+    icon: Mail,
+  },
+  {
     label: "Research Company",
     href: "/dashboard/research",
     icon: Search,
@@ -95,6 +102,11 @@ const toolsNavItems = [
     label: "Review Contacts",
     href: "/dashboard/contacts/review",
     icon: UserCheck,
+  },
+  {
+    label: "Sender Profiles",
+    href: "/dashboard/settings/sender-profiles",
+    icon: Contact,
   },
   {
     label: "Navigation",

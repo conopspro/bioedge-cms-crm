@@ -36,6 +36,23 @@ export type EnhancementType = "youtube" | "scholar" | "book" | "image" | "link"
 /** Types of outreach methods */
 export type OutreachType = "email" | "phone" | "linkedin" | "call" | "text" | "meeting" | "other"
 
+/** Campaign status */
+export type CampaignStatus = "draft" | "generating" | "ready" | "sending" | "paused" | "completed"
+
+/** Campaign recipient status */
+export type RecipientStatus =
+  | "pending"
+  | "generated"
+  | "approved"
+  | "queued"
+  | "sent"
+  | "delivered"
+  | "opened"
+  | "clicked"
+  | "bounced"
+  | "failed"
+  | "suppressed"
+
 /** Presentation status */
 export type PresentationStatus = "draft" | "published" | "archived"
 
@@ -715,6 +732,114 @@ export interface OutreachLog {
   response_received: boolean
   created_at: string
 }
+
+// ============================================
+// CAMPAIGNS & EMAIL OUTREACH
+// ============================================
+
+/** Sender profile for email campaigns */
+export interface SenderProfile {
+  id: string
+  auth_user_id: string | null
+  name: string
+  email: string
+  title: string | null
+  phone: string | null
+  signature: string | null
+  created_at: string
+}
+
+/** Email campaign */
+export interface Campaign {
+  id: string
+  name: string
+  status: CampaignStatus
+
+  // Sender
+  sender_profile_id: string | null
+  reply_to: string | null
+
+  // Content guidance
+  purpose: string
+  tone: string | null
+  context: string | null
+  must_include: string | null
+  must_avoid: string | null
+  call_to_action: string | null
+  max_words: number
+
+  // Reference email (style guide)
+  reference_email: string | null
+
+  // Subject line
+  subject_prompt: string | null
+
+  // Send pacing
+  send_window_start: number
+  send_window_end: number
+  min_delay_seconds: number
+  max_delay_seconds: number
+  daily_send_limit: number
+
+  // Natural sending controls
+  one_per_company: boolean
+  track_opens: boolean
+  track_clicks: boolean
+  company_cooldown_days: number
+
+  created_at: string
+  updated_at: string
+}
+
+export type CampaignInsert = Omit<Campaign, "id" | "created_at" | "updated_at" | "status"> & {
+  status?: CampaignStatus
+}
+
+/** Campaign recipient (one email to one contact) */
+export interface CampaignRecipient {
+  id: string
+  campaign_id: string
+  contact_id: string
+  company_id: string | null
+
+  // AI-generated content
+  subject: string | null
+  body: string | null
+  body_html: string | null
+
+  // Status
+  status: RecipientStatus
+  approved: boolean
+
+  // Timestamps
+  generated_at: string | null
+  sent_at: string | null
+  delivered_at: string | null
+  opened_at: string | null
+  clicked_at: string | null
+
+  // Tracking
+  resend_id: string | null
+  error: string | null
+  suppression_reason: string | null
+
+  created_at: string
+}
+
+export type CampaignRecipientInsert = Pick<CampaignRecipient, "campaign_id" | "contact_id"> & {
+  company_id?: string | null
+  status?: RecipientStatus
+}
+
+/** Campaign event link (campaign promotes one or more events) */
+export interface CampaignEvent {
+  id: string
+  campaign_id: string
+  event_id: string
+  created_at: string
+}
+
+export type CampaignEventInsert = Omit<CampaignEvent, "id" | "created_at">
 
 // ============================================
 // VENUES & ROOMS
@@ -1490,6 +1615,21 @@ export interface Database {
         Row: OutreachLog
         Insert: OutreachLogInsert
         Update: Partial<OutreachLogInsert>
+      }
+      sender_profiles: {
+        Row: SenderProfile
+        Insert: Omit<SenderProfile, "id" | "created_at">
+        Update: Partial<Omit<SenderProfile, "id" | "created_at">>
+      }
+      campaigns: {
+        Row: Campaign
+        Insert: CampaignInsert
+        Update: Partial<CampaignInsert>
+      }
+      campaign_recipients: {
+        Row: CampaignRecipient
+        Insert: CampaignRecipientInsert
+        Update: Partial<CampaignRecipient>
       }
     }
     Enums: {

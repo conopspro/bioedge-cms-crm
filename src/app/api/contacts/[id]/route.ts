@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import type { ContactUpdate } from "@/types/database"
+import { suppressCompanyRecipients } from "@/lib/campaigns/suppress"
 
 type RouteParams = {
   params: Promise<{ id: string }>
@@ -124,6 +125,26 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json(
         { error: "No data returned from update" },
         { status: 500 }
+      )
+    }
+
+    // Campaign suppression: if outreach_status changed to "responded",
+    // suppress all unsent campaign emails to contacts at this company
+    if (
+      cleanBody.outreach_status === "responded" &&
+      data.company_id
+    ) {
+      const contactName = `${data.first_name} ${data.last_name}`
+      const companyName = data.company?.name || "their company"
+      const today = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      })
+      const reason = `${contactName} at ${companyName} responded on ${today}`
+
+      // Fire and forget: don't block the response
+      suppressCompanyRecipients(data.company_id, reason).catch((err) =>
+        console.error("Suppression check failed:", err)
       )
     }
 

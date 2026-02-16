@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import type { ContactInsert } from "@/types/database"
 
@@ -14,7 +14,7 @@ import type { ContactInsert } from "@/types/database"
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
     const companyId = searchParams.get("company_id")
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const body: ContactInsert = await request.json()
 
     // Debug logging - omit sensitive fields in production

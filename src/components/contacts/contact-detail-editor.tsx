@@ -622,6 +622,7 @@ export function ContactDetailEditor({
         {/* Outreach History */}
         <OutreachLogEditor
           contactId={contact.id}
+          companyId={contact.company_id}
           entries={outreachLog}
         />
       </div>

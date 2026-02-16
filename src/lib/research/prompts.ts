@@ -25,6 +25,7 @@ export const BIOEDGE_VOICE_GUIDELINES = `
 
 **Formatting:**
 - NO em dashes (—). Use colons, periods, or commas instead.
+- NO emojis. Ever. Not in subject lines, not in body text, not in sign-offs.
 - Paragraphs 3-4 sentences max for readability.
 - Break content with subheads every 200-300 words.
 - Minimal bullet points in prose.
@@ -61,6 +62,60 @@ export const BIOEDGE_VOICE_GUIDELINES = `
 - Dismissing other approaches to position their product
 - Dense technical jargon without explanation
 - Pure product descriptions dressed as articles
+`
+
+export const WARM_PITCH_GUIDELINES = `
+## Warm Pitch Email Guidelines
+
+The goal is to open a friendly conversation, not close a sale. Write like you're reaching out to someone whose work you genuinely find interesting. This should feel warm and personal, like a note from a colleague in the industry.
+
+**Tone:**
+- Conversational and genuinely curious about their business
+- Friendly, not formal or corporate
+- Interested in THEM, not just pitching your own thing
+- Enthusiastic but not over-the-top
+
+**Structure:**
+- Get to the point quickly. Why are you writing?
+- Mention your reason for reaching out naturally
+- Simple, low-pressure ask
+
+**The #1 Rule: Don't Fake Familiarity**
+
+You have research data about the recipient's company. Use it to write a RELEVANT email, but NEVER write as if you personally know them or have been following their work. The recipient knows this is a first-touch email. Pretending otherwise is the single biggest tell of AI slop.
+
+NEVER do this:
+- "I've been following your work on [X]..." (you haven't)
+- "I was really impressed by [thing from their website]..." (you scraped it)
+- "I noticed your company is doing amazing things with..." (robotic flattery)
+- "As someone who [references their title/role]..." (creepy, you don't know them)
+- "I came across [company] and was blown away by..." (nobody talks like this)
+- "Your approach to [thing] really caught my eye..." (AI slop pattern)
+- Leading with a compliment about their company or product
+
+INSTEAD do this:
+- Be direct about why you're reaching out: "We're building a longevity media platform and your company fits what we cover."
+- Reference the industry or category, not their specific company page: "We work with supplement companies in the longevity space."
+- If there's a real shared context (same event, mutual connection), mention it honestly.
+- If there's no shared context, don't manufacture one. Just be straightforward.
+
+The email should read like: "Here's who we are, here's why I'm writing, here's what I'm asking." Not: "I stalked your LinkedIn and here's a paragraph proving it."
+
+**Rules:**
+- Don't repeat major nouns or verbs (e.g., don't use "love" twice)
+- No pricing or detailed menus
+- No bullet-pointed option lists in the email body
+- Don't claim a personal connection that doesn't exist
+- Don't open with flattery or compliments about their company
+- Don't reference specific details from their website as if you personally discovered them
+
+**What makes it feel warm vs. cold:**
+- WARM: Direct and honest about why you're reaching out
+- COLD: Opens with fake-personal flattery scraped from their website
+- WARM: "What does 2026 look like for you?"
+- COLD: "I've been following your innovative work in cellular regeneration..."
+- WARM: "We cover longevity companies like yours on bioEDGE"
+- COLD: "I was really impressed by your unique approach to NAD+ supplementation"
 `
 
 export const FIFTEEN_SYSTEMS = `

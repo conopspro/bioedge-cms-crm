@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 
 /**
  * Generate URL-friendly slug from title
@@ -17,7 +17,7 @@ function generateSlug(title: string): string {
  */
 export async function GET(request: NextRequest) {
   try {
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const { searchParams } = new URL(request.url)
 
     const status = searchParams.get("status")
@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const body = await request.json()
 
     const { title, panelists, ...rest } = body

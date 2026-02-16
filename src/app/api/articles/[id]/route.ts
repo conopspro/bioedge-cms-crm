@@ -1,4 +1,4 @@
-import { createAdminClient } from "@/lib/supabase/admin"
+import { createClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 import type { ArticleUpdate } from "@/types/database"
 
@@ -14,7 +14,7 @@ type RouteParams = {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     // Fetch article with company (article_enhancements table may not exist yet)
     const { data: article, error } = await supabase
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const body = await request.json()
 
     // Build update object, cleaning up empty strings to null
@@ -132,7 +132,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params
-    const supabase = createAdminClient()
+    const supabase = await createClient()
 
     const { error } = await supabase
       .from("articles")
