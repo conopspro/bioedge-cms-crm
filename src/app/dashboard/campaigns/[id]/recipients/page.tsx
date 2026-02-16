@@ -89,6 +89,7 @@ export default function AddRecipientsPage() {
   const [titleFilter, setTitleFilter] = useState("")
   const [hasEmail, setHasEmail] = useState(true)
   const [eventFilter, setEventFilter] = useState<string>("all")
+  const [outreachRecencyFilter, setOutreachRecencyFilter] = useState<string>("all")
 
   // Data state
   const [contacts, setContacts] = useState<ContactResult[]>([])
@@ -183,6 +184,8 @@ export default function AddRecipientsPage() {
       if (hasEmail) params.set("has_email", "true")
       if (eventFilter && eventFilter !== "all")
         params.set("event_id", eventFilter)
+      if (outreachRecencyFilter && outreachRecencyFilter !== "all")
+        params.set("outreach", outreachRecencyFilter)
 
       const res = await fetch(
         `/api/campaigns/${campaignId}/available-contacts?${params.toString()}`
@@ -207,6 +210,7 @@ export default function AddRecipientsPage() {
     titleFilter,
     hasEmail,
     eventFilter,
+    outreachRecencyFilter,
     campaignId,
   ])
 
@@ -441,6 +445,27 @@ export default function AddRecipientsPage() {
                   <SelectItem value="not_contacted">Not Contacted</SelectItem>
                   <SelectItem value="contacted">Contacted</SelectItem>
                   <SelectItem value="responded">Responded</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Last Outreach */}
+            <div className="space-y-2">
+              <Label>Last Outreach</Label>
+              <Select
+                value={outreachRecencyFilter}
+                onValueChange={setOutreachRecencyFilter}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="never">Never Contacted</SelectItem>
+                  <SelectItem value="7d">Last 7 Days</SelectItem>
+                  <SelectItem value="30d">Last 30 Days</SelectItem>
+                  <SelectItem value="90d">Last 90 Days</SelectItem>
+                  <SelectItem value="90d_plus">Stale (90+ Days)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

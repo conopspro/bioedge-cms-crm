@@ -21,6 +21,7 @@ type RouteParams = {
  * - title_search: Filter by title keyword
  * - has_email: Only contacts with email (default true)
  * - event_id: Filter by companies that attended an event
+ * - outreach: Filter by outreach recency (never, 7d, 30d, 90d, 90d_plus)
  */
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
@@ -37,6 +38,75 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const titleSearch = searchParams.get("title_search")
     const hasEmail = searchParams.get("has_email") !== "false"
     const eventId = searchParams.get("event_id")
+    const outreach = searchParams.get("outreach") // never, 7d, 30d, 90d, 90d_plus
+
+    // Outreach recency filter — find contact IDs from outreach_log
+    let outreachContactIds: string[] | null = null
+    let outreachFilterMode: "include" | "exclude" | null = null
+    if (outreach && outreach !== "all") {
+      if (outreach === "never") {
+        // Contacts with NO outreach_log entries at all
+        const { data: contactedIds } = await supabase
+          .from("outreach_log")
+          .select("contact_id")
+          .limit(50000)
+
+        const uniqueIds = [...new Set((contactedIds || []).map((r) => r.contact_id))]
+        outreachContactIds = uniqueIds
+        outreachFilterMode = "exclude"
+      } else if (outreach === "90d_plus") {
+        // Stale: contacted but NOT within the last 90 days
+        const now = new Date()
+        const cutoff90 = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+        const cutoffStr = cutoff90.toISOString().split("T")[0]
+
+        const { data: allContacted } = await supabase
+          .from("outreach_log")
+          .select("contact_id")
+          .limit(50000)
+        const allContactedIds = [...new Set((allContacted || []).map((r) => r.contact_id))]
+
+        const { data: recentlyContacted } = await supabase
+          .from("outreach_log")
+          .select("contact_id")
+          .gte("date", cutoffStr)
+          .limit(50000)
+        const recentIds = new Set((recentlyContacted || []).map((r) => r.contact_id))
+
+        outreachContactIds = allContactedIds.filter((id) => !recentIds.has(id))
+        outreachFilterMode = "include"
+        if (outreachContactIds.length === 0) {
+          return NextResponse.json({ contacts: [], cooldown_warnings: [] })
+        }
+      } else {
+        // Recent outreach within a date range (7d, 30d, 90d)
+        const now = new Date()
+        let cutoffDate: Date
+        if (outreach === "7d") {
+          cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        } else if (outreach === "30d") {
+          cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        } else if (outreach === "90d") {
+          cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+        } else {
+          cutoffDate = now
+        }
+
+        const cutoffStr = cutoffDate.toISOString().split("T")[0]
+        const { data: recentLogs } = await supabase
+          .from("outreach_log")
+          .select("contact_id")
+          .gte("date", cutoffStr)
+          .limit(50000)
+
+        const uniqueIds = [...new Set((recentLogs || []).map((r) => r.contact_id))]
+        outreachContactIds = uniqueIds
+        outreachFilterMode = "include"
+        if (uniqueIds.length === 0) {
+          return NextResponse.json({ contacts: [], cooldown_warnings: [] })
+        }
+      }
+    }
 
     // If filtering by event, first get company IDs from event_companies
     let eventCompanyIds: string[] | null = null
@@ -108,6 +178,15 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     // Apply has_email filter
     if (hasEmail) {
       query = query.not("email", "is", null)
+    }
+
+    // Apply outreach recency filter — contact ID list
+    if (outreachContactIds && outreachFilterMode === "include") {
+      query = query.in("id", outreachContactIds)
+    } else if (outreachContactIds && outreachFilterMode === "exclude") {
+      if (outreachContactIds.length > 0) {
+        query = query.not("id", "in", `(${outreachContactIds.join(",")})`)
+      }
     }
 
     // Apply outreach status filter
