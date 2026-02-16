@@ -81,15 +81,21 @@ export default async function PresentationsPage({ searchParams }: PageProps) {
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
         <div className="mx-auto max-w-[1200px] px-8 py-16 md:py-20">
-          <span className="mb-4 inline-block rounded bg-deep-blue px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
-            Video Library
-          </span>
-          <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
-            Presentations
-          </h1>
-          <p className="max-w-2xl text-lg text-white/90">
-            Explore our library of presentations, panels, and talks featuring industry leaders in longevity and health optimization.
-          </p>
+          <div className="flex items-start gap-6">
+            <img
+              src="https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"
+              alt="BioEdge"
+              className="h-[100px] w-[100px] flex-shrink-0 hidden md:block"
+            />
+            <div>
+              <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
+                Presentations
+              </h1>
+              <p className="max-w-2xl text-lg text-white/90">
+                Explore our library of presentations, panels, and talks featuring industry leaders in longevity and health optimization.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

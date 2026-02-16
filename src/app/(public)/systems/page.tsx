@@ -150,19 +150,25 @@ export default function SystemsIndexPage() {
   return (
     <>
       {/* Hero */}
-      <div className="be-event-hero">
-        <div className="be-container py-16 relative z-10">
-          <p className="text-sm text-gold font-heading uppercase tracking-wider mb-4">
-            bioEDGE Decoder
-          </p>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
-            15 Biological Systems
-          </h1>
-          <p className="text-xl text-white/80">
-            A framework for understanding your body&apos;s signals. Each system represents a domain of function that produces observable patterns when supported or stressed.
-          </p>
+      <section className="relative bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
+        <div className="mx-auto max-w-[1200px] px-8 py-16 md:py-20">
+          <div className="flex items-start gap-6">
+            <img
+              src="https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"
+              alt="BioEdge"
+              className="h-[100px] w-[100px] flex-shrink-0 hidden md:block"
+            />
+            <div>
+              <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
+                15 Biological Systems
+              </h1>
+              <p className="max-w-2xl text-lg text-white/90">
+                A framework for understanding your body&apos;s signals. Each system represents a domain of function that produces observable patterns when supported or stressed.
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* Content */}
       <div className="be-container py-12">

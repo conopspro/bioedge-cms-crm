@@ -377,13 +377,13 @@ export async function generateMetadata() {
       title: settings?.page_title || "bioEDGE Longevity Summit",
       description: settings?.meta_description || "A transformational live experience bringing the EDGE Framework to cities across America.",
       type: "website",
-      ...(settings?.og_image_url ? { images: [{ url: settings.og_image_url }] } : {}),
+      images: [{ url: settings?.og_image_url || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png" }],
     },
     twitter: {
-      card: settings?.og_image_url ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: settings?.page_title || "bioEDGE Longevity Summit",
       description: settings?.meta_description || "A transformational live experience bringing the EDGE Framework to cities across America.",
-      ...(settings?.og_image_url ? { images: [settings.og_image_url] } : {}),
+      images: [settings?.og_image_url || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"],
     },
   }
 }

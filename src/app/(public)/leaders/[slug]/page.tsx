@@ -732,6 +732,7 @@ export async function generateMetadata({ params }: PageProps) {
   const fullName = `${contact.first_name} ${contact.last_name}`.trim()
   const description = contact.bio?.slice(0, 160) || `Learn about ${fullName}${contact.title ? `, ${contact.title}` : ""}.`
   const ogImage = contact.avatar_url || contact.linkedin_avatar_url
+    || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"
 
   return {
     title: `${fullName} | Longevity Leaders`,
@@ -740,13 +741,13 @@ export async function generateMetadata({ params }: PageProps) {
       title: fullName,
       description,
       type: "profile",
-      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      images: [{ url: ogImage }],
     },
     twitter: {
-      card: ogImage ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: fullName,
       description,
-      ...(ogImage ? { images: [ogImage] } : {}),
+      images: [ogImage],
     },
   }
 }

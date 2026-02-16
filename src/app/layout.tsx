@@ -18,9 +18,18 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "bioEDGE Longevity",
     locale: "en_US",
+    images: [
+      {
+        url: "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png",
+        width: 512,
+        height: 512,
+        alt: "bioEDGE Longevity",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
+    images: ["https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"],
   },
 }
 

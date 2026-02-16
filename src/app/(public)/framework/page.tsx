@@ -1,5 +1,4 @@
-import { ArrowLeft, ExternalLink } from "lucide-react"
-import Link from "next/link"
+import { ExternalLink } from "lucide-react"
 
 /**
  * EDGE Framework Page
@@ -12,26 +11,25 @@ export default function EdgeFrameworkPage() {
   return (
     <>
       {/* Hero */}
-      <div className="be-event-hero">
-        <div className="be-container py-16 relative z-10">
-          <Link
-            href="/systems"
-            className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-gold transition-colors mb-6"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Systems
-          </Link>
-          <p className="text-sm text-gold font-heading uppercase tracking-wider mb-4">
-            Biological EDGE
-          </p>
-          <h1 className="font-heading text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
-            The EDGE Framework
-          </h1>
-          <p className="text-xl text-white/80 max-w-2xl">
-            Eliminate. Decode. Gain. Execute.
-          </p>
+      <section className="relative bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
+        <div className="mx-auto max-w-[1200px] px-8 py-16 md:py-20">
+          <div className="flex items-start gap-6">
+            <img
+              src="https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"
+              alt="BioEdge"
+              className="h-[100px] w-[100px] flex-shrink-0 hidden md:block"
+            />
+            <div>
+              <h1 className="mb-4 text-4xl font-bold tracking-wide text-white md:text-5xl">
+                The EDGE Framework
+              </h1>
+              <p className="max-w-2xl text-lg text-white/90">
+                Eliminate. Decode. Gain. Execute.
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
 
       {/* In-page navigation */}
       <nav className="border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-20">

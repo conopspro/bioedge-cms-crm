@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: PresentationPageProps) {
 
   const ogImage = presentation.recording_metadata?.thumbnail
     || getYouTubeThumbnailUrl(presentation.youtube_url)
+    || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"
 
   return {
     title: presentation.title,
@@ -47,13 +48,13 @@ export async function generateMetadata({ params }: PresentationPageProps) {
       title: presentation.title,
       description: presentation.short_description || undefined,
       type: "video.other",
-      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      images: [{ url: ogImage }],
     },
     twitter: {
-      card: ogImage ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: presentation.title,
       description: presentation.short_description || undefined,
-      ...(ogImage ? { images: [ogImage] } : {}),
+      images: [ogImage],
     },
   }
 }

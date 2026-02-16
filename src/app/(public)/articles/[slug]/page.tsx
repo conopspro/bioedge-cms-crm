@@ -32,6 +32,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
   }
 
   const ogImage = getArticleImageUrl(article.featured_image_url, article.youtube_url)
+    || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"
 
   return {
     title: article.title,
@@ -40,13 +41,13 @@ export async function generateMetadata({ params }: ArticlePageProps) {
       title: article.title,
       description: article.excerpt || undefined,
       type: "article",
-      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      images: [{ url: ogImage }],
     },
     twitter: {
-      card: ogImage ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: article.title,
       description: article.excerpt || undefined,
-      ...(ogImage ? { images: [ogImage] } : {}),
+      images: [ogImage],
     },
   }
 }

@@ -39,6 +39,7 @@ export async function generateMetadata({ params }: SpotlightPageProps) {
 
   const ogImage = spotlight.recording_metadata?.thumbnail
     || getYouTubeThumbnailUrl(spotlight.youtube_url)
+    || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"
 
   return {
     title: spotlight.title,
@@ -47,13 +48,13 @@ export async function generateMetadata({ params }: SpotlightPageProps) {
       title: spotlight.title,
       description: spotlight.short_description || undefined,
       type: "video.other",
-      ...(ogImage ? { images: [{ url: ogImage }] } : {}),
+      images: [{ url: ogImage }],
     },
     twitter: {
-      card: ogImage ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: spotlight.title,
       description: spotlight.short_description || undefined,
-      ...(ogImage ? { images: [ogImage] } : {}),
+      images: [ogImage],
     },
   }
 }

@@ -34,6 +34,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: `Longevity Clinics in ${stateName}`,
       description: `Find longevity and anti-aging clinics in ${stateName}.`,
+      images: [
+        {
+          url: "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png",
+          width: 512,
+          height: 512,
+          alt: "bioEDGE Longevity",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `Longevity Clinics in ${stateName}`,
+      description: `Find longevity and anti-aging clinics in ${stateName}.`,
+      images: ["https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"],
     },
   }
 }

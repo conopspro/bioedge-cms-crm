@@ -532,13 +532,13 @@ export async function generateMetadata({ params }: PageProps) {
     openGraph: {
       title: company.name,
       description,
-      ...(company.logo_url ? { images: [{ url: company.logo_url }] } : {}),
+      images: [{ url: company.logo_url || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png" }],
     },
     twitter: {
-      card: company.logo_url ? "summary_large_image" : "summary",
+      card: "summary_large_image",
       title: company.name,
       description,
-      ...(company.logo_url ? { images: [company.logo_url] } : {}),
+      images: [company.logo_url || "https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771278971437-bi-fade-logo.png"],
     },
   }
 }
