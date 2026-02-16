@@ -97,7 +97,7 @@ export function PublicHeader({ className, events = [], navItems }: PublicHeaderP
         </div>
 
         {/* Navigation - centered under logo */}
-        <nav className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 lg:gap-6">
+        <nav className="flex flex-wrap justify-center items-center gap-x-3 gap-y-2 lg:gap-4">
           {navItems && navItems.length > 0 ? (
             // Database-driven navigation
             navItems.map((item) =>
@@ -107,7 +107,7 @@ export function PublicHeader({ className, events = [], navItems }: PublicHeaderP
                   href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
+                  className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold"
                 >
                   {item.label}
                 </a>
@@ -115,7 +115,7 @@ export function PublicHeader({ className, events = [], navItems }: PublicHeaderP
                 <Link
                   key={item.id}
                   href={item.href}
-                  className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold"
+                  className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold"
                 >
                   {item.label}
                 </Link>
@@ -124,15 +124,15 @@ export function PublicHeader({ className, events = [], navItems }: PublicHeaderP
           ) : (
             // Fallback hardcoded navigation
             <>
-              <Link href="/articles" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Articles</Link>
-              <Link href="/companies" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Companies</Link>
-              <Link href="/leaders" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Leaders</Link>
-              <Link href="/presentations" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Presentations</Link>
-              <Link href="/clinics" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Clinics</Link>
-              <a href="https://bioedge.circle.so/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Coach</a>
-              <a href="https://www.bioedgedecoder.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Decoder</a>
-              <Link href="/systems" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Systems</Link>
-              <a href="https://longevitynewswire.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">News</a>
+              <Link href="/articles" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Articles</Link>
+              <Link href="/companies" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Companies</Link>
+              <Link href="/leaders" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Leaders</Link>
+              <Link href="/presentations" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Presentations</Link>
+              <Link href="/clinics" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Clinics</Link>
+              <a href="https://bioedge.circle.so/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Coach</a>
+              <a href="https://www.bioedgedecoder.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Decoder</a>
+              <Link href="/systems" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Systems</Link>
+              <a href="https://longevitynewswire.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">News</a>
             </>
           )}
           <Link
