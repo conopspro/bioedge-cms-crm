@@ -166,13 +166,13 @@ class EmailGeneratorService {
     // Subject line instructions — core principles always included
     const subjectDefaults = [
       `3-6 words ideal. Shorter subjects get higher open rates.`,
-      `Lowercase is fine — it feels more personal and less like marketing.`,
+      `Lowercase style is fine for common words — it feels more personal and less like marketing. BUT always capitalize proper nouns: company names, brand names, event names, city names, and people's names. Example: "Calocurb at NYC Longevity Summit" not "calocurb at nyc longevity summit".`,
       `Reference their company name, role, or something specific to them when natural.`,
       `Must feel like one human writing to another — not a campaign.`,
       `NEVER use: "Quick question", "Partnership opportunity", "Exciting news", "Touching base", or any pattern that screams mass email.`,
       `NEVER use clickbait, ALL CAPS words, exclamation marks, or emojis in subject lines or body text. Zero emojis, ever.`,
       `Each recipient MUST get a unique subject line. No two should follow the same template.`,
-      `Good examples: "your work on NAD+", "re: longevity summit", "{CompanyName} + bioedge", "saw your talk on {topic}"`,
+      `Good examples: "your work on NAD+", "re: Longevity Summit", "TruDiagnostic + bioEDGE", "saw your talk on {topic}"`,
       `Bad examples: "Quick question for you", "Exciting opportunity", "Let's connect!", "Partnership inquiry"`,
     ].join("\n- ")
 

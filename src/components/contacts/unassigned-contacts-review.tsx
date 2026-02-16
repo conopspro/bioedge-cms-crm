@@ -167,7 +167,7 @@ export function UnassignedContactsReview({
               <div className="flex items-start justify-between">
                 <div>
                   <CardTitle className="text-lg">
-                    {contact.first_name} {contact.last_name}
+                    {`${contact.first_name} ${contact.last_name}`.trim() || contact.email || "Unknown"}
                   </CardTitle>
                   <CardDescription className="mt-1">
                     {contact.email}

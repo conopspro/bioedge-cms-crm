@@ -7,16 +7,36 @@ type RouteParams = {
   params: Promise<{ id: string }>
 }
 
+const DEFAULT_BATCH_SIZE = 5
+
 /**
  * POST /api/campaigns/[id]/generate
  *
- * Generate personalized emails for all pending recipients in a campaign.
- * Processes sequentially with brief delays to respect Claude rate limits.
+ * Generate personalized emails for pending recipients in a campaign.
+ * Processes a small batch per request to stay within Vercel's 60s timeout.
+ * The frontend calls this repeatedly until all recipients are done.
+ *
+ * Request body (optional):
+ *   { batchSize?: number }  — max recipients to process per call (default: 5)
+ *
+ * Response:
+ *   { generated, errors, remaining, total, status }
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { id: campaignId } = await params
     const supabase = await createClient()
+
+    // Parse optional batch size from request body
+    let batchSize = DEFAULT_BATCH_SIZE
+    try {
+      const body = await request.json()
+      if (body?.batchSize && typeof body.batchSize === "number" && body.batchSize > 0) {
+        batchSize = Math.min(body.batchSize, 20) // Cap at 20 to stay safe
+      }
+    } catch {
+      // No body or invalid JSON — use default batch size
+    }
 
     // Check if email generator is configured
     if (!emailGeneratorService.isConfigured()) {
@@ -58,13 +78,46 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .map((ce) => ce.events as unknown as { name: string; start_date: string | null; end_date: string | null; city: string | null; state: string | null; slug: string | null; registration_url: string | null })
       .filter(Boolean)
 
-    // Get all pending recipients
-    const { data: pendingRecipients, error: recipError } = await supabase
+    // Count total pending BEFORE this batch (for progress tracking)
+    const { count: totalPending } = await supabase
+      .from("campaign_recipients")
+      .select("id", { count: "exact", head: true })
+      .eq("campaign_id", campaignId)
+      .eq("status", "pending")
+
+    // Count already-generated recipients (for progress display)
+    const { count: alreadyGenerated } = await supabase
+      .from("campaign_recipients")
+      .select("id", { count: "exact", head: true })
+      .eq("campaign_id", campaignId)
+      .in("status", ["generated", "approved", "queued", "sent", "delivered", "opened", "clicked"])
+
+    const totalRecipients = (totalPending || 0) + (alreadyGenerated || 0)
+
+    if (!totalPending || totalPending === 0) {
+      // Nothing left to generate — mark as ready
+      await supabase
+        .from("campaigns")
+        .update({ status: "ready", updated_at: new Date().toISOString() })
+        .eq("id", campaignId)
+
+      return NextResponse.json({
+        generated: 0,
+        errors: 0,
+        remaining: 0,
+        total: totalRecipients,
+        status: "ready",
+      })
+    }
+
+    // Get this batch of pending recipients
+    const { data: batchRecipients, error: recipError } = await supabase
       .from("campaign_recipients")
       .select("id, contact_id, company_id")
       .eq("campaign_id", campaignId)
       .eq("status", "pending")
       .order("created_at", { ascending: true })
+      .limit(batchSize)
 
     if (recipError) {
       return NextResponse.json(
@@ -73,23 +126,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    if (!pendingRecipients || pendingRecipients.length === 0) {
+    if (!batchRecipients || batchRecipients.length === 0) {
       return NextResponse.json({
-        message: "No pending recipients to generate",
         generated: 0,
+        errors: 0,
+        remaining: 0,
+        total: totalRecipients,
+        status: "ready",
       })
     }
 
-    // Update campaign status to generating
-    await supabase
-      .from("campaigns")
-      .update({ status: "generating", updated_at: new Date().toISOString() })
-      .eq("id", campaignId)
+    // Update campaign status to generating (if not already)
+    if (campaign.status !== "generating") {
+      await supabase
+        .from("campaigns")
+        .update({ status: "generating", updated_at: new Date().toISOString() })
+        .eq("id", campaignId)
+    }
 
     let generated = 0
     let errors = 0
 
-    for (const recipient of pendingRecipients) {
+    for (const recipient of batchRecipients) {
       try {
         // Fetch contact details
         const { data: contact } = await supabase
@@ -194,9 +252,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
         generated++
 
-        // Brief delay between API calls (1.5 seconds)
-        if (generated < pendingRecipients.length) {
-          await new Promise((resolve) => setTimeout(resolve, 1500))
+        // Brief delay between API calls (1 second)
+        if (generated < batchRecipients.length) {
+          await new Promise((resolve) => setTimeout(resolve, 1000))
         }
       } catch (err) {
         console.error(
@@ -216,33 +274,29 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }
     }
 
-    // Check if there are still pending recipients
-    const { data: remainingPending } = await supabase
+    // Check remaining pending after this batch
+    const { count: remaining } = await supabase
       .from("campaign_recipients")
-      .select("id")
+      .select("id", { count: "exact", head: true })
       .eq("campaign_id", campaignId)
       .eq("status", "pending")
-      .limit(1)
 
-    // Update campaign status
-    const newStatus =
-      remainingPending && remainingPending.length > 0
-        ? "draft"
-        : "ready"
+    const remainingCount = remaining || 0
 
-    await supabase
-      .from("campaigns")
-      .update({
-        status: newStatus,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", campaignId)
+    // If no more pending, mark campaign as ready
+    if (remainingCount === 0) {
+      await supabase
+        .from("campaigns")
+        .update({ status: "ready", updated_at: new Date().toISOString() })
+        .eq("id", campaignId)
+    }
 
     return NextResponse.json({
       generated,
       errors,
-      total: pendingRecipients.length,
-      status: newStatus,
+      remaining: remainingCount,
+      total: totalRecipients,
+      status: remainingCount === 0 ? "ready" : "generating",
     })
   } catch (error) {
     console.error("Unexpected error:", error)

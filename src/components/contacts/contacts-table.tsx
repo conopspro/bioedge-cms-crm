@@ -245,7 +245,7 @@ export function ContactsTable({
                       href={`/dashboard/contacts/${contact.id}`}
                       className="font-medium hover:underline"
                     >
-                      {`${contact.first_name} ${contact.last_name}`.trim() || "Unknown"}
+                      {`${contact.first_name} ${contact.last_name}`.trim() || contact.email || "Unknown"}
                     </Link>
                     {contact.title && (
                       <p className="text-sm text-muted-foreground">

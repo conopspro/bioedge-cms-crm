@@ -55,7 +55,7 @@ export default async function ContactDetailPage({ params }: PageProps) {
     company = companies.find(c => c.id === contact.company_id) || null
   }
 
-  const displayName = `${contact.first_name} ${contact.last_name}`.trim() || "Unknown Contact"
+  const displayName = `${contact.first_name} ${contact.last_name}`.trim() || contact.email || "Unknown Contact"
 
   return (
     <div className="space-y-6">

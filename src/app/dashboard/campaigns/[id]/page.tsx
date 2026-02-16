@@ -154,6 +154,8 @@ export default function CampaignDetailPage() {
   const [sending, setSending] = useState(false)
   const [sendProgress, setSendProgress] = useState<{ sent: number; total: number; current: string } | null>(null)
   const sendAbortRef = useRef(false)
+  const [generateProgress, setGenerateProgress] = useState<{ done: number; total: number } | null>(null)
+  const generateAbortRef = useRef(false)
 
   // Edit state for preview modal
   const [isEditing, setIsEditing] = useState(false)
@@ -195,22 +197,63 @@ export default function CampaignDetailPage() {
 
   const handleGenerate = async () => {
     setGenerating(true)
+    generateAbortRef.current = false
+    setGenerateProgress(null)
+
     try {
-      const res = await fetch(`/api/campaigns/${campaignId}/generate`, {
-        method: "POST",
-      })
-      if (res.ok) {
-        await fetchCampaign()
-      } else {
+      let remaining = 1 // Start the loop
+
+      while (remaining > 0 && !generateAbortRef.current) {
+        const res = await fetch(`/api/campaigns/${campaignId}/generate`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ batchSize: 5 }),
+        })
+
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          alert(data.error || "Failed to generate emails")
+          break
+        }
+
         const data = await res.json()
-        alert(data.error || "Failed to generate emails")
+        remaining = data.remaining || 0
+
+        // Update progress: total - remaining = done so far
+        setGenerateProgress({
+          done: (data.total || 0) - remaining,
+          total: data.total || 0,
+        })
+
+        // Refresh campaign data to show newly generated emails
+        await fetchCampaign()
+
+        if (remaining === 0 || data.status === "ready") {
+          break
+        }
+      }
+
+      if (generateAbortRef.current) {
+        // User cancelled — revert campaign status to draft
+        await fetch(`/api/campaigns/${campaignId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "draft" }),
+        })
+        await fetchCampaign()
       }
     } catch (error) {
       console.error("Generation failed:", error)
       alert("Failed to generate emails")
     } finally {
       setGenerating(false)
+      setGenerateProgress(null)
+      generateAbortRef.current = false
     }
+  }
+
+  const handleCancelGenerate = () => {
+    generateAbortRef.current = true
   }
 
   const handleApproveAll = async () => {
@@ -528,6 +571,27 @@ export default function CampaignDetailPage() {
                 </Link>
               </Button>
             )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-destructive hover:text-destructive"
+              onClick={async () => {
+                if (!confirm(`Are you sure you want to delete "${campaign.name}"? This will also delete all recipients and generated emails.`)) return
+                try {
+                  const res = await fetch(`/api/campaigns/${campaignId}`, { method: "DELETE" })
+                  if (res.ok) {
+                    router.push("/dashboard/campaigns")
+                  } else {
+                    alert("Failed to delete campaign")
+                  }
+                } catch {
+                  alert("Failed to delete campaign")
+                }
+              }}
+            >
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+              Delete
+            </Button>
           </div>
           <p className="text-muted-foreground mt-1">{campaign.purpose}</p>
           {campaign.campaign_events && campaign.campaign_events.length > 0 && (
@@ -558,6 +622,7 @@ export default function CampaignDetailPage() {
         }}
         onGenerate={handleGenerate}
         generating={generating}
+        generateProgress={generateProgress}
       />
 
       {/* Campaign Settings (visible for drafts, collapsed for others) */}
@@ -662,16 +727,30 @@ export default function CampaignDetailPage() {
         </Button>
 
         {pendingCount > 0 && (
-          <Button
-            variant="outline"
-            onClick={handleGenerate}
-            disabled={generating}
-          >
-            <Sparkles className="mr-2 h-4 w-4" />
-            {generating
-              ? "Generating..."
-              : `Generate Emails (${pendingCount})`}
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={handleGenerate}
+              disabled={generating}
+            >
+              <Sparkles className="mr-2 h-4 w-4" />
+              {generating
+                ? generateProgress
+                  ? `Generating ${generateProgress.done}/${generateProgress.total}...`
+                  : "Generating..."
+                : `Generate Emails (${pendingCount})`}
+            </Button>
+            {generating && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleCancelGenerate}
+              >
+                <X className="mr-1 h-3 w-3" />
+                Cancel
+              </Button>
+            )}
+          </div>
         )}
 
         {generatedCount > 0 && (

@@ -174,7 +174,7 @@ export function ContactDetailEditor({
   const [newHighlight, setNewHighlight] = useState("")
   const [newExpertise, setNewExpertise] = useState("")
 
-  const displayName = `${contact.first_name} ${contact.last_name}`.trim() || "Unknown Contact"
+  const displayName = `${contact.first_name} ${contact.last_name}`.trim() || contact.email || "Unknown Contact"
 
   const startEditing = (section: string) => {
     setFormData({ ...contact })

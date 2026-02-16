@@ -19,6 +19,7 @@ interface PipelineProps {
   }
   onGenerate: () => void
   generating: boolean
+  generateProgress?: { done: number; total: number } | null
 }
 
 type StepStatus = "completed" | "current" | "upcoming"
@@ -40,6 +41,7 @@ export function CampaignWorkflowPipeline({
   recipientCounts,
   onGenerate,
   generating,
+  generateProgress,
 }: PipelineProps) {
   const { total, pending, generated, approved, sent } = recipientCounts
   const configComplete = hasName && hasPurpose && hasSender
@@ -86,8 +88,10 @@ export function CampaignWorkflowPipeline({
               ? "current"
               : "upcoming",
       detail:
-        campaignStatus === "generating"
-          ? "In progress..."
+        campaignStatus === "generating" || generating
+          ? generateProgress
+            ? `${generateProgress.done}/${generateProgress.total}`
+            : "In progress..."
           : pending > 0
             ? `${pending} pending`
             : (generated + approved + sent) > 0

@@ -301,7 +301,7 @@ export function CompanyContactsManager({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-sm truncate">
-                      {contact.first_name} {contact.last_name}
+                      {`${contact.first_name} ${contact.last_name}`.trim() || contact.email || "Unknown"}
                     </p>
                     {contact.show_on_articles ? (
                       <Badge variant="outline" className="text-xs gap-1 text-green-600">
@@ -353,7 +353,7 @@ export function CompanyContactsManager({
                     size="icon"
                     title="Delete"
                     onClick={() =>
-                      handleDeleteContact(contact.id, `${contact.first_name} ${contact.last_name}`)
+                      handleDeleteContact(contact.id, `${contact.first_name} ${contact.last_name}`.trim() || contact.email || "this contact")
                     }
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />

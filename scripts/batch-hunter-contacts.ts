@@ -295,10 +295,10 @@ async function main() {
         }
 
         // Check for name duplicates within this company
-        const firstName = hunterEmail.first_name || emailAddr.split("@")[0].charAt(0).toUpperCase() + emailAddr.split("@")[0].slice(1)
+        const firstName = hunterEmail.first_name || ""
         const lastName = hunterEmail.last_name || ""
 
-        if (hunterEmail.first_name && lastName) {
+        if (firstName && lastName) {
           const { data: nameMatches } = await supabase
             .from("contacts")
             .select("id")

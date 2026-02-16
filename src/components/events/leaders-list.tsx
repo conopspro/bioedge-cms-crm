@@ -196,7 +196,7 @@ export function LeadersList({ eventId, leaders, existingCompanyIds, existingPres
       .filter((c) => !leaders.some((l) => l.contact_id === c.id))
       .map((contact) => ({
         value: contact.id,
-        label: `${contact.first_name} ${contact.last_name}`,
+        label: `${contact.first_name} ${contact.last_name}`.trim() || contact.email || "Unknown",
         sublabel: contact.title || undefined,
       }))
   }, [contacts, leaders])
@@ -300,7 +300,7 @@ export function LeadersList({ eventId, leaders, existingCompanyIds, existingPres
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <p className="font-medium truncate">
-            {leader.contact ? `${leader.contact.first_name} ${leader.contact.last_name}` : "Unknown Contact"}
+            {leader.contact ? (`${leader.contact.first_name} ${leader.contact.last_name}`.trim() || "Unknown Contact") : "Unknown Contact"}
           </p>
           {leader.is_featured && (
             <Badge variant="success" className="text-xs">Featured</Badge>

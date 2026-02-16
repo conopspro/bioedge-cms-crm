@@ -1,8 +1,9 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { Plus, Mail, Pencil, RefreshCw } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { Plus, Mail, Pencil, RefreshCw, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -47,6 +48,7 @@ const STATUS_BADGES: Record<string, { label: string; variant: "default" | "secon
 }
 
 export default function CampaignsPage() {
+  const router = useRouter()
   const [campaigns, setCampaigns] = useState<CampaignListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [statusFilter, setStatusFilter] = useState<string>("all")
@@ -74,6 +76,23 @@ export default function CampaignsPage() {
     fetchCampaigns()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter])
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete "${name}"? This will also delete all recipients and generated emails.`)) {
+      return
+    }
+    try {
+      const res = await fetch(`/api/campaigns/${id}`, { method: "DELETE" })
+      if (res.ok) {
+        setCampaigns((prev) => prev.filter((c) => c.id !== id))
+      } else {
+        alert("Failed to delete campaign")
+      }
+    } catch (error) {
+      console.error("Delete failed:", error)
+      alert("Failed to delete campaign")
+    }
+  }
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString("en-US", {
@@ -152,6 +171,7 @@ export default function CampaignsPage() {
                 <TableHead className="text-center">Recipients</TableHead>
                 <TableHead className="text-center">Progress</TableHead>
                 <TableHead>Created</TableHead>
+                <TableHead className="w-[80px]"></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -167,23 +187,12 @@ export default function CampaignsPage() {
                 return (
                   <TableRow key={campaign.id}>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`/dashboard/campaigns/${campaign.id}`}
-                          className="font-medium hover:underline"
-                        >
-                          {campaign.name}
-                        </Link>
-                        {campaign.status === "draft" && (
-                          <Link
-                            href={`/dashboard/campaigns/${campaign.id}/edit`}
-                            className="text-muted-foreground hover:text-foreground transition-colors"
-                            title="Edit campaign"
-                          >
-                            <Pencil className="h-3.5 w-3.5" />
-                          </Link>
-                        )}
-                      </div>
+                      <Link
+                        href={`/dashboard/campaigns/${campaign.id}`}
+                        className="font-medium hover:underline"
+                      >
+                        {campaign.name}
+                      </Link>
                       <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
                         {campaign.purpose}
                       </p>
@@ -218,6 +227,30 @@ export default function CampaignsPage() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDate(campaign.created_at)}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          title="Edit"
+                          asChild
+                        >
+                          <Link href={`/dashboard/campaigns/${campaign.id}/edit`}>
+                            <Pencil className="h-3.5 w-3.5" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8"
+                          title="Delete"
+                          onClick={() => handleDelete(campaign.id, campaign.name)}
+                        >
+                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
