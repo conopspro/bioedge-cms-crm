@@ -1488,6 +1488,86 @@ export type EventFAQInsert = Omit<EventFAQ, "id" | "created_at" | "updated_at">
 export type EventFAQUpdate = Partial<EventFAQInsert>
 
 // ============================================
+// CLINIC DIRECTORY
+// ============================================
+
+/** Longevity clinic for public directory and outreach */
+export interface Clinic {
+  id: string
+  // Identity
+  name: string
+  slug: string
+  external_id: string | null // Original CSV ID for dedup
+  // Location
+  address: string | null
+  city: string | null
+  state: string | null
+  zip_code: string | null
+  country: string | null
+  latitude: number | null
+  longitude: number | null
+  metro_area: string | null
+  google_maps_url: string | null
+  google_place_id: string | null
+  // Contact info
+  phone: string | null
+  phone_formatted: string | null
+  email: string | null // Internal only — never shown on public pages
+  website: string | null
+  domain: string | null
+  // Details
+  description: string | null
+  tags: string[]
+  search_term: string | null
+  // Ratings
+  google_rating: number | null
+  reviews_count: number
+  // Media
+  photos: string[]
+  videos: string[]
+  custom_urls: { title: string; url: string }[]
+  // Social media
+  facebook: string | null
+  instagram: string | null
+  linkedin: string | null
+  youtube: string | null
+  twitter: string | null
+  tiktok: string | null
+  threads: string | null
+  // Flags
+  is_featured: boolean
+  is_active: boolean
+  is_draft: boolean
+  // Timestamps
+  created_at: string
+  updated_at: string
+}
+
+/** Contact associated with a clinic (from Hunter.io) */
+export interface ClinicContact {
+  id: string
+  clinic_id: string
+  name: string | null
+  email: string | null // Internal only — never shown on public pages
+  phone: string | null
+  created_at: string
+}
+
+/** Clinic with contacts for detail views */
+export interface ClinicWithContacts extends Clinic {
+  clinic_contacts?: ClinicContact[]
+}
+
+/** Data for creating a new clinic */
+export type ClinicInsert = Omit<Clinic, "id" | "created_at" | "updated_at">
+
+/** Data for updating a clinic */
+export type ClinicUpdate = Partial<ClinicInsert>
+
+/** Data for creating a clinic contact */
+export type ClinicContactInsert = Omit<ClinicContact, "id" | "created_at">
+
+// ============================================
 // IMPORT TYPES
 // ============================================
 
@@ -1631,6 +1711,16 @@ export interface Database {
         Row: CampaignRecipient
         Insert: CampaignRecipientInsert
         Update: Partial<CampaignRecipient>
+      }
+      clinics: {
+        Row: Clinic
+        Insert: ClinicInsert
+        Update: ClinicUpdate
+      }
+      clinic_contacts: {
+        Row: ClinicContact
+        Insert: ClinicContactInsert
+        Update: Partial<ClinicContactInsert>
       }
     }
     Enums: {

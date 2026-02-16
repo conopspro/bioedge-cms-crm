@@ -20,6 +20,7 @@ import {
   Star,
   Mail,
   Contact,
+  MapPin,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -69,6 +70,11 @@ const mainNavItems = [
     label: "Events",
     href: "/dashboard/events",
     icon: Calendar,
+  },
+  {
+    label: "Clinics",
+    href: "/dashboard/clinics",
+    icon: MapPin,
   },
   {
     label: "Media",

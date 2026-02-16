@@ -89,6 +89,9 @@ export function PublicFooter({ className, navItems }: PublicFooterProps) {
                     <li>
                       <Link href="/leaders" className="text-white hover:text-gold transition-colors">Leaders</Link>
                     </li>
+                    <li>
+                      <Link href="/clinics" className="text-white hover:text-gold transition-colors">Clinics</Link>
+                    </li>
                   </>
                 )}
               </ul>

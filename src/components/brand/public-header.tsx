@@ -128,6 +128,7 @@ export function PublicHeader({ className, events = [], navItems }: PublicHeaderP
               <Link href="/companies" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Companies</Link>
               <Link href="/leaders" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Leaders</Link>
               <Link href="/presentations" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Presentations</Link>
+              <Link href="/clinics" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Clinics</Link>
               <a href="https://bioedge.circle.so/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Coach</a>
               <a href="https://www.bioedgedecoder.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Decoder</a>
               <Link href="/systems" className="font-heading text-xs lg:text-sm font-bold tracking-wide text-white transition-colors hover:text-gold">Systems</Link>
