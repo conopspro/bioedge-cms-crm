@@ -57,10 +57,12 @@ interface ContactsTableProps {
   search: string
   statusFilter: string
   visibilityFilter: string
+  outreachFilter: string
   loading: boolean
   onSearchChange: (search: string) => void
   onStatusChange: (status: string) => void
   onVisibilityChange: (visibility: string) => void
+  onOutreachChange: (outreach: string) => void
   onPageChange: (page: number) => void
   onRefresh: () => void
 }
@@ -76,10 +78,12 @@ export function ContactsTable({
   search,
   statusFilter,
   visibilityFilter,
+  outreachFilter,
   loading,
   onSearchChange,
   onStatusChange,
   onVisibilityChange,
+  onOutreachChange,
   onPageChange,
   onRefresh,
 }: ContactsTableProps) {
@@ -110,7 +114,7 @@ export function ContactsTable({
   return (
     <div className="space-y-4">
       {/* Filters */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <Input
           placeholder="Search contacts..."
           value={search}
@@ -137,6 +141,18 @@ export function ContactsTable({
           <option value="published">Published</option>
           <option value="warning">Needs Attention</option>
           <option value="hidden">Hidden</option>
+        </select>
+        <select
+          value={outreachFilter}
+          onChange={(e) => onOutreachChange(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">All Outreach</option>
+          <option value="never">Never Contacted</option>
+          <option value="7d">Last 7 Days</option>
+          <option value="30d">Last 30 Days</option>
+          <option value="90d">Last 90 Days</option>
+          <option value="90d_plus">Stale (90+ Days)</option>
         </select>
         {loading && (
           <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />
@@ -172,7 +188,7 @@ export function ContactsTable({
                 <TableCell colSpan={7} className="h-24 text-center">
                   {loading ? (
                     <div className="text-muted-foreground">Loading...</div>
-                  ) : total === 0 && !search && statusFilter === "all" && visibilityFilter === "all" ? (
+                  ) : total === 0 && !search && statusFilter === "all" && visibilityFilter === "all" && outreachFilter === "all" ? (
                     <div className="text-muted-foreground">
                       No contacts yet.{" "}
                       <Link

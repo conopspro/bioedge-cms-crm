@@ -19,6 +19,7 @@ export default function ContactsPage() {
   const [search, setSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [visibilityFilter, setVisibilityFilter] = useState("all")
+  const [outreachFilter, setOutreachFilter] = useState("all")
   const [loading, setLoading] = useState(true)
 
   // Debounce search
@@ -41,6 +42,7 @@ export default function ContactsPage() {
       if (debouncedSearch) params.set("search", debouncedSearch)
       if (statusFilter !== "all") params.set("status", statusFilter)
       if (visibilityFilter !== "all") params.set("visibility", visibilityFilter)
+      if (outreachFilter !== "all") params.set("outreach", outreachFilter)
 
       const res = await fetch(`/api/contacts?${params}`)
       if (res.ok) {
@@ -53,18 +55,18 @@ export default function ContactsPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter])
+  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter, outreachFilter])
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1)
-  }, [statusFilter, visibilityFilter])
+  }, [statusFilter, visibilityFilter, outreachFilter])
 
   // Fetch when debounced search or other params change
   useEffect(() => {
     fetchContacts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter])
+  }, [page, pageSize, debouncedSearch, statusFilter, visibilityFilter, outreachFilter])
 
   return (
     <div className="space-y-6">
@@ -93,10 +95,12 @@ export default function ContactsPage() {
         search={search}
         statusFilter={statusFilter}
         visibilityFilter={visibilityFilter}
+        outreachFilter={outreachFilter}
         loading={loading}
         onSearchChange={setSearch}
         onStatusChange={setStatusFilter}
         onVisibilityChange={setVisibilityFilter}
+        onOutreachChange={setOutreachFilter}
         onPageChange={setPage}
         onRefresh={fetchContacts}
       />

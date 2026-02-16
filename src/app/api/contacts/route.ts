@@ -28,6 +28,85 @@ export async function GET(request: NextRequest) {
     const visibility = searchParams.get("visibility")
     const companyId = searchParams.get("company_id")
     const showOnArticles = searchParams.get("show_on_articles")
+    const outreach = searchParams.get("outreach") // never, 7d, 30d, 90d, 90d_plus
+
+    // Outreach recency filter — find contact IDs from outreach_log
+    let outreachContactIds: string[] | null = null
+    let outreachFilterMode: "include" | "exclude" | null = null
+    if (outreach && outreach !== "all") {
+      if (outreach === "never") {
+        // Contacts with NO outreach_log entries at all
+        // Get all contact IDs that HAVE outreach logs, then exclude them
+        const { data: contactedIds } = await supabase
+          .from("outreach_log")
+          .select("contact_id")
+          .limit(50000)
+
+        const uniqueIds = [...new Set((contactedIds || []).map((r) => r.contact_id))]
+        outreachContactIds = uniqueIds
+        outreachFilterMode = "exclude"
+      } else {
+        // Recent outreach within a date range
+        const now = new Date()
+        let cutoffDate: Date
+
+        if (outreach === "7d") {
+          cutoffDate = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        } else if (outreach === "30d") {
+          cutoffDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+        } else if (outreach === "90d") {
+          cutoffDate = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+        } else if (outreach === "90d_plus") {
+          // Contacted, but NOT within the last 90 days
+          // Get contacts with ANY outreach, then exclude those with recent outreach
+          const cutoff90 = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000)
+          const cutoffStr = cutoff90.toISOString().split("T")[0]
+
+          // Get all contacted contact IDs
+          const { data: allContacted } = await supabase
+            .from("outreach_log")
+            .select("contact_id")
+            .limit(50000)
+          const allContactedIds = [...new Set((allContacted || []).map((r) => r.contact_id))]
+
+          // Get recently contacted contact IDs
+          const { data: recentlyContacted } = await supabase
+            .from("outreach_log")
+            .select("contact_id")
+            .gte("date", cutoffStr)
+            .limit(50000)
+          const recentIds = new Set((recentlyContacted || []).map((r) => r.contact_id))
+
+          // Stale = contacted but not recently
+          outreachContactIds = allContactedIds.filter((id) => !recentIds.has(id))
+          outreachFilterMode = "include"
+          // If no stale contacts found, return empty result
+          if (outreachContactIds.length === 0) {
+            return NextResponse.json({ contacts: [], total: 0, page, pageSize })
+          }
+          // Skip the standard date filter below
+          cutoffDate = now // unused, but satisfies TypeScript
+        } else {
+          cutoffDate = now
+        }
+
+        if (outreach !== "90d_plus") {
+          const cutoffStr = cutoffDate.toISOString().split("T")[0]
+          const { data: recentLogs } = await supabase
+            .from("outreach_log")
+            .select("contact_id")
+            .gte("date", cutoffStr)
+            .limit(50000)
+
+          const uniqueIds = [...new Set((recentLogs || []).map((r) => r.contact_id))]
+          outreachContactIds = uniqueIds
+          outreachFilterMode = "include"
+          if (uniqueIds.length === 0) {
+            return NextResponse.json({ contacts: [], total: 0, page, pageSize })
+          }
+        }
+      }
+    }
 
     // If searching by company name, find matching company IDs first
     let companySearchIds: string[] | null = null
@@ -59,6 +138,17 @@ export async function GET(request: NextRequest) {
     // Status filter
     if (status && status !== "all") {
       query = query.eq("outreach_status", status)
+    }
+
+    // Outreach recency filter — apply contact ID list
+    if (outreachContactIds && outreachFilterMode === "include") {
+      query = query.in("id", outreachContactIds)
+    } else if (outreachContactIds && outreachFilterMode === "exclude") {
+      // "never contacted" — exclude contacts that have outreach logs
+      // Supabase doesn't have a .notIn(), so use .not() with .in()
+      if (outreachContactIds.length > 0) {
+        query = query.not("id", "in", `(${outreachContactIds.join(",")})`)
+      }
     }
 
     // Legacy show_on_articles filter
