@@ -7,6 +7,7 @@ interface NavItem {
   href: string
   is_external: boolean
   display_order: number
+  parent_id: string | null
 }
 
 interface PublicFooterProps {
@@ -57,7 +58,9 @@ export function PublicFooter({ className, navItems }: PublicFooterProps) {
               </h3>
               <ul className="space-y-1">
                 {navItems && navItems.length > 0 ? (
-                  navItems.map((item) => (
+                  navItems
+                    .filter((item) => item.href !== "#") // Skip group headers
+                    .map((item) => (
                     <li key={item.id}>
                       {item.is_external ? (
                         <a

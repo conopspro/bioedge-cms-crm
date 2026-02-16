@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const supabase = await createClient()
     const body = await request.json()
 
-    const { label, href, location, is_external = false, display_order = 0, is_visible = true, event_id = null } = body
+    const { label, href, location, is_external = false, display_order = 0, is_visible = true, event_id = null, parent_id = null } = body
 
     if (!label || !href || !location) {
       return NextResponse.json({ error: "label, href, and location are required" }, { status: 400 })
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase
       .from("navigation_items")
-      .insert({ label, href, location, is_external, display_order, is_visible, event_id })
+      .insert({ label, href, location, is_external, display_order, is_visible, event_id, parent_id })
       .select()
       .single()
 

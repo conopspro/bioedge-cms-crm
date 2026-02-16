@@ -15,7 +15,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const supabase = await createClient()
     const body = await request.json()
 
-    const allowedFields = ["label", "href", "is_external", "display_order", "is_visible", "location"]
+    const allowedFields = ["label", "href", "is_external", "display_order", "is_visible", "location", "parent_id"]
 
     const updateData: Record<string, unknown> = {}
     for (const field of allowedFields) {
