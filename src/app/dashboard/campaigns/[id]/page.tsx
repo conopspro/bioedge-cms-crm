@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
@@ -149,6 +149,9 @@ export default function CampaignDetailPage() {
   const [testSending, setTestSending] = useState(false)
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
   const [showTestForm, setShowTestForm] = useState(false)
+  const [sending, setSending] = useState(false)
+  const [sendProgress, setSendProgress] = useState<{ sent: number; total: number; current: string } | null>(null)
+  const sendAbortRef = useRef(false)
 
   const fetchCampaign = useCallback(async (retries = 3) => {
     try {
@@ -342,6 +345,64 @@ export default function CampaignDetailPage() {
     } catch (error) {
       console.error("Status update failed:", error)
     }
+  }
+
+  const handleStartSending = async () => {
+    const approved = campaign?.campaign_recipients?.filter(
+      (r: { status: string }) => r.status === "approved"
+    ).length || 0
+    if (approved === 0) return
+
+    setSending(true)
+    sendAbortRef.current = false
+    setSendProgress({ sent: 0, total: approved, current: "" })
+
+    try {
+      // Set campaign status to "sending"
+      await fetch(`/api/campaigns/${campaignId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "sending" }),
+      })
+
+      // Send loop — one email per iteration
+      while (!sendAbortRef.current) {
+        const res = await fetch(`/api/campaigns/${campaignId}/send`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        })
+        const data = await res.json()
+
+        if (data.completed) break
+        if (data.error) {
+          console.error("Send error:", data.error)
+          break
+        }
+        if (data.skipped) continue
+        if (data.sent) {
+          setSendProgress((prev) => ({
+            sent: (prev?.sent || 0) + 1,
+            total: prev?.total || approved,
+            current: data.contact_name || "",
+          }))
+
+          // Brief delay between sends (cap at 10s for browser UX)
+          const delay = Math.min(data.recommended_delay_seconds || 5, 10)
+          await new Promise((resolve) => setTimeout(resolve, delay * 1000))
+        }
+      }
+    } catch (error) {
+      console.error("Sending failed:", error)
+    } finally {
+      setSending(false)
+      setSendProgress(null)
+      await fetchCampaign()
+    }
+  }
+
+  const handlePauseSending = async () => {
+    sendAbortRef.current = true
+    await handleUpdateStatus("paused")
   }
 
   const handleRemoveRecipient = async (recipientId: string) => {
@@ -598,17 +659,27 @@ export default function CampaignDetailPage() {
           </Button>
         )}
 
-        {(campaign.status === "ready" || campaign.status === "paused") && (
-          <Button onClick={() => handleUpdateStatus("sending")}>
+        {(campaign.status === "ready" || campaign.status === "paused") && !sending && (
+          <Button onClick={handleStartSending}>
             <Play className="mr-2 h-4 w-4" />
             Start Sending
           </Button>
         )}
 
-        {campaign.status === "sending" && (
+        {sending && (
           <Button
             variant="outline"
-            onClick={() => handleUpdateStatus("paused")}
+            onClick={handlePauseSending}
+          >
+            <Pause className="mr-2 h-4 w-4" />
+            Pause
+          </Button>
+        )}
+
+        {campaign.status === "sending" && !sending && (
+          <Button
+            variant="outline"
+            onClick={handlePauseSending}
           >
             <Pause className="mr-2 h-4 w-4" />
             Pause
@@ -619,6 +690,23 @@ export default function CampaignDetailPage() {
           <RefreshCw className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Send progress */}
+      {sending && sendProgress && (
+        <div className="flex items-center gap-3 rounded-md bg-blue-50 dark:bg-blue-900/20 px-4 py-3">
+          <RefreshCw className="h-4 w-4 animate-spin text-blue-600 dark:text-blue-400" />
+          <div className="text-sm text-blue-700 dark:text-blue-300">
+            <span className="font-medium">
+              Sending {sendProgress.sent + 1} of {sendProgress.total}
+            </span>
+            {sendProgress.current && (
+              <span className="text-blue-600 dark:text-blue-400">
+                {" "}— {sendProgress.current}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Progress bar */}
       {totalRecipients > 0 && (
