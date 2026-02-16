@@ -184,7 +184,7 @@ export default function AddRecipientsPage() {
       if (hasEmail) params.set("has_email", "true")
       if (eventFilter && eventFilter !== "all")
         params.set("event_id", eventFilter)
-      if (outreachTimeRange !== "all" && (outreachFilter === "contacted" || outreachFilter === "responded"))
+      if (outreachTimeRange && outreachTimeRange !== "all")
         params.set("outreach", outreachTimeRange)
 
       const res = await fetch(
@@ -435,12 +435,7 @@ export default function AddRecipientsPage() {
               <Label>Outreach Status</Label>
               <Select
                 value={outreachFilter}
-                onValueChange={(v) => {
-                  setOutreachFilter(v)
-                  if (v !== "contacted" && v !== "responded") {
-                    setOutreachTimeRange("all")
-                  }
-                }}
+                onValueChange={setOutreachFilter}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Not Contacted" />
@@ -454,27 +449,26 @@ export default function AddRecipientsPage() {
               </Select>
             </div>
 
-            {/* When — only shows for contacted/responded */}
-            {(outreachFilter === "contacted" || outreachFilter === "responded") && (
-              <div className="space-y-2">
-                <Label>When</Label>
-                <Select
-                  value={outreachTimeRange}
-                  onValueChange={setOutreachTimeRange}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Any time" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Any Time</SelectItem>
-                    <SelectItem value="7d">Last 7 Days</SelectItem>
-                    <SelectItem value="30d">Last 30 Days</SelectItem>
-                    <SelectItem value="90d">Last 90 Days</SelectItem>
-                    <SelectItem value="90d_plus">90+ Days Ago (Stale)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+            {/* Last Outreach */}
+            <div className="space-y-2">
+              <Label>Last Outreach</Label>
+              <Select
+                value={outreachTimeRange}
+                onValueChange={setOutreachTimeRange}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Any time" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any Time</SelectItem>
+                  <SelectItem value="never">Never</SelectItem>
+                  <SelectItem value="7d">Within 7 Days</SelectItem>
+                  <SelectItem value="30d">Within 30 Days</SelectItem>
+                  <SelectItem value="90d">Within 90 Days</SelectItem>
+                  <SelectItem value="90d_plus">90+ Days Ago</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
             {/* Seniority */}
             <div className="space-y-2">
