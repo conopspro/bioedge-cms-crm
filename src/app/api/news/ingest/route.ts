@@ -1,7 +1,8 @@
 /**
  * News Ingestion API
  *
- * POST /api/news/ingest
+ * GET  /api/news/ingest — called by Vercel cron (Authorization: Bearer CRON_SECRET)
+ * POST /api/news/ingest — called by dashboard manual trigger (admin session)
  *
  * Fetches all 13 RSS feeds, deduplicates against existing articles,
  * runs Claude AI analysis on new articles, and inserts into news_articles.
@@ -27,7 +28,20 @@ const MAX_ARTICLES_PER_RUN = 20
 // Allow up to 5 minutes for this route
 export const maxDuration = 300
 
+// Prevent Vercel from caching the GET response
+export const dynamic = "force-dynamic"
+
+// Vercel cron sends GET requests
+export async function GET(request: NextRequest) {
+  return handleIngest(request)
+}
+
+// Dashboard manual trigger sends POST requests
 export async function POST(request: NextRequest) {
+  return handleIngest(request)
+}
+
+async function handleIngest(request: NextRequest) {
   // Auth check: either CRON_SECRET header (Vercel cron) or admin session
   const cronSecret = request.headers.get("authorization")?.replace("Bearer ", "")
   const vercelCronSecret = request.headers.get("x-vercel-cron-secret") // Vercel-injected
