@@ -16,6 +16,7 @@ import {
   ArrowLeft,
   Loader2,
   Trash2,
+  MapPin,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -55,29 +56,233 @@ const TAG_PRESETS = [
   "Red Light Therapy",
 ]
 
-interface QueueItem {
-  id: string
-  name: string
-  city: string | null
-  state: string | null
-  country: string | null
-  phone: string | null
-  website: string | null
-  google_rating: number | null
-  reviews_count: number
-  email: string | null
-  search_tag: string
-  search_location: string
-  perplexity_status: string
-  status: string
-  created_at: string
-}
-
-interface Pagination {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
+// Metro sub-areas: when a user picks a metro, we search each sub-area separately
+// to get much deeper coverage than a single "metro area" query
+const METRO_SUB_AREAS: Record<string, string[]> = {
+  "New York metro area": [
+    "Manhattan, NY",
+    "Brooklyn, NY",
+    "Queens, NY",
+    "Bronx, NY",
+    "Staten Island, NY",
+    "Long Island, NY",
+    "The Hamptons, NY",
+    "Westchester County, NY",
+    "Jersey City, NJ",
+    "Hoboken, NJ",
+    "Newark, NJ",
+    "White Plains, NY",
+    "Stamford, CT",
+  ],
+  "Los Angeles metro area": [
+    "Los Angeles, CA",
+    "Beverly Hills, CA",
+    "Santa Monica, CA",
+    "West Hollywood, CA",
+    "Pasadena, CA",
+    "Burbank, CA",
+    "Long Beach, CA",
+    "Malibu, CA",
+    "Culver City, CA",
+    "Glendale, CA",
+    "Calabasas, CA",
+    "Manhattan Beach, CA",
+    "Brentwood, Los Angeles, CA",
+  ],
+  "Chicago metro area": [
+    "Chicago, IL",
+    "Evanston, IL",
+    "Oak Park, IL",
+    "Naperville, IL",
+    "Schaumburg, IL",
+    "Highland Park, IL",
+    "Lake Forest, IL",
+    "Hinsdale, IL",
+    "Winnetka, IL",
+  ],
+  "Dallas-Fort Worth metro area": [
+    "Dallas, TX",
+    "Fort Worth, TX",
+    "Plano, TX",
+    "Frisco, TX",
+    "Arlington, TX",
+    "McKinney, TX",
+    "Southlake, TX",
+    "Highland Park, TX",
+    "Allen, TX",
+  ],
+  "Houston metro area": [
+    "Houston, TX",
+    "The Woodlands, TX",
+    "Sugar Land, TX",
+    "Katy, TX",
+    "Pearland, TX",
+    "League City, TX",
+    "Cypress, TX",
+    "Memorial, Houston, TX",
+  ],
+  "Washington, D.C. metro area": [
+    "Washington, D.C.",
+    "Arlington, VA",
+    "Alexandria, VA",
+    "Bethesda, MD",
+    "McLean, VA",
+    "Chevy Chase, MD",
+    "Tysons, VA",
+    "Reston, VA",
+    "Rockville, MD",
+  ],
+  "San Francisco Bay Area": [
+    "San Francisco, CA",
+    "Oakland, CA",
+    "San Jose, CA",
+    "Palo Alto, CA",
+    "Berkeley, CA",
+    "Walnut Creek, CA",
+    "Mill Valley, CA",
+    "Sausalito, CA",
+    "Menlo Park, CA",
+    "Mountain View, CA",
+    "Los Gatos, CA",
+    "San Mateo, CA",
+  ],
+  "Greater Miami": [
+    "Miami, FL",
+    "Miami Beach, FL",
+    "Coral Gables, FL",
+    "Brickell, Miami, FL",
+    "Coconut Grove, Miami, FL",
+    "Fort Lauderdale, FL",
+    "Boca Raton, FL",
+    "West Palm Beach, FL",
+    "Aventura, FL",
+    "Key Biscayne, FL",
+  ],
+  "Greater Boston": [
+    "Boston, MA",
+    "Cambridge, MA",
+    "Brookline, MA",
+    "Newton, MA",
+    "Wellesley, MA",
+    "Concord, MA",
+    "Lexington, MA",
+    "Salem, MA",
+    "Needham, MA",
+  ],
+  "Greater Phoenix": [
+    "Phoenix, AZ",
+    "Scottsdale, AZ",
+    "Paradise Valley, AZ",
+    "Tempe, AZ",
+    "Mesa, AZ",
+    "Chandler, AZ",
+    "Gilbert, AZ",
+    "Peoria, AZ",
+  ],
+  "Greater Seattle": [
+    "Seattle, WA",
+    "Bellevue, WA",
+    "Kirkland, WA",
+    "Redmond, WA",
+    "Mercer Island, WA",
+    "Issaquah, WA",
+    "Bothell, WA",
+    "Edmonds, WA",
+  ],
+  "Atlanta metro area": [
+    "Atlanta, GA",
+    "Buckhead, Atlanta, GA",
+    "Decatur, GA",
+    "Alpharetta, GA",
+    "Roswell, GA",
+    "Marietta, GA",
+    "Sandy Springs, GA",
+    "Brookhaven, GA",
+  ],
+  "Denver metro area": [
+    "Denver, CO",
+    "Cherry Creek, Denver, CO",
+    "Boulder, CO",
+    "Littleton, CO",
+    "Englewood, CO",
+    "Greenwood Village, CO",
+    "Lone Tree, CO",
+    "Parker, CO",
+  ],
+  "Tampa Bay Area": [
+    "Tampa, FL",
+    "St. Petersburg, FL",
+    "Clearwater, FL",
+    "Sarasota, FL",
+    "Lakewood Ranch, FL",
+    "Brandon, FL",
+    "Wesley Chapel, FL",
+  ],
+  "San Diego metro area": [
+    "San Diego, CA",
+    "La Jolla, CA",
+    "Del Mar, CA",
+    "Encinitas, CA",
+    "Carlsbad, CA",
+    "Coronado, CA",
+    "Chula Vista, CA",
+  ],
+  "Nashville metro area": [
+    "Nashville, TN",
+    "Franklin, TN",
+    "Brentwood, TN",
+    "Murfreesboro, TN",
+    "Hendersonville, TN",
+    "Green Hills, Nashville, TN",
+  ],
+  "Austin, TX metro area": [
+    "Austin, TX",
+    "Round Rock, TX",
+    "Cedar Park, TX",
+    "Lakeway, TX",
+    "West Lake Hills, TX",
+    "Dripping Springs, TX",
+  ],
+  "Raleigh-Durham metro area": [
+    "Raleigh, NC",
+    "Durham, NC",
+    "Chapel Hill, NC",
+    "Cary, NC",
+    "Wake Forest, NC",
+    "Apex, NC",
+  ],
+  "Las Vegas metro area": [
+    "Las Vegas, NV",
+    "Henderson, NV",
+    "Summerlin, Las Vegas, NV",
+    "Green Valley, Henderson, NV",
+    "Spring Valley, Las Vegas, NV",
+  ],
+  "Minneapolis-St. Paul": [
+    "Minneapolis, MN",
+    "St. Paul, MN",
+    "Edina, MN",
+    "Wayzata, MN",
+    "Minnetonka, MN",
+    "Bloomington, MN",
+    "Plymouth, MN",
+  ],
+  "Portland, OR metro area": [
+    "Portland, OR",
+    "Lake Oswego, OR",
+    "Beaverton, OR",
+    "West Linn, OR",
+    "Tigard, OR",
+    "Vancouver, WA",
+  ],
+  "Charlotte metro area": [
+    "Charlotte, NC",
+    "Ballantyne, Charlotte, NC",
+    "South End, Charlotte, NC",
+    "Huntersville, NC",
+    "Cornelius, NC",
+    "Lake Norman, NC",
+  ],
 }
 
 // Top 50 US metro area suggestions for the location input
@@ -134,6 +339,31 @@ const METRO_SUGGESTIONS = [
   "Scottsdale-Mesa, AZ",
 ]
 
+interface QueueItem {
+  id: string
+  name: string
+  city: string | null
+  state: string | null
+  country: string | null
+  phone: string | null
+  website: string | null
+  google_rating: number | null
+  reviews_count: number
+  email: string | null
+  search_tag: string
+  search_location: string
+  perplexity_status: string
+  status: string
+  created_at: string
+}
+
+interface Pagination {
+  page: number
+  limit: number
+  total: number
+  totalPages: number
+}
+
 export default function DiscoverClinicsPage() {
   // Search state
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
@@ -142,11 +372,10 @@ export default function DiscoverClinicsPage() {
   const [searchResult, setSearchResult] = useState<{
     inserted: number
     skipped: number
-    tagsSearched: number
-    nextPageToken: string | null
+    tagsMerged: number
+    searchesRun: number
   } | null>(null)
   const [searchProgress, setSearchProgress] = useState<string | null>(null)
-  const [pageToken, setPageToken] = useState<string | null>(null)
 
   // Queue state
   const [queue, setQueue] = useState<QueueItem[]>([])
@@ -208,65 +437,85 @@ export default function DiscoverClinicsPage() {
     }
   }
 
-  // Search Google Places — loops through each selected tag sequentially
-  const handleSearch = async (nextPage = false) => {
+  /**
+   * Resolve the location into sub-areas if it matches a known metro,
+   * otherwise return it as a single-item array.
+   */
+  const resolveLocations = (location: string): string[] => {
+    // Check if the entered location matches a metro with sub-areas
+    const subAreas = METRO_SUB_AREAS[location]
+    if (subAreas) return subAreas
+    return [location]
+  }
+
+  // Search Google Places — loops through tags × locations (with metro expansion)
+  // API now auto-paginates (up to 3 pages / ~60 results per query)
+  const handleSearch = async () => {
     if (selectedTags.size === 0 || !searchLocation) return
     setSearching(true)
     setSearchResult(null)
     setSearchProgress(null)
 
     const tags = Array.from(selectedTags)
+    const locations = resolveLocations(searchLocation.trim())
+    const totalCombos = tags.length * locations.length
+
     let totalInserted = 0
     let totalSkipped = 0
-    let lastNextPageToken: string | null = null
+    let totalTagsMerged = 0
+    let searchesRun = 0
 
-    for (let i = 0; i < tags.length; i++) {
-      const tag = tags[i]
-      setSearchProgress(`Searching "${tag}" (${i + 1}/${tags.length})...`)
+    for (let t = 0; t < tags.length; t++) {
+      const tag = tags[t]
+      for (let l = 0; l < locations.length; l++) {
+        const location = locations[l]
+        searchesRun++
 
-      try {
-        const res = await fetch("/api/clinics/search-places", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            tag,
-            location: searchLocation,
-            pageToken: nextPage && i === 0 ? pageToken : undefined,
-          }),
-        })
-        if (res.ok) {
-          const result = await res.json()
-          totalInserted += result.inserted
-          totalSkipped += result.skipped
-          // Only track nextPageToken for single-tag searches
-          if (tags.length === 1) {
-            lastNextPageToken = result.nextPageToken
+        const progress = locations.length > 1
+          ? `"${tag}" in ${location} (${searchesRun}/${totalCombos})`
+          : `"${tag}" (${t + 1}/${tags.length})`
+        setSearchProgress(progress)
+
+        try {
+          const res = await fetch("/api/clinics/search-places", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ tag, location }),
+          })
+          if (res.ok) {
+            const result = await res.json()
+            totalInserted += result.inserted
+            totalSkipped += result.skipped
+            totalTagsMerged += result.tagsMerged || 0
+          } else {
+            const err = await res.json()
+            console.error(`Search failed for "${tag}" in ${location}:`, err.error)
           }
-        } else {
-          const err = await res.json()
-          console.error(`Search failed for "${tag}":`, err.error)
+        } catch {
+          console.error(`Search failed for "${tag}" in ${location}`)
         }
-      } catch {
-        console.error(`Search failed for "${tag}"`)
-      }
 
-      // Small delay between tags to avoid rate limiting
-      if (i < tags.length - 1) {
-        await new Promise((r) => setTimeout(r, 500))
+        // Small delay between searches to avoid rate limiting
+        if (searchesRun < totalCombos) {
+          await new Promise((r) => setTimeout(r, 500))
+        }
       }
     }
 
     setSearchResult({
       inserted: totalInserted,
       skipped: totalSkipped,
-      tagsSearched: tags.length,
-      nextPageToken: lastNextPageToken,
+      tagsMerged: totalTagsMerged,
+      searchesRun,
     })
-    setPageToken(lastNextPageToken)
     setSearchProgress(null)
     setSearching(false)
     fetchQueue(1)
   }
+
+  // Check if the current location has sub-area expansion
+  const hasSubAreas = METRO_SUB_AREAS[searchLocation.trim()] !== undefined
+  const subAreaCount = hasSubAreas ? METRO_SUB_AREAS[searchLocation.trim()].length : 0
 
   // Bulk actions
   const handleBulkAction = async (action: "approve" | "reject" | "delete") => {
@@ -475,9 +724,22 @@ export default function DiscoverClinicsPage() {
                 <option key={m} value={m} />
               ))}
             </datalist>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Tip: Use metro areas for broader coverage (e.g., &quot;Dallas-Fort Worth metro area&quot;, &quot;Greater Boston&quot;, &quot;San Francisco Bay Area&quot;)
-            </p>
+            {hasSubAreas ? (
+              <div className="mt-2 flex items-start gap-2 rounded-md bg-blue-50 dark:bg-blue-950/30 px-3 py-2">
+                <MapPin className="h-4 w-4 text-electric-blue mt-0.5 flex-shrink-0" />
+                <div className="text-xs">
+                  <span className="font-medium text-electric-blue">Deep search enabled</span>
+                  <span className="text-muted-foreground">
+                    {" — "}will search {subAreaCount} sub-areas: {METRO_SUB_AREAS[searchLocation.trim()].slice(0, 4).join(", ")}
+                    {subAreaCount > 4 && `, +${subAreaCount - 4} more`}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Tip: Select a metro area for deep sub-area search (boroughs, suburbs, neighborhoods)
+              </p>
+            )}
           </div>
           <Button
             onClick={() => handleSearch()}
@@ -496,23 +758,14 @@ export default function DiscoverClinicsPage() {
         {searchResult && (
           <div className="mt-4 flex items-center gap-4">
             <p className="text-sm">
-              {searchResult.tagsSearched > 1 && (
-                <span className="text-muted-foreground">{searchResult.tagsSearched} tags searched — </span>
-              )}
+              <span className="text-muted-foreground">{searchResult.searchesRun} searches run — </span>
               <span className="font-medium text-green-600">{searchResult.inserted} new</span>{" "}
-              added to queue,{" "}
-              <span className="text-muted-foreground">{searchResult.skipped} already in database</span>
+              added to queue
+              {searchResult.tagsMerged > 0 && (
+                <>, <span className="font-medium text-blue-600">{searchResult.tagsMerged} tags merged</span></>
+              )}
+              , <span className="text-muted-foreground">{searchResult.skipped} already in database</span>
             </p>
-            {searchResult.nextPageToken && selectedTags.size === 1 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSearch(true)}
-                disabled={searching}
-              >
-                Load More Results
-              </Button>
-            )}
           </div>
         )}
       </div>

@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
               google_rating: item.google_rating,
               reviews_count: item.reviews_count,
               photos: item.photos,
-              tags: [item.search_tag],
+              tags: item.search_tag.split(", ").map((t: string) => t.trim()).filter(Boolean),
               email: item.email,
               is_active: true,
               is_draft: false,
