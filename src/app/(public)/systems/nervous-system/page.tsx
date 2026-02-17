@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Suspense } from "react"
 import { SystemDirectory } from "@/components/directory/system-solutions"
+import { SystemNews } from "@/components/directory/system-news"
 
 /**
  * Nervous System Page
@@ -39,14 +40,15 @@ export default function NervousSystemPage() {
       <nav className="border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-20">
         <div className="be-container">
           <div className="max-w-3xl mx-auto flex flex-wrap gap-x-6 gap-y-2 py-3 text-sm">
-            <a href="#natural-intelligence" className="text-text-light hover:text-navy transition-colors">Natural Intelligence</a>
-            <a href="#eliminate" className="text-text-light hover:text-navy transition-colors">Eliminate</a>
-            <a href="#decode" className="text-text-light hover:text-navy transition-colors">Decode</a>
-            <a href="#gain" className="text-text-light hover:text-navy transition-colors">Gain</a>
-            <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
-            <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
-            <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
-            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
+            <a href="#natural-intelligence" className="text-electric-blue hover:text-navy transition-colors">Natural Intelligence</a>
+            <a href="#eliminate" className="text-electric-blue hover:text-navy transition-colors">Eliminate</a>
+            <a href="#decode" className="text-electric-blue hover:text-navy transition-colors">Decode</a>
+            <a href="#gain" className="text-electric-blue hover:text-navy transition-colors">Gain</a>
+            <a href="#execute" className="text-electric-blue hover:text-navy transition-colors">Execute</a>
+            <a href="#questions" className="text-electric-blue hover:text-navy transition-colors">Questions</a>
+            <a href="#connections" className="text-electric-blue hover:text-navy transition-colors">Connections</a>
+            <a href="#news" className="text-electric-blue hover:text-navy transition-colors">News</a>
+            <a href="#directory" className="text-electric-blue hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -528,6 +530,10 @@ export default function NervousSystemPage() {
               <strong className="text-navy">Energy Production</strong> — Both systems can cause weakness and tremor. Distinguishing factor: Nervous System weakness follows nerve distribution and may include wasting; Energy weakness is generalized and improves with rest.
             </p>
 
+
+            <Suspense fallback={null}>
+              <SystemNews system="Nervous System" label="Nervous System" />
+            </Suspense>
 
             <Suspense fallback={null}>
               <SystemDirectory system="Nervous System" label="Nervous System" />

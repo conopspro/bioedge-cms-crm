@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { Suspense } from "react"
 import { SystemDirectory } from "@/components/directory/system-solutions"
+import { SystemNews } from "@/components/directory/system-news"
 
 /**
  * Detoxification System Page
@@ -38,14 +39,15 @@ export default function DetoxificationSystemPage() {
       <nav className="border-b border-border bg-white/80 backdrop-blur-sm sticky top-0 z-20">
         <div className="be-container">
           <div className="max-w-3xl mx-auto flex flex-wrap gap-x-6 gap-y-2 py-3 text-sm">
-            <a href="#natural-intelligence" className="text-text-light hover:text-navy transition-colors">Natural Intelligence</a>
-            <a href="#eliminate" className="text-text-light hover:text-navy transition-colors">Eliminate</a>
-            <a href="#decode" className="text-text-light hover:text-navy transition-colors">Decode</a>
-            <a href="#gain" className="text-text-light hover:text-navy transition-colors">Gain</a>
-            <a href="#execute" className="text-text-light hover:text-navy transition-colors">Execute</a>
-            <a href="#questions" className="text-text-light hover:text-navy transition-colors">Questions</a>
-            <a href="#connections" className="text-text-light hover:text-navy transition-colors">Connections</a>
-            <a href="#directory" className="text-text-light hover:text-navy transition-colors">Directory</a>
+            <a href="#natural-intelligence" className="text-electric-blue hover:text-navy transition-colors">Natural Intelligence</a>
+            <a href="#eliminate" className="text-electric-blue hover:text-navy transition-colors">Eliminate</a>
+            <a href="#decode" className="text-electric-blue hover:text-navy transition-colors">Decode</a>
+            <a href="#gain" className="text-electric-blue hover:text-navy transition-colors">Gain</a>
+            <a href="#execute" className="text-electric-blue hover:text-navy transition-colors">Execute</a>
+            <a href="#questions" className="text-electric-blue hover:text-navy transition-colors">Questions</a>
+            <a href="#connections" className="text-electric-blue hover:text-navy transition-colors">Connections</a>
+            <a href="#news" className="text-electric-blue hover:text-navy transition-colors">News</a>
+            <a href="#directory" className="text-electric-blue hover:text-navy transition-colors">Directory</a>
           </div>
         </div>
       </nav>
@@ -513,6 +515,10 @@ export default function DetoxificationSystemPage() {
               <strong className="text-navy">Circulation</strong> — Blood delivers nutrients to detox organs and carries toxins away. Compromised circulation may impair clearance. The lymphatic system works in parallel to move debris.
             </p>
 
+
+            <Suspense fallback={null}>
+              <SystemNews system="Detoxification" label="Detoxification" />
+            </Suspense>
 
             <Suspense fallback={null}>
               <SystemDirectory system="Detoxification" label="Detoxification" />

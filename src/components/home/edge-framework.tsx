@@ -1,6 +1,30 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import Link from "next/link"
+import {
+  Zap, Heart, Wind, Droplets, Apple, Shield, Gauge,
+  Bone, Brain, Smile, Lightbulb, RefreshCw, AlertTriangle,
+  Thermometer, Waves, Star,
+} from "lucide-react"
+
+const biologicalSystems = [
+  { name: "Breath", slug: "breath", description: "Respiratory system, oxygen delivery, breathing patterns", icon: Wind },
+  { name: "Circulation", slug: "circulation", description: "Heart, blood vessels, blood flow, cardiovascular health", icon: Heart },
+  { name: "Consciousness", slug: "consciousness", description: "Awareness, presence, thought quality, mental clarity", icon: Lightbulb },
+  { name: "Defense", slug: "defense", description: "Immune function, inflammation, autoimmunity", icon: Shield },
+  { name: "Detoxification", slug: "detoxification", description: "Liver function, lymphatic drainage, elimination", icon: Droplets },
+  { name: "Digestive", slug: "digestive", description: "Gut health, microbiome, nutrient absorption", icon: Apple },
+  { name: "Emotional", slug: "emotional", description: "Mental wellbeing, mood regulation, psychological health", icon: Smile },
+  { name: "Energy Production", slug: "energy-production", description: "Mitochondrial function, ATP, metabolic efficiency", icon: Zap },
+  { name: "Hormonal", slug: "hormonal", description: "Endocrine system, hormone balance, thyroid, adrenals", icon: Gauge },
+  { name: "Hydration", slug: "hydration", description: "Fluid balance, electrolytes, cellular hydration", icon: Waves },
+  { name: "Nervous System", slug: "nervous-system", description: "Brain-body connection, neural pathways, vagal tone", icon: Brain },
+  { name: "Regeneration", slug: "regeneration", description: "Cellular repair, stem cells, longevity pathways", icon: RefreshCw },
+  { name: "Stress Response", slug: "stress-response", description: "Fight or flight, cortisol regulation, stress adaptation", icon: AlertTriangle },
+  { name: "Structure & Movement", slug: "structure-movement", description: "Bones, joints, connective tissue, muscles, mobility", icon: Bone },
+  { name: "Temperature", slug: "temperature", description: "Heat regulation, cold tolerance, metabolic temperature", icon: Thermometer },
+]
 
 const edgeItems = [
   {
@@ -111,6 +135,82 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
               <p className="text-[0.95rem] leading-relaxed text-deep-blue">{item.description}</p>
             </div>
           ))}
+        </div>
+
+        {/* Book Promo */}
+        <div className="mt-12 mb-12">
+          <a
+            href="https://www.amazon.com/Biological-EDGE-Practical-Guide-Longevity-ebook/dp/B0GJQ5NDGF/ref=sr_1_1"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(13,89,138,0.25)]"
+          >
+            <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
+            <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
+              <img
+                src="https://qfilerjwqhphxheqnozl.supabase.co/storage/v1/object/public/media/general/1771290785045-bioedge-book.png"
+                alt="Biological EDGE: A Practical Guide to Longevity"
+                className="h-32 w-auto flex-shrink-0 rounded shadow-xl transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="flex-1 min-w-0">
+                <h3 className="text-xl font-bold text-white md:text-2xl">
+                  Biological EDGE:<span className="font-normal text-white"> A Practical Guide to Longevity</span>
+                </h3>
+                <div className="mt-3 hidden sm:block">
+                  <div className="flex items-center gap-0.5 mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-sm italic text-white/80">
+                    &ldquo;Meticulous research. Penetrating analysis. Data-driven conclusions. A solid framework for change.&rdquo;
+                  </p>
+                  <p className="mt-1 text-xs text-white/50">
+                    &mdash; Dr. Michael J. Krentz, Retired
+                  </p>
+                </div>
+              </div>
+              <span className="hidden flex-shrink-0 items-center gap-2 rounded-full bg-electric-blue px-5 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-white group-hover:text-navy sm:inline-flex">
+                Available on Amazon
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
+            </div>
+          </a>
+        </div>
+
+        {/* 15 Biological Systems */}
+        <div>
+          <h3 className="mb-6 text-center text-[30px] font-bold tracking-wide" style={{ color: titleColor || undefined }}>
+            15 Biological Systems
+          </h3>
+          <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+            {biologicalSystems.map((system) => {
+              const Icon = system.icon
+              return (
+                <Link key={system.slug} href={`/systems/${system.slug}`}>
+                  <div className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(13,89,138,0.15)]">
+                    <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-navy transition-transform duration-400 group-hover:scale-x-100" />
+                    <div className="flex items-start gap-4">
+                      <span
+                        className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+                        style={{ background: "linear-gradient(135deg, #017ab2 0%, #0d2840 100%)" }}
+                      >
+                        <Icon className="h-5 w-5 text-white" />
+                      </span>
+                      <div>
+                        <p className="font-bold text-navy transition-colors group-hover:text-electric-blue">
+                          {system.name}
+                        </p>
+                        <p className="mt-0.5 text-sm text-deep-blue">{system.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>

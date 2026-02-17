@@ -214,61 +214,42 @@ export default function SystemsIndexPage() {
           </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {/* 15 Biological Systems */}
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {systems.map((system) => {
             const Icon = system.icon
-            const content = (
-              <div
-                className={`be-card hover:shadow-lg transition-all h-full text-center ${
-                  system.available ? "cursor-pointer" : "opacity-60"
-                }`}
-                style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
-              >
-                {/* Icon */}
-                <div
-                  className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-                  style={{
-                    background: system.available
-                      ? "linear-gradient(135deg, #017ab2 0%, #0d2840 100%)"
-                      : "#e5e7eb",
-                    boxShadow: "0 0 0 4px rgba(1, 122, 178, 0.2)",
-                  }}
-                >
-                  <Icon className={`h-8 w-8 ${system.available ? "text-white" : "text-gray-400"}`} />
-                </div>
-
-                {/* Name */}
-                <h2 className="font-heading font-semibold mb-1" style={{ color: "#0d2840" }}>
-                  {system.name}
-                </h2>
-
-                {/* Tagline */}
-                <p className="text-sm mt-1" style={{ color: "#017ab2" }}>
-                  {system.tagline}
-                </p>
-
-                {/* Description */}
-                <p className="text-xs text-text-light mt-2">
-                  {system.description}
-                </p>
-
-                {!system.available && (
-                  <span className="inline-block text-xs font-heading uppercase tracking-wide text-text-light bg-gray-100 px-2 py-1 rounded mt-3">
-                    Coming Soon
+            const card = (
+              <div className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(13,89,138,0.15)] h-full">
+                <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-navy transition-transform duration-400 group-hover:scale-x-100" />
+                <div className="flex items-start gap-4">
+                  <span
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full"
+                    style={{
+                      background: system.available
+                        ? "linear-gradient(135deg, #017ab2 0%, #0d2840 100%)"
+                        : "#e5e7eb",
+                    }}
+                  >
+                    <Icon className={`h-5 w-5 ${system.available ? "text-white" : "text-gray-400"}`} />
                   </span>
-                )}
+                  <div>
+                    <p className="font-heading font-bold text-navy transition-colors group-hover:text-electric-blue">
+                      {system.name}
+                    </p>
+                    <p className="mt-0.5 text-sm text-text-light">{system.description}</p>
+                  </div>
+                </div>
               </div>
             )
 
             if (system.available) {
               return (
                 <Link key={system.slug} href={`/systems/${system.slug}`}>
-                  {content}
+                  {card}
                 </Link>
               )
             }
-
-            return <div key={system.slug}>{content}</div>
+            return <div key={system.slug}>{card}</div>
           })}
         </div>
       </div>
