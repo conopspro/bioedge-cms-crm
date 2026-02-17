@@ -88,7 +88,7 @@ export function NewsCard({ article }: NewsCardProps) {
                 <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-700">
                   Longevity Significance
                 </p>
-                <p className="mt-1 text-xs italic leading-relaxed text-gray-700">
+                <p className="mt-1 text-sm italic leading-relaxed text-gray-700">
                   {article.edge_significance}
                 </p>
               </div>
