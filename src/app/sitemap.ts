@@ -100,6 +100,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.5,
     },
+    {
+      url: `${BASE_URL}/clinics`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/news`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.8,
+    },
   ]
 
   // System pages
@@ -214,6 +226,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
+  // Fetch active clinics
+  const { data: clinicData } = await supabase
+    .from("clinics")
+    .select("slug, state")
+    .eq("is_active", true)
+    .eq("is_draft", false)
+    .not("slug", "is", null)
+
+  const clinicPages: MetadataRoute.Sitemap = (clinicData || []).map((clinic) => ({
+    url: `${BASE_URL}/clinics/${clinic.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+  }))
+
+  // Distinct states for /clinics/state/[state] pages
+  const STATE_ABBREVS: Record<string, string> = {
+    "Alabama": "al", "Alaska": "ak", "Arizona": "az", "Arkansas": "ar", "California": "ca",
+    "Colorado": "co", "Connecticut": "ct", "Delaware": "de", "Florida": "fl", "Georgia": "ga",
+    "Hawaii": "hi", "Idaho": "id", "Illinois": "il", "Indiana": "in", "Iowa": "ia",
+    "Kansas": "ks", "Kentucky": "ky", "Louisiana": "la", "Maine": "me", "Maryland": "md",
+    "Massachusetts": "ma", "Michigan": "mi", "Minnesota": "mn", "Mississippi": "ms", "Missouri": "mo",
+    "Montana": "mt", "Nebraska": "ne", "Nevada": "nv", "New Hampshire": "nh", "New Jersey": "nj",
+    "New Mexico": "nm", "New York": "ny", "North Carolina": "nc", "North Dakota": "nd", "Ohio": "oh",
+    "Oklahoma": "ok", "Oregon": "or", "Pennsylvania": "pa", "Rhode Island": "ri", "South Carolina": "sc",
+    "South Dakota": "sd", "Tennessee": "tn", "Texas": "tx", "Utah": "ut", "Vermont": "vt",
+    "Virginia": "va", "Washington": "wa", "West Virginia": "wv", "Wisconsin": "wi", "Wyoming": "wy",
+    "District of Columbia": "dc",
+  }
+  const stateSlugSet = new Set<string>()
+  for (const clinic of clinicData || []) {
+    if (!clinic.state) continue
+    const abbrev = STATE_ABBREVS[clinic.state] || clinic.state.toLowerCase()
+    stateSlugSet.add(abbrev)
+  }
+  const clinicStatePages: MetadataRoute.Sitemap = [...stateSlugSet].sort().map((stateSlug) => ({
+    url: `${BASE_URL}/clinics/state/${stateSlug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  }))
+
   // Fetch distinct months for news archives
   const { data: newsDates } = await supabase
     .from("news_articles")
@@ -247,6 +301,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...leaderPages,
     ...presentationPages,
     ...spotlightPages,
+    ...clinicPages,
+    ...clinicStatePages,
     ...newsArchivePages,
   ]
 }
