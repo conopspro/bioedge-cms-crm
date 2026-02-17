@@ -80,16 +80,40 @@ interface Pagination {
   totalPages: number
 }
 
+// Metro area suggestions for the location input
+const METRO_SUGGESTIONS = [
+  "New York metro area",
+  "Los Angeles metro area",
+  "Chicago metro area",
+  "Dallas-Fort Worth metro area",
+  "Houston metro area",
+  "San Francisco Bay Area",
+  "Greater Boston",
+  "Greater Miami",
+  "Greater Phoenix",
+  "Greater Seattle",
+  "Denver metro area",
+  "Atlanta metro area",
+  "San Diego metro area",
+  "Minneapolis-St. Paul",
+  "Tampa Bay Area",
+  "Austin, TX",
+  "Nashville, TN",
+  "Scottsdale, AZ",
+]
+
 export default function DiscoverClinicsPage() {
   // Search state
-  const [searchTag, setSearchTag] = useState("")
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
   const [searchLocation, setSearchLocation] = useState("")
   const [searching, setSearching] = useState(false)
   const [searchResult, setSearchResult] = useState<{
     inserted: number
     skipped: number
+    tagsSearched: number
     nextPageToken: string | null
   } | null>(null)
+  const [searchProgress, setSearchProgress] = useState<string | null>(null)
   const [pageToken, setPageToken] = useState<string | null>(null)
 
   // Queue state
@@ -134,35 +158,82 @@ export default function DiscoverClinicsPage() {
     fetchQueue()
   }, [fetchQueue])
 
-  // Search Google Places
+  // Toggle a tag on/off
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) => {
+      const next = new Set(prev)
+      if (next.has(tag)) next.delete(tag)
+      else next.add(tag)
+      return next
+    })
+  }
+
+  const selectAllTags = () => {
+    if (selectedTags.size === TAG_PRESETS.length) {
+      setSelectedTags(new Set())
+    } else {
+      setSelectedTags(new Set(TAG_PRESETS))
+    }
+  }
+
+  // Search Google Places — loops through each selected tag sequentially
   const handleSearch = async (nextPage = false) => {
-    if (!searchTag || !searchLocation) return
+    if (selectedTags.size === 0 || !searchLocation) return
     setSearching(true)
     setSearchResult(null)
-    try {
-      const res = await fetch("/api/clinics/search-places", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tag: searchTag,
-          location: searchLocation,
-          pageToken: nextPage ? pageToken : undefined,
-        }),
-      })
-      if (res.ok) {
-        const result = await res.json()
-        setSearchResult(result)
-        setPageToken(result.nextPageToken)
-        fetchQueue(1)
-      } else {
-        const err = await res.json()
-        alert(err.error || "Search failed")
+    setSearchProgress(null)
+
+    const tags = Array.from(selectedTags)
+    let totalInserted = 0
+    let totalSkipped = 0
+    let lastNextPageToken: string | null = null
+
+    for (let i = 0; i < tags.length; i++) {
+      const tag = tags[i]
+      setSearchProgress(`Searching "${tag}" (${i + 1}/${tags.length})...`)
+
+      try {
+        const res = await fetch("/api/clinics/search-places", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tag,
+            location: searchLocation,
+            pageToken: nextPage && i === 0 ? pageToken : undefined,
+          }),
+        })
+        if (res.ok) {
+          const result = await res.json()
+          totalInserted += result.inserted
+          totalSkipped += result.skipped
+          // Only track nextPageToken for single-tag searches
+          if (tags.length === 1) {
+            lastNextPageToken = result.nextPageToken
+          }
+        } else {
+          const err = await res.json()
+          console.error(`Search failed for "${tag}":`, err.error)
+        }
+      } catch {
+        console.error(`Search failed for "${tag}"`)
       }
-    } catch {
-      alert("Search failed")
-    } finally {
-      setSearching(false)
+
+      // Small delay between tags to avoid rate limiting
+      if (i < tags.length - 1) {
+        await new Promise((r) => setTimeout(r, 500))
+      }
     }
+
+    setSearchResult({
+      inserted: totalInserted,
+      skipped: totalSkipped,
+      tagsSearched: tags.length,
+      nextPageToken: lastNextPageToken,
+    })
+    setPageToken(lastNextPageToken)
+    setSearchProgress(null)
+    setSearching(false)
+    fetchQueue(1)
   }
 
   // Bulk actions
@@ -317,43 +388,75 @@ export default function DiscoverClinicsPage() {
       {/* Search Panel */}
       <div className="rounded-lg border bg-card p-6">
         <h2 className="text-lg font-semibold mb-4">Search Google Places</h2>
-        <div className="flex flex-wrap items-end gap-4">
-          <div className="flex-1 min-w-[200px]">
-            <label className="text-sm font-medium mb-1 block">Tag / Category</label>
-            <Select value={searchTag} onValueChange={setSearchTag}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a tag preset..." />
-              </SelectTrigger>
-              <SelectContent>
-                {TAG_PRESETS.map((tag) => (
-                  <SelectItem key={tag} value={tag}>
-                    {tag}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+
+        {/* Tag Multi-Select */}
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-sm font-medium">Tags / Categories</label>
+            <button
+              type="button"
+              onClick={selectAllTags}
+              className="text-xs text-electric-blue hover:underline"
+            >
+              {selectedTags.size === TAG_PRESETS.length ? "Deselect All" : "Select All"}
+            </button>
           </div>
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex flex-wrap gap-2">
+            {TAG_PRESETS.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onClick={() => toggleTag(tag)}
+                className={`inline-flex items-center rounded-full px-3 py-1.5 text-xs font-medium transition-colors border ${
+                  selectedTags.has(tag)
+                    ? "bg-electric-blue text-white border-electric-blue"
+                    : "bg-background text-foreground border-border hover:border-electric-blue/50 hover:bg-muted"
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+          {selectedTags.size > 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              {selectedTags.size} tag{selectedTags.size !== 1 ? "s" : ""} selected
+              {selectedTags.size > 1 && " — each tag will be searched separately"}
+            </p>
+          )}
+        </div>
+
+        {/* Location + Search */}
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="flex-1 min-w-[300px]">
             <label className="text-sm font-medium mb-1 block">Location</label>
             <input
               type="text"
-              placeholder='e.g., "Austin, TX" or "Los Angeles, CA"'
+              placeholder='City, state, or metro area (e.g., "San Francisco Bay Area")'
               value={searchLocation}
               onChange={(e) => setSearchLocation(e.target.value)}
               className="w-full rounded-md border bg-background px-3 py-2 text-sm"
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              list="metro-suggestions"
             />
+            <datalist id="metro-suggestions">
+              {METRO_SUGGESTIONS.map((m) => (
+                <option key={m} value={m} />
+              ))}
+            </datalist>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Tip: Use metro areas for broader coverage (e.g., &quot;Dallas-Fort Worth metro area&quot;, &quot;Greater Boston&quot;, &quot;San Francisco Bay Area&quot;)
+            </p>
           </div>
           <Button
             onClick={() => handleSearch()}
-            disabled={searching || !searchTag || !searchLocation}
+            disabled={searching || selectedTags.size === 0 || !searchLocation}
           >
             {searching ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Search className="mr-2 h-4 w-4" />
             )}
-            {searching ? "Searching..." : "Search"}
+            {searching ? (searchProgress || "Searching...") : "Search"}
           </Button>
         </div>
 
@@ -361,11 +464,14 @@ export default function DiscoverClinicsPage() {
         {searchResult && (
           <div className="mt-4 flex items-center gap-4">
             <p className="text-sm">
+              {searchResult.tagsSearched > 1 && (
+                <span className="text-muted-foreground">{searchResult.tagsSearched} tags searched — </span>
+              )}
               <span className="font-medium text-green-600">{searchResult.inserted} new</span>{" "}
               added to queue,{" "}
               <span className="text-muted-foreground">{searchResult.skipped} already in database</span>
             </p>
-            {searchResult.nextPageToken && (
+            {searchResult.nextPageToken && selectedTags.size === 1 && (
               <Button
                 variant="outline"
                 size="sm"
