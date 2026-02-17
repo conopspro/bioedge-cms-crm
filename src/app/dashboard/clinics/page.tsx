@@ -14,6 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Upload,
+  Download,
+  Globe,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -74,6 +76,36 @@ export default function ClinicsPage() {
   const [stateFilter, setStateFilter] = useState("all")
   const [activeFilter, setActiveFilter] = useState("all")
   const [showUploader, setShowUploader] = useState(false)
+  const [exporting, setExporting] = useState(false)
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      const params = new URLSearchParams()
+      if (searchQuery) params.set("search", searchQuery)
+      if (stateFilter && stateFilter !== "all") params.set("state", stateFilter)
+      if (activeFilter === "active") params.set("active", "true")
+      if (activeFilter === "inactive") params.set("active", "false")
+      const res = await fetch(`/api/clinics/export?${params.toString()}`)
+      if (res.ok) {
+        const blob = await res.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement("a")
+        a.href = url
+        a.download = res.headers.get("Content-Disposition")?.split("filename=")[1]?.replace(/"/g, "") || "clinics-export.csv"
+        document.body.appendChild(a)
+        a.click()
+        a.remove()
+        window.URL.revokeObjectURL(url)
+      } else {
+        alert("Export failed")
+      }
+    } catch {
+      alert("Export failed")
+    } finally {
+      setExporting(false)
+    }
+  }
 
   const fetchClinics = useCallback(
     async (page = 1) => {
@@ -146,6 +178,16 @@ export default function ClinicsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={handleExport} disabled={exporting}>
+            <Download className="mr-2 h-4 w-4" />
+            {exporting ? "Exporting..." : "Export CSV"}
+          </Button>
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/clinics/discover">
+              <Globe className="mr-2 h-4 w-4" />
+              Discover Clinics
+            </Link>
+          </Button>
           <Button
             variant="outline"
             onClick={() => setShowUploader(!showUploader)}

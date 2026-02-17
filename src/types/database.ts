@@ -1568,6 +1568,61 @@ export type ClinicUpdate = Partial<ClinicInsert>
 export type ClinicContactInsert = Omit<ClinicContact, "id" | "created_at">
 
 // ============================================
+// CLINIC DISCOVERY QUEUE
+// ============================================
+
+/** Queue status for clinic discovery */
+export type ClinicQueueStatus = "pending" | "approved" | "rejected" | "imported"
+
+/** Perplexity email lookup status */
+export type ClinicQueuePerplexityStatus = "pending" | "searching" | "found" | "not_found" | "error"
+
+/** A queued clinic from Google Places search, pending review */
+export interface ClinicQueueItem {
+  id: string
+  // Google Places data
+  name: string
+  address: string | null
+  city: string | null
+  state: string | null
+  zip_code: string | null
+  country: string | null
+  latitude: number | null
+  longitude: number | null
+  google_place_id: string
+  google_maps_url: string | null
+  phone: string | null
+  phone_formatted: string | null
+  website: string | null
+  domain: string | null
+  description: string | null
+  google_rating: number | null
+  reviews_count: number
+  photos: string[]
+  // Search context
+  search_tag: string
+  search_location: string
+  search_query: string | null
+  // Perplexity email lookup
+  email: string | null
+  perplexity_status: ClinicQueuePerplexityStatus
+  perplexity_searched_at: string | null
+  // Queue status
+  status: ClinicQueueStatus
+  imported_clinic_id: string | null
+  imported_at: string | null
+  // Timestamps
+  created_at: string
+  updated_at: string
+}
+
+/** Data for inserting a queued clinic */
+export type ClinicQueueInsert = Omit<ClinicQueueItem, "id" | "created_at" | "updated_at">
+
+/** Data for updating a queued clinic */
+export type ClinicQueueUpdate = Partial<ClinicQueueInsert>
+
+// ============================================
 // NEWS ARTICLES (Longevity Newswire)
 // ============================================
 
