@@ -16,6 +16,7 @@ import { HomepageFeaturedCompanies } from "@/components/home/homepage-featured-c
 import { HomepageFeaturedPresentations } from "@/components/home/homepage-featured-presentations"
 import { HomepageFeaturedArticles } from "@/components/home/homepage-featured-articles"
 import { HomepageFeaturedSpotlight } from "@/components/home/homepage-featured-spotlight"
+import { HomepageFeaturedNews } from "@/components/home/homepage-featured-news"
 import { WebSiteJsonLd } from "@/components/seo/json-ld"
 
 /**
@@ -46,6 +47,7 @@ export default async function HomePage() {
     { count: totalPresentationsCount },
     { count: totalArticlesCount },
     { count: totalSpotlightsCount },
+    { data: latestNews },
   ] = await Promise.all([
     // Homepage settings
     supabase
@@ -186,6 +188,14 @@ export default async function HomePage() {
       .from("spotlights")
       .select("id", { count: "exact", head: true })
       .eq("status", "published"),
+
+    // Latest news articles for homepage
+    supabase
+      .from("news_articles")
+      .select("id, title, url, source_name, published_at, summary, edge_categories, biological_systems")
+      .eq("status", "published")
+      .order("published_at", { ascending: false })
+      .limit(3),
   ])
 
   // Prefetch slider data for any slider sections (avoids per-component DB queries)
@@ -356,6 +366,9 @@ export default async function HomePage() {
 
         {/* Dynamic sections */}
         {(sections || []).map(renderSection)}
+
+        {/* Latest news — always at the bottom */}
+        <HomepageFeaturedNews articles={(latestNews || []) as any} />
       </main>
       <PublicFooter navItems={footerNavItems || undefined} />
     </div>
