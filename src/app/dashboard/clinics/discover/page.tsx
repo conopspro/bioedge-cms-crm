@@ -410,7 +410,7 @@ export default function DiscoverClinicsPage() {
       try {
         const params = new URLSearchParams()
         params.set("page", String(page))
-        params.set("limit", "50")
+        params.set("limit", "100")
         if (statusFilter && statusFilter !== "all") params.set("status", statusFilter)
         const res = await fetch(`/api/clinic-queue?${params.toString()}`)
         if (res.ok) {
