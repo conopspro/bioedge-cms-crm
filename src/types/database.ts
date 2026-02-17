@@ -1568,6 +1568,48 @@ export type ClinicUpdate = Partial<ClinicInsert>
 export type ClinicContactInsert = Omit<ClinicContact, "id" | "created_at">
 
 // ============================================
+// NEWS ARTICLES (Longevity Newswire)
+// ============================================
+
+/** Status for news articles */
+export type NewsArticleStatus = "draft" | "published" | "hidden"
+
+/** A news article ingested from an RSS feed and analyzed by AI */
+export interface NewsArticle {
+  id: string
+  title: string
+  url: string                        // original article URL (dedup key)
+  source_name: string                // e.g. "Nature Aging", "Peter Attia MD"
+  source_feed_url: string | null     // the RSS feed it came from
+  published_at: string | null        // article publish date from RSS
+  author: string | null              // article author if available
+
+  // AI-generated fields
+  summary: string | null             // 2-3 sentence summary for the card
+  key_points: string[]               // 3 concise findings (max 12 words each)
+  edge_significance: string | null   // 2-3 sentence EDGE importance analysis
+  edge_categories: EdgeCategory[]    // e.g. ["decode","gain"]
+  biological_systems: BiologicalSystem[] // e.g. ["Circulation","Hormonal"]
+
+  // Raw content for re-analysis
+  raw_content: string | null         // first 4000 chars of article content
+
+  // Admin fields
+  status: NewsArticleStatus
+  ai_model: string | null            // which Claude model analyzed it
+  analyzed_at: string | null         // when AI analysis was run
+
+  created_at: string
+  updated_at: string
+}
+
+/** Data for creating a news article */
+export type NewsArticleInsert = Omit<NewsArticle, "id" | "created_at" | "updated_at">
+
+/** Data for updating a news article */
+export type NewsArticleUpdate = Partial<NewsArticleInsert>
+
+// ============================================
 // IMPORT TYPES
 // ============================================
 

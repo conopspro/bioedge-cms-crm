@@ -5,6 +5,9 @@ import { GeoRedirect } from "@/components/clinics/geo-redirect"
 import { Suspense } from "react"
 import type { Metadata } from "next"
 
+// Revalidate every 60 seconds (matches site-wide pattern)
+export const revalidate = 60
+
 export const metadata: Metadata = {
   title: "Longevity Clinics Directory | bioEDGE",
   description:
@@ -63,13 +66,25 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
   let isProximitySearch = false
   let proximityLabel = ""
 
-  // Total directory count for the hero (unfiltered)
-  const { count: directoryTotal } = await supabase
-    .from("clinics")
-    .select("id", { count: "exact", head: true })
-    .eq("is_active", true)
-    .eq("is_draft", false)
-  const heroTotal = directoryTotal || 0
+  // Total directory count for the hero (unfiltered) + reference data
+  // Run in parallel to minimize latency
+  const [countRes, statesRes, tagsRes] = await Promise.all([
+    supabase
+      .from("clinics")
+      .select("id", { count: "exact", head: true })
+      .eq("is_active", true)
+      .eq("is_draft", false),
+    supabase.rpc("get_clinic_states"),
+    supabase.rpc("get_clinic_tags_count"),
+  ])
+
+  const heroTotal = countRes.count || 0
+  const states = ((statesRes.data || []) as { state: string; clinic_count: number }[]).map(
+    (s) => s.state
+  )
+  const allTags = ((tagsRes.data || []) as { tag: string; count: number }[]).sort((a, b) =>
+    a.tag.localeCompare(b.tag)
+  )
 
   // Determine if this is a proximity search
   let lat = params.lat ? parseFloat(params.lat) : null
@@ -220,10 +235,6 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE)
 
-  // Fetch distinct states via RPC (efficient — returns only distinct values with counts)
-  const { data: statesData } = await supabase.rpc("get_clinic_states")
-  const states = ((statesData || []) as { state: string; clinic_count: number }[]).map((s) => s.state)
-
   // Fetch cities for currently selected state (if any)
   let cities: { city: string; clinic_count: number }[] = []
   if (params.state) {
@@ -232,10 +243,6 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
     })
     cities = (citiesData || []) as { city: string; clinic_count: number }[]
   }
-
-  // Fetch all tags with counts via RPC
-  const { data: tagsData } = await supabase.rpc("get_clinic_tags_count")
-  const allTags = ((tagsData || []) as { tag: string; count: number }[]).sort((a, b) => a.tag.localeCompare(b.tag))
 
   const hasFilters = params.state || params.tag || params.q || params.city || params.zip || params.radius || params.near
 

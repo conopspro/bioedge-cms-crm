@@ -309,6 +309,134 @@ If no relevant people are found, return "NONE".`,
   }
 
   /**
+   * Analyze a news article for the Longevity Newswire
+   *
+   * Evaluates as a "scientific analyst specializing in longevity research"
+   * and returns structured analysis with EDGE Framework mapping.
+   *
+   * @param title - Article title
+   * @param url - Original article URL
+   * @param content - First 4000 chars of article content
+   * @param model - Override model (defaults to current model)
+   */
+  async analyzeNewsArticle(
+    title: string,
+    url: string,
+    content: string,
+    model?: string
+  ): Promise<{
+    summary: string
+    keyPoints: string[]
+    edgeSignificance: string
+    edgeCategories: string[]
+    biologicalSystems: string[]
+  }> {
+    if (!this.client) {
+      throw new Error("Anthropic API key not configured. Set ANTHROPIC_API_KEY environment variable.")
+    }
+
+    const systemPrompt = `You are a sharp, evidence-informed science writer for bioEDGE Longevity. You think through the lens of the EDGE Framework and understand how the body's systems interconnect — but you never lecture about it. You write like a smart friend who reads the research and tells you what actually matters.
+
+Your internal framework (DO NOT name these directly in your writing — let them shape your thinking, not your vocabulary):
+
+EDGE Framework — four layers of health optimization:
+- Eliminate what interferes. Chemical, digital, behavioral. Before you add anything, identify what's getting in the way and stop it. This is where everything starts.
+- Decode your body's signals. Listen to how your fifteen systems communicate. Understand why signals get mislabeled. Improve your ability to interpret what's going on.
+- Gain advantage through strategic optimization. Once interference is eliminated and signals are decoded correctly, specific tools can support your systems. Devices, supplements, foods, hormetic stressors, biohacking practices.
+- Execute with intention and consistency. The best protocol in the world does nothing if you don't implement it. This is the discipline of daily practice, tracked over time, sustained long enough for your body to respond.
+
+The fifteen body systems you think through (never call them "biological systems" or "bioEDGE systems" — just weave them naturally into your analysis when relevant):
+Breath, Circulation, Consciousness, Defense, Detoxification, Digestive, Emotional, Energy Production, Hormonal, Hydration, Nervous System, Regeneration, Stress Response, Structure & Movement, Temperature
+
+You must respond ONLY with valid JSON. No markdown, no backticks, no explanation.`
+
+    const userPrompt = `Analyze this longevity/health article and return a JSON object with these exact fields:
+
+{
+  "summary": "2-3 sentences. What's the finding and why should someone who cares about living longer and better pay attention? Be direct, evidence-informed, and conversational — not academic, not hype.",
+  "keyPoints": ["Finding 1", "Finding 2", "Finding 3"],
+  "longevitySignificance": "2-3 sentences connecting this research to the bigger picture of health optimization. If it relates to removing interference, reading the body's signals, gaining an edge through specific tools, or the discipline of consistent practice — let that thinking show naturally. If the research touches on how the body breathes, circulates, defends, detoxifies, regenerates, or any other core function — mention it conversationally, not as a category label. Write like you're explaining to a smart, motivated person why this matters for their healthspan.",
+  "edgeCategories": ["eliminate", "decode", "gain", "execute"],
+  "biologicalSystems": ["System1", "System2"]
+}
+
+Rules:
+- summary: Direct and conversational. No jargon-heavy academic tone. No hype. Evidence-informed.
+- keyPoints: Exactly 3 concise findings, each MAX 12 words. Start with the most important.
+- longevitySignificance: Write naturally. Don't say "this relates to the Eliminate pillar" or "this connects to the Decode framework." Instead, let the ideas breathe — e.g., "This is the kind of interference worth removing before stacking any new protocol" or "Understanding how your circulation responds to cold exposure gives you a sharper read on what's working."
+- edgeCategories: Tag with ONLY the relevant ones from: eliminate, decode, gain, execute (lowercase). These are metadata tags, not for display in the text.
+- biologicalSystems: Tag with ONLY the relevant ones from: Breath, Circulation, Consciousness, Defense, Detoxification, Digestive, Emotional, Energy Production, Hormonal, Hydration, Nervous System, Regeneration, Stress Response, Structure & Movement, Temperature (exact casing). These are metadata tags, not for display in the text.
+- If the article doesn't clearly relate to any EDGE category or system, use empty arrays.
+
+Article Title: ${title}
+Article URL: ${url}
+
+Content (first 4000 chars):
+${content.slice(0, 4000)}`
+
+    const response = await this.client.messages.create({
+      model: model || this.model,
+      max_tokens: 800,
+      messages: [
+        { role: "user", content: userPrompt },
+      ],
+      system: systemPrompt,
+    })
+
+    const textBlock = response.content.find((block) => block.type === "text")
+    if (!textBlock) {
+      return {
+        summary: "",
+        keyPoints: [],
+        edgeSignificance: "",
+        edgeCategories: [],
+        biologicalSystems: [],
+      }
+    }
+
+    try {
+      // Clean any markdown code block wrapping
+      const cleaned = textBlock.text
+        .replace(/^```json\s*/i, "")
+        .replace(/```\s*$/, "")
+        .trim()
+      const parsed = JSON.parse(cleaned)
+
+      // Validate and sanitize
+      const validEdge = ["eliminate", "decode", "gain", "execute"]
+      const validSystems = [
+        "Breath", "Circulation", "Consciousness", "Defense", "Detoxification",
+        "Digestive", "Emotional", "Energy Production", "Hormonal", "Hydration",
+        "Nervous System", "Regeneration", "Stress Response", "Structure & Movement",
+        "Temperature",
+      ]
+
+      return {
+        summary: String(parsed.summary || "").slice(0, 1000),
+        keyPoints: (parsed.keyPoints || [])
+          .slice(0, 3)
+          .map((p: unknown) => String(p).slice(0, 100)),
+        edgeSignificance: String(parsed.longevitySignificance || parsed.edgeSignificance || "").slice(0, 1000),
+        edgeCategories: (parsed.edgeCategories || []).filter(
+          (c: unknown) => validEdge.includes(String(c).toLowerCase())
+        ).map((c: unknown) => String(c).toLowerCase()),
+        biologicalSystems: (parsed.biologicalSystems || []).filter(
+          (s: unknown) => validSystems.includes(String(s))
+        ),
+      }
+    } catch {
+      console.error("[Anthropic] Failed to parse news analysis JSON:", textBlock.text.slice(0, 200))
+      return {
+        summary: "",
+        keyPoints: [],
+        edgeSignificance: "",
+        edgeCategories: [],
+        biologicalSystems: [],
+      }
+    }
+  }
+
+  /**
    * Generate a warm outreach pitch for a company
    */
   async generateWarmPitch(
