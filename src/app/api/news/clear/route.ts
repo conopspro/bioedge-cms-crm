@@ -3,14 +3,16 @@
  *
  * DELETE /api/news/clear
  *
- * Deletes ALL news articles from the database.
+ * Deletes news articles from the database.
+ * Send { ids: [...] } in the body to delete specific articles.
+ * Send no body (or empty ids) to delete ALL articles.
  * Protected by admin session only.
- * Used when you want to start fresh (e.g., after changing the AI prompt).
  */
 
+import { NextRequest } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
   const supabase = await createClient()
 
   // Auth: admin session only
@@ -19,15 +21,40 @@ export async function DELETE() {
     return Response.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  // Delete all news articles
-  const { error, count } = await supabase
-    .from("news_articles")
-    .delete()
-    .neq("id", "00000000-0000-0000-0000-000000000000") // delete all rows (neq trick)
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 })
+  // Check for specific IDs in the body
+  let ids: string[] = []
+  try {
+    const body = await request.json()
+    if (body.ids && Array.isArray(body.ids) && body.ids.length > 0) {
+      ids = body.ids
+    }
+  } catch {
+    // No body or invalid JSON — delete all
   }
 
-  return Response.json({ deleted: count || 0, message: "All news articles deleted" })
+  if (ids.length > 0) {
+    // Delete specific articles
+    const { error, count } = await supabase
+      .from("news_articles")
+      .delete()
+      .in("id", ids)
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 })
+    }
+
+    return Response.json({ deleted: count || ids.length, message: `${count || ids.length} articles deleted` })
+  } else {
+    // Delete all articles
+    const { error, count } = await supabase
+      .from("news_articles")
+      .delete()
+      .neq("id", "00000000-0000-0000-0000-000000000000")
+
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 })
+    }
+
+    return Response.json({ deleted: count || 0, message: "All news articles deleted" })
+  }
 }

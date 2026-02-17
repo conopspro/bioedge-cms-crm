@@ -67,8 +67,10 @@ export function NewsTable({ articles }: NewsTableProps) {
   const [isIngesting, setIsIngesting] = useState(false)
   const [isTesting, setIsTesting] = useState(false)
   const [isClearing, setIsClearing] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [remaining, setRemaining] = useState(0)
   const [updatingId, setUpdatingId] = useState<string | null>(null)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
 
   // Streaming progress state
   const [progressLog, setProgressLog] = useState<ProgressEvent[]>([])
@@ -122,6 +124,50 @@ export function NewsTable({ articles }: NewsTableProps) {
       alert(`Error: ${err instanceof Error ? err.message : "Unknown"}`)
     } finally {
       setIsClearing(false)
+    }
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) {
+        next.delete(id)
+      } else {
+        next.add(id)
+      }
+      return next
+    })
+  }
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === articles.length) {
+      setSelectedIds(new Set())
+    } else {
+      setSelectedIds(new Set(articles.map((a) => a.id)))
+    }
+  }
+
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return
+    if (!confirm(`Delete ${selectedIds.size} selected article${selectedIds.size > 1 ? "s" : ""}? This cannot be undone.`)) return
+    setIsDeleting(true)
+    try {
+      const res = await fetch("/api/news/clear", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      })
+      const data = await res.json()
+      if (res.ok) {
+        setSelectedIds(new Set())
+        router.refresh()
+      } else {
+        alert(`Error: ${data.error}`)
+      }
+    } catch (err) {
+      alert(`Error: ${err instanceof Error ? err.message : "Unknown"}`)
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -307,6 +353,21 @@ export function NewsTable({ articles }: NewsTableProps) {
         <span className="text-sm text-muted-foreground">
           {articles.length} articles total
         </span>
+
+        {selectedIds.size > 0 && (
+          <button
+            onClick={handleDeleteSelected}
+            disabled={isDeleting || isIngesting || isTesting}
+            className="inline-flex items-center gap-2 rounded-md border border-red-300 px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 transition"
+          >
+            {isDeleting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <Trash2 className="h-4 w-4" />
+            )}
+            {isDeleting ? "Deleting..." : `Delete Selected (${selectedIds.size})`}
+          </button>
+        )}
 
         {articles.length > 0 && (
           <button
@@ -502,6 +563,14 @@ export function NewsTable({ articles }: NewsTableProps) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/30">
+                <th className="w-10 px-4 py-3">
+                  <input
+                    type="checkbox"
+                    checked={articles.length > 0 && selectedIds.size === articles.length}
+                    onChange={toggleSelectAll}
+                    className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/20"
+                  />
+                </th>
                 <th className="px-4 py-3 text-left font-medium text-muted-foreground">
                   Title
                 </th>
@@ -527,7 +596,15 @@ export function NewsTable({ articles }: NewsTableProps) {
             </thead>
             <tbody className="divide-y">
               {articles.map((article) => (
-                <tr key={article.id} className="hover:bg-muted/20 transition">
+                <tr key={article.id} className={`hover:bg-muted/20 transition ${selectedIds.has(article.id) ? "bg-primary/5" : ""}`}>
+                  <td className="w-10 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(article.id)}
+                      onChange={() => toggleSelect(article.id)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/20"
+                    />
+                  </td>
                   <td className="px-4 py-3">
                     <a
                       href={article.url}
