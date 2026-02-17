@@ -61,7 +61,7 @@ function formatDateRange(startDate: string | null, endDate: string | null): stri
  */
 export function PublicHeader({ className, events = [], navItems }: PublicHeaderProps) {
   return (
-    <header className={cn("bg-[#0d598a]", className)}>
+    <header className={cn("sticky top-0 z-50 bg-[#0d598a]", className)}>
       <div className="be-container py-4">
         {/* Top row: Logo left, Events right */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
