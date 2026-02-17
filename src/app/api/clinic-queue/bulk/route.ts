@@ -1,10 +1,11 @@
 import { createClient } from "@/lib/supabase/server"
 import { NextRequest, NextResponse } from "next/server"
 
-function generateSlug(name: string, city?: string | null, state?: string | null): string {
+function generateBaseSlug(name: string, city?: string | null, state?: string | null, zip?: string | null): string {
   const parts = [name]
   if (city) parts.push(city)
   if (state) parts.push(state)
+  if (zip) parts.push(zip)
   return parts
     .join(" ")
     .toLowerCase()
@@ -15,6 +16,37 @@ function generateSlug(name: string, city?: string | null, state?: string | null)
     .replace(/-+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 200)
+}
+
+/**
+ * Generate a unique slug by checking the clinics table.
+ * If "restore-hyper-wellness-austin-tx" exists, tries "-2", "-3", etc.
+ */
+async function generateUniqueSlug(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  name: string,
+  city?: string | null,
+  state?: string | null,
+  zip?: string | null
+): Promise<string> {
+  const base = generateBaseSlug(name, city, state, zip)
+
+  // Check if the base slug is available
+  const { data: existing } = await supabase
+    .from("clinics")
+    .select("slug")
+    .like("slug", `${base}%`)
+
+  const existingSlugs = new Set((existing || []).map((c) => c.slug))
+
+  if (!existingSlugs.has(base)) return base
+
+  // Find next available suffix
+  let suffix = 2
+  while (existingSlugs.has(`${base}-${suffix}`)) {
+    suffix++
+  }
+  return `${base}-${suffix}`
 }
 
 function extractDomain(url: string | null): string | null {
@@ -77,7 +109,7 @@ export async function POST(request: NextRequest) {
 
       for (const item of items || []) {
         try {
-          const slug = generateSlug(item.name, item.city, item.state)
+          const slug = await generateUniqueSlug(supabase, item.name, item.city, item.state, item.zip_code)
           const domain = extractDomain(item.website)
 
           // Insert into clinics table
