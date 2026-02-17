@@ -123,6 +123,33 @@ const COMMON_SLOP_WORDS = [
   "forward-thinking",
 ]
 
+// Metro areas → cities for quick selection
+// Each entry maps a metro name to { states, cities } where cities are just the city name portion
+const METRO_AREAS: Record<string, { states: string[]; cities: string[] }> = {
+  "New York Metro": { states: ["NY", "NJ", "CT"], cities: ["Manhattan", "Brooklyn", "Queens", "Bronx", "Staten Island", "Long Island", "The Hamptons", "White Plains", "Jersey City", "Hoboken", "Newark", "Stamford", "New York", "Yonkers"] },
+  "Los Angeles": { states: ["CA"], cities: ["Los Angeles", "Beverly Hills", "Santa Monica", "West Hollywood", "Pasadena", "Burbank", "Long Beach", "Malibu", "Culver City", "Glendale", "Calabasas", "Manhattan Beach"] },
+  "Chicago": { states: ["IL"], cities: ["Chicago", "Evanston", "Oak Park", "Naperville", "Schaumburg", "Highland Park", "Lake Forest", "Hinsdale", "Winnetka"] },
+  "Dallas-Fort Worth": { states: ["TX"], cities: ["Dallas", "Fort Worth", "Plano", "Frisco", "Arlington", "McKinney", "Southlake", "Allen"] },
+  "Houston": { states: ["TX"], cities: ["Houston", "The Woodlands", "Sugar Land", "Katy", "Pearland", "League City", "Cypress"] },
+  "DC Metro": { states: ["DC", "VA", "MD"], cities: ["Washington", "Arlington", "Alexandria", "Bethesda", "McLean", "Chevy Chase", "Tysons", "Reston", "Rockville"] },
+  "SF Bay Area": { states: ["CA"], cities: ["San Francisco", "Oakland", "San Jose", "Palo Alto", "Berkeley", "Walnut Creek", "Mill Valley", "Sausalito", "Menlo Park", "Mountain View", "Los Gatos", "San Mateo"] },
+  "Miami": { states: ["FL"], cities: ["Miami", "Miami Beach", "Coral Gables", "Fort Lauderdale", "Boca Raton", "West Palm Beach", "Aventura", "Key Biscayne"] },
+  "Boston": { states: ["MA"], cities: ["Boston", "Cambridge", "Brookline", "Newton", "Wellesley", "Concord", "Lexington", "Salem", "Needham"] },
+  "Phoenix": { states: ["AZ"], cities: ["Phoenix", "Scottsdale", "Paradise Valley", "Tempe", "Mesa", "Chandler", "Gilbert", "Peoria"] },
+  "Seattle": { states: ["WA"], cities: ["Seattle", "Bellevue", "Kirkland", "Redmond", "Mercer Island", "Issaquah", "Bothell", "Edmonds"] },
+  "Atlanta": { states: ["GA"], cities: ["Atlanta", "Decatur", "Alpharetta", "Roswell", "Marietta", "Sandy Springs", "Brookhaven"] },
+  "Denver": { states: ["CO"], cities: ["Denver", "Boulder", "Littleton", "Englewood", "Greenwood Village", "Lone Tree", "Parker"] },
+  "Tampa Bay": { states: ["FL"], cities: ["Tampa", "St. Petersburg", "Clearwater", "Sarasota", "Lakewood Ranch", "Brandon", "Wesley Chapel"] },
+  "San Diego": { states: ["CA"], cities: ["San Diego", "La Jolla", "Del Mar", "Encinitas", "Carlsbad", "Coronado", "Chula Vista"] },
+  "Nashville": { states: ["TN"], cities: ["Nashville", "Franklin", "Brentwood", "Murfreesboro", "Hendersonville"] },
+  "Austin": { states: ["TX"], cities: ["Austin", "Round Rock", "Cedar Park", "Lakeway", "Dripping Springs"] },
+  "Raleigh-Durham": { states: ["NC"], cities: ["Raleigh", "Durham", "Chapel Hill", "Cary", "Wake Forest", "Apex"] },
+  "Las Vegas": { states: ["NV"], cities: ["Las Vegas", "Henderson", "Summerlin", "North Las Vegas"] },
+  "Minneapolis-St. Paul": { states: ["MN"], cities: ["Minneapolis", "St. Paul", "Edina", "Wayzata", "Minnetonka", "Bloomington", "Plymouth"] },
+  "Portland": { states: ["OR", "WA"], cities: ["Portland", "Lake Oswego", "Beaverton", "West Linn", "Tigard", "Vancouver"] },
+  "Charlotte": { states: ["NC"], cities: ["Charlotte", "Huntersville", "Cornelius"] },
+}
+
 interface ClinicRow {
   id: string
   name: string
@@ -535,6 +562,67 @@ export default function NewClinicEmailPage() {
               )}
             </div>
           </div>
+
+          {/* Metro area quick-select — show metros whose states overlap with selected states */}
+          {selectedStates.size > 0 && (() => {
+            const relevantMetros = Object.entries(METRO_AREAS).filter(([, metro]) =>
+              metro.states.some(s => selectedStates.has(s))
+            )
+            if (relevantMetros.length === 0) return null
+            return (
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Metro Areas</Label>
+                <div className="flex flex-wrap gap-1.5">
+                  {relevantMetros.map(([metroName, metro]) => {
+                    // Find which of this metro's cities exist in availableCities
+                    const matchingCities = metro.cities.filter(c =>
+                      availableCities.some(ac => ac.toLowerCase() === c.toLowerCase())
+                    )
+                    // Check if all matching cities are already selected
+                    const allSelected = matchingCities.length > 0 && matchingCities.every(c =>
+                      Array.from(selectedCities).some(sc => sc.toLowerCase() === c.toLowerCase())
+                    )
+                    return (
+                      <Button
+                        key={metroName}
+                        variant={allSelected ? "default" : "secondary"}
+                        size="sm"
+                        className="h-7 text-xs"
+                        disabled={matchingCities.length === 0}
+                        onClick={() => {
+                          setAllCitiesSelected(false)
+                          if (allSelected) {
+                            // Deselect all metro cities
+                            setSelectedCities(prev => {
+                              const next = new Set(prev)
+                              matchingCities.forEach(c => {
+                                const match = availableCities.find(ac => ac.toLowerCase() === c.toLowerCase())
+                                if (match) next.delete(match)
+                              })
+                              return next
+                            })
+                          } else {
+                            // Select all metro cities
+                            setSelectedCities(prev => {
+                              const next = new Set(prev)
+                              matchingCities.forEach(c => {
+                                const match = availableCities.find(ac => ac.toLowerCase() === c.toLowerCase())
+                                if (match) next.add(match)
+                              })
+                              return next
+                            })
+                          }
+                        }}
+                      >
+                        {metroName} ({matchingCities.length})
+                      </Button>
+                    )
+                  })}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">Click a metro to select all its cities</p>
+              </div>
+            )
+          })()}
 
           {availableCities.length > 0 && (
             <div>
