@@ -92,30 +92,39 @@ export async function POST(request: NextRequest) {
       const toMergeClinics = []
 
       for (const place of places) {
+        let matched = false
+
+        // Check if already imported into clinics table
         const existingClinic = existingClinicMap.get(place.id)
         if (existingClinic) {
-          // Already imported — merge the new tag if not already present
+          matched = true
           if (!existingClinic.tags.includes(tag)) {
             toMergeClinics.push({
               id: existingClinic.id,
               newTags: [...existingClinic.tags, tag],
             })
-          } else {
-            totalSkipped++
           }
-          continue
         }
 
+        // Also check if still in the queue (could exist alongside an imported clinic)
         const queueEntry = existingQueueMap.get(place.id)
         if (queueEntry) {
-          // Already in queue — check if this tag is new
+          matched = true
           const existingTags = queueEntry.search_tag.split(", ").map((t: string) => t.trim())
           if (!existingTags.includes(tag)) {
             toMerge.push({
               id: queueEntry.id,
               newTag: [...existingTags, tag].join(", "),
             })
-          } else {
+          }
+        }
+
+        if (matched) {
+          // Only count as skipped if tag was already present in ALL matched records
+          if (
+            (!existingClinic || existingClinic.tags.includes(tag)) &&
+            (!queueEntry || queueEntry.search_tag.split(", ").map((t: string) => t.trim()).includes(tag))
+          ) {
             totalSkipped++
           }
           continue
