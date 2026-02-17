@@ -226,22 +226,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
-  // Fetch active clinics
-  const { data: clinicData } = await supabase
-    .from("clinics")
-    .select("slug, state")
-    .eq("is_active", true)
-    .eq("is_draft", false)
-    .not("slug", "is", null)
-
-  const clinicPages: MetadataRoute.Sitemap = (clinicData || []).map((clinic) => ({
-    url: `${BASE_URL}/clinics/${clinic.slug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.5,
-  }))
-
-  // Distinct states for /clinics/state/[state] pages
+  // Fetch distinct states/countries via RPC (avoids pulling 22k+ clinic rows)
   const STATE_ABBREVS: Record<string, string> = {
     "Alabama": "al", "Alaska": "ak", "Arizona": "az", "Arkansas": "ar", "California": "ca",
     "Colorado": "co", "Connecticut": "ct", "Delaware": "de", "Florida": "fl", "Georgia": "ga",
@@ -255,18 +240,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "Virginia": "va", "Washington": "wa", "West Virginia": "wv", "Wisconsin": "wi", "Wyoming": "wy",
     "District of Columbia": "dc",
   }
-  const stateSlugSet = new Set<string>()
-  for (const clinic of clinicData || []) {
-    if (!clinic.state) continue
-    const abbrev = STATE_ABBREVS[clinic.state] || clinic.state.toLowerCase()
-    stateSlugSet.add(abbrev)
-  }
-  const clinicStatePages: MetadataRoute.Sitemap = [...stateSlugSet].sort().map((stateSlug) => ({
-    url: `${BASE_URL}/clinics/state/${stateSlug}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.6,
-  }))
+
+  const { data: clinicStates } = await supabase.rpc("get_clinic_states")
+
+  const clinicStatePages: MetadataRoute.Sitemap = (clinicStates || []).map(
+    (row: { state: string; clinic_count: number }) => {
+      const slug = STATE_ABBREVS[row.state] || row.state.toLowerCase().replace(/\s+/g, "-")
+      return {
+        url: `${BASE_URL}/clinics/state/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      }
+    }
+  )
 
   // Fetch distinct months for news archives
   const { data: newsDates } = await supabase
@@ -301,7 +288,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...leaderPages,
     ...presentationPages,
     ...spotlightPages,
-    ...clinicPages,
     ...clinicStatePages,
     ...newsArchivePages,
   ]

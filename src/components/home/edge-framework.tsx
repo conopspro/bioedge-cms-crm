@@ -166,7 +166,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
                     &ldquo;Meticulous research. Penetrating analysis. Data-driven conclusions. A solid framework for change.&rdquo;
                   </p>
                   <p className="mt-1 text-xs text-white/50">
-                    &mdash; Dr. Michael J. Krentz, Retired
+                    &mdash; Dr. Michael J. Krentz
                   </p>
                 </div>
               </div>
