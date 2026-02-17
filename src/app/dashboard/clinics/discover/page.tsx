@@ -483,10 +483,10 @@ export default function DiscoverClinicsPage() {
         const location = locations[l]
         searchesRun++
 
-        const progress = locations.length > 1
+        const label = locations.length > 1
           ? `"${tag}" in ${location} (${searchesRun}/${totalCombos})`
           : `"${tag}" (${t + 1}/${tags.length})`
-        setSearchProgress(progress)
+        setSearchProgress(label)
 
         try {
           const res = await fetch("/api/clinics/search-places", {
@@ -499,6 +499,13 @@ export default function DiscoverClinicsPage() {
             totalInserted += result.inserted
             totalSkipped += result.skipped
             totalTagsMerged += result.tagsMerged || 0
+
+            // Update running totals in real time
+            const parts = [`${searchesRun}/${totalCombos}`]
+            if (totalInserted > 0) parts.push(`${totalInserted} new`)
+            if (totalTagsMerged > 0) parts.push(`${totalTagsMerged} tags merged`)
+            parts.push(`${totalSkipped} skipped`)
+            setSearchProgress(`${label} — ${parts.slice(1).join(", ")}`)
           } else {
             const err = await res.json()
             console.error(`Search failed for "${tag}" in ${location}:`, err.error)
