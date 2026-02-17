@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next"
 import { createClient } from "@/lib/supabase/server"
+import { getMonthSlug } from "@/lib/news-utils"
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://bioedgelongevity.com"
 
@@ -213,6 +214,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }))
 
+  // Fetch distinct months for news archives
+  const { data: newsDates } = await supabase
+    .from("news_articles")
+    .select("published_at")
+    .eq("status", "published")
+    .not("published_at", "is", null)
+    .order("published_at", { ascending: false })
+
+  const newsMonthSet = new Set<string>()
+  const newsArchivePages: MetadataRoute.Sitemap = []
+  for (const row of newsDates || []) {
+    if (!row.published_at) continue
+    const slug = getMonthSlug(new Date(row.published_at))
+    if (!newsMonthSet.has(slug)) {
+      newsMonthSet.add(slug)
+      newsArchivePages.push({
+        url: `${BASE_URL}/news/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      })
+    }
+  }
+
   return [
     ...staticPages,
     ...systemPages,
@@ -222,5 +247,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...leaderPages,
     ...presentationPages,
     ...spotlightPages,
+    ...newsArchivePages,
   ]
 }

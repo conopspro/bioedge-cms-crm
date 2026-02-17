@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
+import { getMonthSlug, getMonthLabel } from "@/lib/news-utils"
 import { NewsFilters } from "@/components/directory/news-filters"
 import { NewsGrid } from "@/components/directory/news-grid"
+import Link from "next/link"
 import { Suspense } from "react"
 import type { Metadata } from "next"
 
@@ -65,22 +67,45 @@ export default async function NewsPage({ searchParams }: PageProps) {
     query = query.contains("biological_systems", [params.system])
   }
   if (params.q) {
-    query = query.ilike("title", `%${params.q}%`)
+    query = query.or(
+      `title.ilike.%${params.q}%,summary.ilike.%${params.q}%,edge_significance.ilike.%${params.q}%,raw_content.ilike.%${params.q}%`
+    )
   }
 
   const { data } = await query
   const articles = data || []
   const hasMore = articles.length === PAGE_SIZE
 
-  // Get distinct source names for the filter dropdown
-  const { data: sourcesData } = await supabase
-    .from("news_articles")
-    .select("source_name")
-    .eq("status", "published")
+  // Get distinct source names and all published dates (for monthly archives)
+  const [{ data: sourcesData }, { data: datesData }] = await Promise.all([
+    supabase
+      .from("news_articles")
+      .select("source_name")
+      .eq("status", "published"),
+    supabase
+      .from("news_articles")
+      .select("published_at")
+      .eq("status", "published")
+      .not("published_at", "is", null)
+      .order("published_at", { ascending: false }),
+  ])
 
   const sources = [
     ...new Set((sourcesData || []).map((s: { source_name: string }) => s.source_name)),
   ].sort()
+
+  // Build monthly archive list
+  const monthSet = new Set<string>()
+  const months: { slug: string; label: string }[] = []
+  for (const row of datesData || []) {
+    if (!row.published_at) continue
+    const d = new Date(row.published_at)
+    const slug = getMonthSlug(d)
+    if (!monthSet.has(slug)) {
+      monthSet.add(slug)
+      months.push({ slug, label: getMonthLabel(d) })
+    }
+  }
 
   return (
     <div className="min-h-screen bg-off-white">
@@ -122,6 +147,26 @@ export default async function NewsPage({ searchParams }: PageProps) {
             initialHasMore={hasMore}
           />
         </Suspense>
+
+        {/* Monthly Archives */}
+        {months.length > 0 && (
+          <div className="mt-12 border-t border-gray-200 pt-8">
+            <h2 className="mb-4 text-xl font-bold text-navy">
+              Monthly Archives
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {months.map((m) => (
+                <Link
+                  key={m.slug}
+                  href={`/news/${m.slug}`}
+                  className="rounded-lg border border-deep-blue/10 bg-white px-4 py-2 text-sm font-medium text-navy hover:bg-electric-blue hover:text-white transition-colors"
+                >
+                  {m.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </section>
     </div>
   )

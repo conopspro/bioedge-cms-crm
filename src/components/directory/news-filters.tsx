@@ -6,6 +6,8 @@ import { Search } from "lucide-react"
 
 interface NewsFiltersProps {
   sources: string[]
+  /** Base path for filter navigation (defaults to "/news") */
+  basePath?: string
 }
 
 const BIOLOGICAL_SYSTEMS = [
@@ -26,7 +28,7 @@ const BIOLOGICAL_SYSTEMS = [
   "Temperature",
 ]
 
-export function NewsFilters({ sources }: NewsFiltersProps) {
+export function NewsFilters({ sources, basePath = "/news" }: NewsFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [searchInput, setSearchInput] = useState(searchParams.get("q") || "")
@@ -44,7 +46,7 @@ export function NewsFilters({ sources }: NewsFiltersProps) {
         params.delete(key)
       }
       params.delete("page")
-      router.push(`/news?${params.toString()}`)
+      router.push(`${basePath}?${params.toString()}`)
     },
     [router, searchParams]
   )
@@ -59,7 +61,7 @@ export function NewsFilters({ sources }: NewsFiltersProps) {
         params.delete("q")
       }
       params.delete("page")
-      router.push(`/news?${params.toString()}`)
+      router.push(`${basePath}?${params.toString()}`)
     },
     [searchInput, router, searchParams]
   )

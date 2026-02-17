@@ -47,9 +47,11 @@ export async function GET(request: NextRequest) {
     query = query.contains("biological_systems", [system])
   }
 
-  // Text search on title
+  // Text search across title, summary, significance, and content
   if (search) {
-    query = query.ilike("title", `%${search}%`)
+    query = query.or(
+      `title.ilike.%${search}%,summary.ilike.%${search}%,edge_significance.ilike.%${search}%,raw_content.ilike.%${search}%`
+    )
   }
 
   const { data, error } = await query
