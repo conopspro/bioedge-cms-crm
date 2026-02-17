@@ -181,6 +181,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Add clinics as recipients
+    const excludeDays: number | null = typeof body.exclude_recently_emailed_days === "number"
+      ? body.exclude_recently_emailed_days
+      : null
+
+    let excludedCount = 0
+
     if (clinicIds.length > 0) {
       // Fetch clinic details for email and name
       const { data: clinics } = await supabase
@@ -189,8 +195,29 @@ export async function POST(request: NextRequest) {
         .in("id", clinicIds)
 
       if (clinics && clinics.length > 0) {
+        // Exclude clinics that were emailed recently (if requested)
+        let recentlyEmailedIds = new Set<string>()
+        if (excludeDays && excludeDays > 0) {
+          const cutoff = new Date()
+          cutoff.setDate(cutoff.getDate() - excludeDays)
+
+          const { data: recentRecipients } = await supabase
+            .from("clinic_campaign_recipients")
+            .select("clinic_id")
+            .not("sent_at", "is", null)
+            .gte("sent_at", cutoff.toISOString())
+            .in("clinic_id", clinics.map((c) => c.id))
+
+          recentlyEmailedIds = new Set(
+            (recentRecipients || []).map((r) => r.clinic_id)
+          )
+        }
+
+        const eligibleClinics = clinics.filter((c) => !recentlyEmailedIds.has(c.id))
+        excludedCount = clinics.length - eligibleClinics.length
+
         // Also check clinic_contacts for email fallback
-        const clinicIdsWithoutEmail = clinics
+        const clinicIdsWithoutEmail = eligibleClinics
           .filter((c) => !c.email)
           .map((c) => c.id)
 
@@ -212,7 +239,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        const recipientRows = clinics.map((clinic) => ({
+        const recipientRows = eligibleClinics.map((clinic) => ({
           clinic_campaign_id: data.id,
           clinic_id: clinic.id,
           recipient_email: clinic.email || contactEmailMap.get(clinic.id) || null,
@@ -221,17 +248,19 @@ export async function POST(request: NextRequest) {
           approved: false,
         }))
 
-        const { error: recipError } = await supabase
-          .from("clinic_campaign_recipients")
-          .insert(recipientRows)
+        if (recipientRows.length > 0) {
+          const { error: recipError } = await supabase
+            .from("clinic_campaign_recipients")
+            .insert(recipientRows)
 
-        if (recipError) {
-          console.error("Error adding clinic recipients:", recipError)
+          if (recipError) {
+            console.error("Error adding clinic recipients:", recipError)
+          }
         }
       }
     }
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json({ ...data, excluded_recently_emailed: excludedCount }, { status: 201 })
   } catch (error) {
     console.error("Unexpected error:", error)
     return NextResponse.json(

@@ -105,7 +105,16 @@ You are writing outreach emails on behalf of bioEDGE Longevity Summit to health 
 - NO hype words: revolutionary, groundbreaking, game-changing, transform, supercharge, miracle.
 - NO em dashes, emojis, or exclamation marks.
 - Short paragraphs (2-3 sentences max).
-- This should feel like a quick personal note, not a marketing blast.`)
+- This should feel like a quick personal note, not a marketing blast.
+
+## Personalization Requirements
+
+Every email MUST be tailored to the specific clinic. You will be given details about the clinic including their name, city, and specialties/services. Use them:
+
+1. **Reference their city or region naturally.** Example: "practitioners in the Austin area" or "your Denver clinic". Do NOT just restate their full address.
+2. **Reference their services or specialties.** Connect what they do to what the event covers. Example: if they do peptide therapy, mention relevant sessions or topics. Do NOT list all their services — pick the one or two most relevant to the event.
+3. **Reference their business by name at least once**, ideally in the opening line or subject. Keep it natural — do NOT say "I see you run [clinic name]" or "I noticed your clinic". Instead weave the name in: "Would the team at [clinic name] be interested in..." or use it in the subject line.
+4. **Do NOT fabricate details.** Only reference information actually provided in the clinic context. If no description or specialties are given, keep it general.`)
 
     // Tone override
     if (campaign.tone) {
@@ -212,22 +221,23 @@ ${eventLines}`)
   ): string {
     const parts: string[] = []
 
-    parts.push(`Write a personalized email to this clinic inviting them to attend:`)
+    parts.push(`Write a personalized email to this clinic inviting them to attend. Remember: reference their business name, city, and relevant services naturally in the email.`)
 
-    parts.push(`\n**Clinic:**`)
-    parts.push(`- Name: ${clinic.name}`)
+    parts.push(`\n**Clinic Details (use these to personalize):**`)
+    parts.push(`- Business Name: ${clinic.name}`)
     if (clinic.city && clinic.state) {
-      parts.push(`- Location: ${clinic.city}, ${clinic.state}`)
+      parts.push(`- City & State: ${clinic.city}, ${clinic.state}`)
     } else if (clinic.city || clinic.state) {
       parts.push(`- Location: ${clinic.city || clinic.state}`)
     }
 
     if (clinic.tags.length > 0) {
-      parts.push(`- Specialties/Services: ${clinic.tags.join(", ")}`)
+      parts.push(`- Their Services/Specialties: ${clinic.tags.join(", ")}`)
+      parts.push(`  (Pick the 1-2 most relevant to the event when personalizing)`)
     }
 
     if (clinic.description) {
-      parts.push(`- Description: ${clinic.description}`)
+      parts.push(`- About Them: ${clinic.description}`)
     }
 
     if (clinic.website) {

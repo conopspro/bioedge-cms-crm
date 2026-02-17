@@ -88,6 +88,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     const body = await request.json()
 
     const clinicIds: string[] = body.clinic_ids
+    const excludeDays: number | null = typeof body.exclude_recently_emailed_days === "number"
+      ? body.exclude_recently_emailed_days
+      : null
+
     if (!clinicIds || !Array.isArray(clinicIds) || clinicIds.length === 0) {
       return NextResponse.json(
         { error: "clinic_ids array is required" },
@@ -163,9 +167,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       (existing || []).map((e) => e.clinic_id)
     )
 
-    // Build insert rows, skipping duplicates
+    // Exclude clinics emailed recently (if requested)
+    let recentlyEmailedIds = new Set<string>()
+    let excludedCount = 0
+    if (excludeDays && excludeDays > 0) {
+      const cutoff = new Date()
+      cutoff.setDate(cutoff.getDate() - excludeDays)
+
+      const { data: recentRecipients } = await supabase
+        .from("clinic_campaign_recipients")
+        .select("clinic_id")
+        .not("sent_at", "is", null)
+        .gte("sent_at", cutoff.toISOString())
+        .in("clinic_id", clinics.map((c) => c.id))
+
+      recentlyEmailedIds = new Set(
+        (recentRecipients || []).map((r) => r.clinic_id)
+      )
+    }
+
+    // Build insert rows, skipping duplicates and recently emailed
     const newRecipients = clinics
-      .filter((c) => !existingIds.has(c.id))
+      .filter((c) => !existingIds.has(c.id) && !recentlyEmailedIds.has(c.id))
       .map((c) => ({
         clinic_campaign_id: campaignId,
         clinic_id: c.id,
@@ -175,11 +198,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         approved: false,
       }))
 
+    excludedCount = clinics.filter((c) => recentlyEmailedIds.has(c.id)).length
+
     if (newRecipients.length === 0) {
       return NextResponse.json({
         added: 0,
         skipped: clinics.length,
-        message: "All clinics are already in this campaign",
+        excluded_recently_emailed: excludedCount,
+        message: "All clinics are already in this campaign or were recently emailed",
       })
     }
 
@@ -199,7 +225,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json(
       {
         added: inserted?.length || 0,
-        skipped: clinics.length - (inserted?.length || 0),
+        skipped: clinics.length - (inserted?.length || 0) - excludedCount,
+        excluded_recently_emailed: excludedCount,
         recipients: inserted,
       },
       { status: 201 }

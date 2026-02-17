@@ -186,6 +186,9 @@ export default function NewClinicEmailPage() {
   const [selectedCities, setSelectedCities] = useState<Set<string>>(new Set())
   const [allCitiesSelected, setAllCitiesSelected] = useState(true)
 
+  const [excludeRecentlyEmailed, setExcludeRecentlyEmailed] = useState(true)
+  const [excludeDays, setExcludeDays] = useState(7)
+
   // ── Step 2: Tag filtering ──
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
 
@@ -493,6 +496,7 @@ export default function NewClinicEmailPage() {
           daily_send_limit: dailyLimit,
           track_opens: false,
           track_clicks: false,
+          exclude_recently_emailed_days: excludeRecentlyEmailed ? excludeDays : null,
           event_ids: Array.from(selectedEventIds),
           clinic_ids: Array.from(selectedClinicIds),
         }),
@@ -500,6 +504,9 @@ export default function NewClinicEmailPage() {
 
       if (res.ok) {
         const data = await res.json()
+        if (data.excluded_recently_emailed > 0) {
+          alert(`Campaign created. ${data.excluded_recently_emailed} clinic(s) excluded because they were emailed in the last ${excludeDays} day(s).`)
+        }
         router.push(`/dashboard/clinic-emails/${data.id}`)
       } else {
         const data = await res.json()
@@ -661,6 +668,28 @@ export default function NewClinicEmailPage() {
               )}
             </div>
           )}
+
+          {/* Exclude recently emailed */}
+          <div className="flex items-center gap-3 pt-2 border-t">
+            <Checkbox
+              id="exclude-recent"
+              checked={excludeRecentlyEmailed}
+              onCheckedChange={(checked) => setExcludeRecentlyEmailed(!!checked)}
+            />
+            <Label htmlFor="exclude-recent" className="text-sm font-normal cursor-pointer">
+              Exclude clinics emailed in the last
+            </Label>
+            <Input
+              type="number"
+              value={excludeDays}
+              onChange={(e) => setExcludeDays(Math.max(1, Number(e.target.value) || 7))}
+              className="w-16 h-8 text-sm"
+              min={1}
+              max={90}
+              disabled={!excludeRecentlyEmailed}
+            />
+            <span className="text-sm text-muted-foreground">days</span>
+          </div>
         </CardContent>
       </Card>
 
