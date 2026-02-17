@@ -1623,6 +1623,96 @@ export type ClinicQueueInsert = Omit<ClinicQueueItem, "id" | "created_at" | "upd
 export type ClinicQueueUpdate = Partial<ClinicQueueInsert>
 
 // ============================================
+// CLINIC CAMPAIGNS (Clinic Email Module)
+// ============================================
+
+/** Status for clinic campaigns */
+export type ClinicCampaignStatus = "draft" | "generating" | "ready" | "sending" | "paused" | "completed"
+
+/** Status for clinic campaign recipients */
+export type ClinicCampaignRecipientStatus =
+  | "pending"
+  | "generated"
+  | "approved"
+  | "sent"
+  | "delivered"
+  | "opened"
+  | "clicked"
+  | "bounced"
+  | "failed"
+  | "suppressed"
+
+/** Clinic campaign — outreach to clinics for event attendance */
+export interface ClinicCampaign {
+  id: string
+  name: string
+  status: ClinicCampaignStatus
+  // Sender
+  sender_profile_id: string | null
+  reply_to: string | null
+  // Targeting
+  target_states: string[]
+  target_cities: string[]
+  target_tags: string[]
+  // AI generation
+  purpose: string | null
+  tone: string | null
+  context: string | null
+  must_include: string | null
+  must_avoid: string | null
+  call_to_action: string | null
+  reference_email: string | null
+  max_words: number
+  subject_prompt: string | null
+  // Send pacing
+  send_window_start: number
+  send_window_end: number
+  min_delay_seconds: number
+  max_delay_seconds: number
+  daily_send_limit: number
+  // Tracking
+  track_opens: boolean
+  track_clicks: boolean
+  // Timestamps
+  created_at: string
+  updated_at: string
+}
+
+/** Clinic campaign recipient — one email to one clinic */
+export interface ClinicCampaignRecipient {
+  id: string
+  clinic_campaign_id: string
+  clinic_id: string
+  recipient_email: string | null
+  recipient_name: string | null
+  subject: string | null
+  body: string | null
+  body_html: string | null
+  status: ClinicCampaignRecipientStatus
+  approved: boolean
+  generated_at: string | null
+  sent_at: string | null
+  delivered_at: string | null
+  opened_at: string | null
+  clicked_at: string | null
+  resend_id: string | null
+  error: string | null
+  created_at: string
+}
+
+/** Clinic campaign ↔ event junction */
+export interface ClinicCampaignEvent {
+  id: string
+  clinic_campaign_id: string
+  event_id: string
+  created_at: string
+}
+
+/** Insert types */
+export type ClinicCampaignInsert = Omit<ClinicCampaign, "id" | "created_at" | "updated_at">
+export type ClinicCampaignRecipientInsert = Omit<ClinicCampaignRecipient, "id" | "created_at">
+
+// ============================================
 // NEWS ARTICLES (Longevity Newswire)
 // ============================================
 

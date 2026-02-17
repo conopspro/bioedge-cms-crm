@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server"
  * POST /api/webhooks/resend
  *
  * Resend webhook endpoint for delivery event tracking.
- * Updates campaign_recipients status based on email events.
+ * Updates campaign_recipients (and clinic_campaign_recipients) status based on email events.
  *
  * Events handled:
  * - email.delivered → delivered
@@ -13,6 +13,9 @@ import { NextRequest, NextResponse } from "next/server"
  * - email.clicked → clicked
  * - email.bounced → bounced
  * - email.complained → failed (spam complaint)
+ *
+ * Looks up resend_id in campaign_recipients first, then falls back to
+ * clinic_campaign_recipients for clinic outreach emails.
  *
  * Setup: Configure this URL in Resend dashboard → Webhooks
  */
@@ -101,20 +104,40 @@ export async function POST(request: NextRequest) {
     }
 
     if (updateData) {
-      const { error } = await supabase
+      // Try campaign_recipients first
+      const { data: campaignMatch, error: campaignError } = await supabase
         .from("campaign_recipients")
         .update(updateData)
         .eq("resend_id", resendId)
+        .select("id")
 
-      if (error) {
+      if (campaignError) {
         console.error(
-          `Resend webhook: failed to update recipient for ${resendId}:`,
-          error
+          `Resend webhook: failed to update campaign_recipients for ${resendId}:`,
+          campaignError
         )
+      }
+
+      // If no match in campaign_recipients, try clinic_campaign_recipients
+      if (!campaignMatch || campaignMatch.length === 0) {
+        const { data: clinicMatch, error: clinicError } = await supabase
+          .from("clinic_campaign_recipients")
+          .update(updateData)
+          .eq("resend_id", resendId)
+          .select("id")
+
+        if (clinicError) {
+          console.error(
+            `Resend webhook: failed to update clinic_campaign_recipients for ${resendId}:`,
+            clinicError
+          )
+        } else if (clinicMatch && clinicMatch.length > 0) {
+          console.log(`Resend webhook: ${type} for ${resendId} (clinic campaign)`)
+        } else {
+          console.warn(`Resend webhook: no recipient found for resend_id ${resendId}`)
+        }
       } else {
-        console.log(
-          `Resend webhook: ${type} for ${resendId}`
-        )
+        console.log(`Resend webhook: ${type} for ${resendId}`)
       }
     }
 

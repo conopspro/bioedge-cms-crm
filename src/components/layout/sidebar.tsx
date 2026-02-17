@@ -21,6 +21,7 @@ import {
   Mail,
   Contact,
   MapPin,
+  Send,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -88,6 +89,11 @@ const toolsNavItems = [
     label: "Campaigns",
     href: "/dashboard/campaigns",
     icon: Mail,
+  },
+  {
+    label: "Clinic Emails",
+    href: "/dashboard/clinic-emails",
+    icon: Send,
   },
   {
     label: "Research Company",
