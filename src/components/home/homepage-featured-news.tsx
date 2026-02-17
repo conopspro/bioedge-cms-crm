@@ -25,9 +25,6 @@ export function HomepageFeaturedNews({ articles }: HomepageFeaturedNewsProps) {
     <section className="bg-off-white py-12 px-8">
       <div className="mx-auto max-w-[1200px]">
         <div className="mb-10 text-center">
-          <span className="mb-4 inline-block rounded px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white bg-electric-blue">
-            News
-          </span>
           <h2 className="text-[30px] font-bold tracking-wide text-navy">
             <Link href="/news" className="hover:text-electric-blue transition-colors">
               Longevity News

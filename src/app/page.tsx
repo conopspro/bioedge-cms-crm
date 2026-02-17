@@ -192,7 +192,7 @@ export default async function HomePage() {
     // Latest news articles for homepage
     supabase
       .from("news_articles")
-      .select("id, title, url, source_name, published_at, summary, edge_categories, biological_systems")
+      .select("id, title, url, source_name, published_at, summary, key_points, edge_significance, edge_categories, biological_systems")
       .eq("status", "published")
       .order("published_at", { ascending: false })
       .limit(3),
