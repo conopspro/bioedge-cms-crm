@@ -224,12 +224,8 @@ export default function NewClinicEmailPage() {
       const res = await fetch("/api/clinics?distinct=states")
       if (res.ok) {
         const data = await res.json()
-        // Extract unique states from clinics
-        const states: string[] = [...new Set(
-          (data || [])
-            .map((c: { state: string | null }) => c.state)
-            .filter(Boolean)
-        )].sort() as string[]
+        // API returns a flat array of state strings
+        const states: string[] = (data || []).filter(Boolean).sort()
         setAvailableStates(states)
       }
     } catch {
@@ -267,11 +263,8 @@ export default function NewClinicEmailPage() {
       const res = await fetch(`/api/clinics?distinct=cities&${stateParams}`)
       if (res.ok) {
         const data = await res.json()
-        const cities: string[] = [...new Set(
-          (data || [])
-            .map((c: { city: string | null }) => c.city)
-            .filter(Boolean)
-        )].sort() as string[]
+        // API returns a flat array of city strings
+        const cities: string[] = (data || []).filter(Boolean).sort()
         setAvailableCities(cities)
       }
     } catch {
