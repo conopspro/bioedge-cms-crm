@@ -89,7 +89,7 @@ export function NewsGrid({ initialArticles, initialHasMore }: NewsGridProps) {
 
   return (
     <>
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-6">
         {articles.map((article) => (
           <NewsCard key={article.id} article={article} />
         ))}
