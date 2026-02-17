@@ -940,9 +940,13 @@ export default function DiscoverClinicsPage() {
                         {statusBadge(item.status)}
                       </TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="text-xs">
-                          {item.search_tag}
-                        </Badge>
+                        <div className="flex flex-wrap gap-1">
+                          {item.search_tag.split(", ").map((t: string) => (
+                            <Badge key={t} variant="outline" className="text-xs">
+                              {t.trim()}
+                            </Badge>
+                          ))}
+                        </div>
                       </TableCell>
                     </TableRow>
                   )
