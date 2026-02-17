@@ -4,7 +4,7 @@
  * GET  /api/news/ingest — called by Vercel cron (Authorization: Bearer CRON_SECRET)
  * POST /api/news/ingest — called by dashboard manual trigger (admin session)
  *
- * Fetches all 13 RSS feeds, deduplicates against existing articles,
+ * Fetches all 12 RSS feeds, deduplicates against existing articles,
  * runs Claude AI analysis on new articles, and inserts into news_articles.
  *
  * Streams progress events as newline-delimited JSON so the dashboard

@@ -32,7 +32,7 @@ export interface FeedItem {
 }
 
 /**
- * The 13 curated longevity RSS feed sources
+ * The 12 curated longevity RSS feed sources
  */
 export const FEED_SOURCES: FeedSource[] = [
   { name: "LifeSpan.io", url: "https://www.lifespan.io/feed" },
@@ -42,7 +42,6 @@ export const FEED_SOURCES: FeedSource[] = [
   { name: "Nature - npj Aging", url: "https://www.nature.com/npjamd.rss" },
   { name: "Neuroscience News", url: "https://neurosciencenews.com/neuroscience-terms/longevity/feed" },
   { name: "Peter Attia MD", url: "https://peterattiamd.com/feed" },
-  { name: "Princeton Longevity Center", url: "https://princetonlongevitycenter.com/feed" },
   {
     name: "SAGE Research on Aging",
     url: "https://journals.sagepub.com/action/showFeed?ui=0&mi=ehikzz&ai=2b4&jc=jaga&type=etoc&feed=rss",
