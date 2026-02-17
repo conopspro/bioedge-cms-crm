@@ -36,24 +36,36 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-// Tag presets for Google Places search
+// Tag presets for Google Places search (alphabetical)
 const TAG_PRESETS = [
-  "Longevity Clinic",
-  "Functional Medicine",
   "Anti-Aging Clinic",
   "Biohacking",
   "Cryotherapy",
-  "IV Therapy",
-  "NAD+ Therapy",
-  "Peptide Therapy",
-  "Stem Cell Therapy",
+  "EBO2",
+  "Exosome Therapy",
+  "Functional Medicine",
+  "Functional Neurology",
   "Hormone Therapy",
-  "Wellness Spa",
-  "Med Spa",
-  "Integrative Medicine",
-  "Regenerative Medicine",
   "Hyperbaric Oxygen Therapy",
+  "Integrative Medicine",
+  "IV Therapy",
+  "Longevity Clinic",
+  "Med Spa",
+  "Methylene Blue Therapy",
+  "Microcurrent Therapy",
+  "NAD+ Therapy",
+  "Ozone Therapy",
+  "PEMF Therapy",
+  "Peptide Therapy",
+  "PRP Therapy",
   "Red Light Therapy",
+  "Regenerative Medicine",
+  "Shockwave Therapy",
+  "Stem Cell Therapy",
+  "Structural Therapy",
+  "Vibroacoustic Therapy",
+  "VO2 Max Testing",
+  "Wellness Spa",
 ]
 
 // Metro sub-areas: when a user picks a metro, we search each sub-area separately
