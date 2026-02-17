@@ -66,14 +66,14 @@ export async function POST(request: NextRequest) {
       // Collect all google_place_ids from results for dedup lookup
       const placeIds = places.map((p) => p.id)
 
-      // Check existing clinics (these are fully skipped — already imported)
+      // Check existing clinics — merge new tag if not already present
       const { data: existingClinics } = await supabase
         .from("clinics")
-        .select("google_place_id")
+        .select("id, google_place_id, tags")
         .in("google_place_id", placeIds)
 
-      const existingClinicIds = new Set(
-        (existingClinics || []).map((c) => c.google_place_id)
+      const existingClinicMap = new Map(
+        (existingClinics || []).map((c) => [c.google_place_id, { id: c.id, tags: c.tags || [] }])
       )
 
       // Check existing queue entries — fetch their current tags so we can merge
@@ -86,13 +86,23 @@ export async function POST(request: NextRequest) {
         (existingQueue || []).map((q) => [q.google_place_id, { id: q.id, search_tag: q.search_tag }])
       )
 
-      // Separate into: new places, places already in queue (merge tags), already imported (skip)
+      // Separate into: new places, places already in queue (merge tags), already imported (merge tags into clinics)
       const newPlaces = []
       const toMerge = []
+      const toMergeClinics = []
 
       for (const place of places) {
-        if (existingClinicIds.has(place.id)) {
-          totalSkipped++
+        const existingClinic = existingClinicMap.get(place.id)
+        if (existingClinic) {
+          // Already imported — merge the new tag if not already present
+          if (!existingClinic.tags.includes(tag)) {
+            toMergeClinics.push({
+              id: existingClinic.id,
+              newTags: [...existingClinic.tags, tag],
+            })
+          } else {
+            totalSkipped++
+          }
           continue
         }
 
@@ -119,6 +129,18 @@ export async function POST(request: NextRequest) {
         const { error } = await supabase
           .from("clinic_queue")
           .update({ search_tag: item.newTag })
+          .eq("id", item.id)
+
+        if (!error) {
+          totalTagsMerged++
+        }
+      }
+
+      // Merge tags for already-imported clinics
+      for (const item of toMergeClinics) {
+        const { error } = await supabase
+          .from("clinics")
+          .update({ tags: item.newTags })
           .eq("id", item.id)
 
         if (!error) {
