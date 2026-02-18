@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import Link from "next/link"
 import {
   Search,
@@ -402,6 +402,8 @@ export default function DiscoverClinicsPage() {
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [bulkProcessing, setBulkProcessing] = useState(false)
   const [lookupProgress, setLookupProgress] = useState<string | null>(null)
+  const [allProgress, setAllProgress] = useState<string | null>(null)
+  const abortRef = useRef(false)
 
   // Fetch queue
   const fetchQueue = useCallback(
@@ -613,6 +615,141 @@ export default function DiscoverClinicsPage() {
     setSelected(new Set())
     fetchQueue(pagination.page)
     alert(`Email lookup complete: ${totalFound} found out of ${totalProcessed} processed`)
+  }
+
+  // Lookup ALL emails (server-side batching, no selection needed)
+  const handleLookupAllEmails = async () => {
+    if (!confirm("This will look up emails for ALL pending queue items with websites. This may use significant Perplexity API credits. Continue?")) return
+
+    setBulkProcessing(true)
+    abortRef.current = false
+    let totalProcessed = 0
+    let totalFound = 0
+    let totalNotFound = 0
+    let totalErrors = 0
+    let remaining = -1
+
+    while (remaining !== 0 && !abortRef.current) {
+      try {
+        setAllProgress(
+          remaining > 0
+            ? `Looking up emails: ${totalProcessed} done, ${totalFound} found, ${remaining} remaining...`
+            : `Looking up emails: starting...`
+        )
+
+        const res = await fetch("/api/clinic-queue/lookup-email-all", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ batchSize: 10 }),
+        })
+
+        if (!res.ok) {
+          const err = await res.json()
+          alert(`Error: ${err.error || "Unknown error"}`)
+          break
+        }
+
+        const result = await res.json()
+        totalProcessed += result.processed
+        totalFound += result.found
+        totalNotFound += result.notFound
+        totalErrors += result.errors
+        remaining = result.remaining
+
+        setAllProgress(
+          `Looking up emails: ${totalProcessed} done, ${totalFound} found, ${remaining} remaining...`
+        )
+
+        if (remaining === 0) break
+
+        // Brief pause between batches
+        await new Promise((r) => setTimeout(r, 1000))
+      } catch {
+        alert("Email lookup failed unexpectedly")
+        break
+      }
+    }
+
+    setAllProgress(null)
+    setBulkProcessing(false)
+    abortRef.current = false
+    fetchQueue(pagination.page)
+    alert(
+      `Email lookup complete!\n\n${totalProcessed} processed\n${totalFound} emails found\n${totalNotFound} not found\n${totalErrors} errors`
+    )
+  }
+
+  // Approve ALL pending queue items (server-side batching)
+  const handleApproveAll = async (filterPerplexity?: string) => {
+    const label = filterPerplexity === "found"
+      ? "ALL pending items with found emails"
+      : "ALL pending items"
+    if (!confirm(`Approve and import ${label} into the clinics table? This cannot be undone.`)) return
+
+    setBulkProcessing(true)
+    abortRef.current = false
+    let totalProcessed = 0
+    let totalErrors: string[] = []
+    let remaining = -1
+
+    while (remaining !== 0 && !abortRef.current) {
+      try {
+        setAllProgress(
+          remaining > 0
+            ? `Approving: ${totalProcessed} imported, ${remaining} remaining...`
+            : `Approving: starting...`
+        )
+
+        const res = await fetch("/api/clinic-queue/bulk-all", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "approve",
+            batchSize: 50,
+            ...(filterPerplexity ? { filter: { perplexity_status: filterPerplexity } } : {}),
+          }),
+        })
+
+        if (!res.ok) {
+          const err = await res.json()
+          alert(`Error: ${err.error || "Unknown error"}`)
+          break
+        }
+
+        const result = await res.json()
+        totalProcessed += result.processed
+        totalErrors = totalErrors.concat(result.errors || [])
+        remaining = result.remaining
+
+        setAllProgress(
+          `Approving: ${totalProcessed} imported, ${remaining} remaining...`
+        )
+
+        if (remaining === 0) break
+      } catch {
+        alert("Approve all failed unexpectedly")
+        break
+      }
+    }
+
+    setAllProgress(null)
+    setBulkProcessing(false)
+    abortRef.current = false
+    setSelected(new Set())
+    fetchQueue(pagination.page)
+
+    if (totalErrors.length > 0) {
+      alert(
+        `Approved ${totalProcessed} items with ${totalErrors.length} errors:\n${totalErrors.slice(0, 5).join("\n")}${totalErrors.length > 5 ? `\n... and ${totalErrors.length - 5} more` : ""}`
+      )
+    } else {
+      alert(`Successfully imported ${totalProcessed} clinics!`)
+    }
+  }
+
+  // Stop an in-progress "all" operation
+  const handleStopAll = () => {
+    abortRef.current = true
   }
 
   // Toggle selection
@@ -857,6 +994,53 @@ export default function DiscoverClinicsPage() {
           {pagination.total.toLocaleString()} items in queue
         </span>
       </div>
+
+      {/* Bulk "All" Actions Bar */}
+      {pagination.total > 0 && statusFilter === "pending" && (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border bg-blue-50 dark:bg-blue-950/20 px-4 py-3">
+          {allProgress ? (
+            <>
+              <Loader2 className="h-4 w-4 animate-spin text-electric-blue" />
+              <span className="text-sm font-medium flex-1">{allProgress}</span>
+              <Button size="sm" variant="outline" onClick={handleStopAll}>
+                Stop
+              </Button>
+            </>
+          ) : (
+            <>
+              <span className="text-sm font-medium text-muted-foreground">
+                Bulk actions (all {pagination.total.toLocaleString()} pending):
+              </span>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleLookupAllEmails}
+                disabled={bulkProcessing}
+              >
+                <Mail className="mr-1 h-3.5 w-3.5" />
+                Lookup All Emails
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => handleApproveAll("found")}
+                disabled={bulkProcessing}
+              >
+                <Check className="mr-1 h-3.5 w-3.5" />
+                Approve All (with email)
+              </Button>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => handleApproveAll()}
+                disabled={bulkProcessing}
+              >
+                <Check className="mr-1 h-3.5 w-3.5" />
+                Approve All
+              </Button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Queue Table */}
       {loading ? (
