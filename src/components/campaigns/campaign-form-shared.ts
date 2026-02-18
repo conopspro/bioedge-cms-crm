@@ -107,6 +107,7 @@ export const COMMON_SLOP = [
   "unlock", "groundbreaking", "unleash", "revolutionary",
   "cutting-edge", "game-changing", "synergy", "leverage",
   "disrupt", "innovate", "empower", "transform",
+  "biohacker", "biohacking", "hacking", "hack",
 ]
 
 export function formatEventDateRange(startDate: string | null, endDate: string | null): string {

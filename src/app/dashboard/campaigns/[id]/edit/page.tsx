@@ -265,6 +265,7 @@ export default function EditCampaignPage() {
     try {
       const body: Record<string, unknown> = pacingOnly
         ? {
+            name: form.name,
             send_window_start: form.send_window_start,
             send_window_end: form.send_window_end,
             min_delay_seconds: form.min_delay_seconds,
@@ -340,6 +341,25 @@ export default function EditCampaignPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl">
+        {/* Campaign name is always editable */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Campaign Name</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Label htmlFor="name">Name *</Label>
+              <Input
+                id="name"
+                placeholder='e.g. "Longevity Summit 2026 Outreach"'
+                value={form.name}
+                onChange={(e) => updateField("name", e.target.value)}
+                required
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Only show content cards for draft campaigns */}
         {!pacingOnly && (
           <>
@@ -352,17 +372,6 @@ export default function EditCampaignPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Campaign Name *</Label>
-                  <Input
-                    id="name"
-                    placeholder='e.g. "Longevity Summit 2026 Outreach"'
-                    value={form.name}
-                    onChange={(e) => updateField("name", e.target.value)}
-                    required
-                  />
-                </div>
-
                 {/* Event Selector */}
                 <div className="space-y-2">
                   <Label>Events</Label>

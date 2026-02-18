@@ -22,6 +22,7 @@ import {
   Trash2,
   X,
   AlertTriangle,
+  Calendar,
   Eye,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -154,6 +155,9 @@ export default function CampaignDetailPage() {
   const [sending, setSending] = useState(false)
   const [sendProgress, setSendProgress] = useState<{ sent: number; total: number; current: string } | null>(null)
   const sendAbortRef = useRef(false)
+  const [showScheduleForm, setShowScheduleForm] = useState(false)
+  const [scheduledDate, setScheduledDate] = useState("")
+  const [scheduledTime, setScheduledTime] = useState("09:00")
   const [generateProgress, setGenerateProgress] = useState<{ done: number; total: number } | null>(null)
   const generateAbortRef = useRef(false)
 
@@ -398,7 +402,7 @@ export default function CampaignDetailPage() {
     }
   }
 
-  const handleStartSending = async () => {
+  const handleStartSending = async (startNow = false) => {
     const approved = campaign?.campaign_recipients?.filter(
       (r: { status: string }) => r.status === "approved"
     ).length || 0
@@ -406,6 +410,31 @@ export default function CampaignDetailPage() {
 
     setSending(true)
     sendAbortRef.current = false
+    setShowScheduleForm(false)
+
+    // If scheduled for the future, wait until that time
+    if (!startNow && scheduledDate) {
+      const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}:00`)
+      const now = new Date()
+      const waitMs = scheduledDateTime.getTime() - now.getTime()
+      if (waitMs > 0) {
+        setSendProgress({ sent: 0, total: approved, current: `Scheduled: waiting until ${scheduledDateTime.toLocaleString()}...` })
+        // Wait in 30s chunks so we can check for abort
+        const waitUntil = Date.now() + waitMs
+        while (Date.now() < waitUntil && !sendAbortRef.current) {
+          const remaining = waitUntil - Date.now()
+          const mins = Math.ceil(remaining / 60000)
+          setSendProgress({ sent: 0, total: approved, current: `Starts in ${mins} min (${scheduledDateTime.toLocaleString()})` })
+          await new Promise((resolve) => setTimeout(resolve, Math.min(30000, remaining)))
+        }
+        if (sendAbortRef.current) {
+          setSending(false)
+          setSendProgress(null)
+          return
+        }
+      }
+    }
+
     setSendProgress({ sent: 0, total: approved, current: "" })
 
     try {
@@ -429,6 +458,19 @@ export default function CampaignDetailPage() {
           console.error("Send error:", data.error)
           break
         }
+
+        // Outside send window — wait and retry
+        if (data.outside_send_window) {
+          setSendProgress((prev) => ({
+            sent: prev?.sent || 0,
+            total: prev?.total || approved,
+            current: `Paused: ${data.message}`,
+          }))
+          // Wait 5 minutes then check again
+          await new Promise((resolve) => setTimeout(resolve, 5 * 60 * 1000))
+          continue
+        }
+
         if (data.skipped) continue
         if (data.sent) {
           setSendProgress((prev) => ({
@@ -437,8 +479,13 @@ export default function CampaignDetailPage() {
             current: data.contact_name || "",
           }))
 
-          // Brief delay between sends (cap at 10s for browser UX)
-          const delay = Math.min(data.recommended_delay_seconds || 5, 10)
+          // Wait the recommended delay between sends
+          const delay = data.recommended_delay_seconds || 120
+          setSendProgress((prev) => ({
+            sent: prev?.sent || 0,
+            total: prev?.total || approved,
+            current: `Waiting ${delay}s before next send...`,
+          }))
           await new Promise((resolve) => setTimeout(resolve, delay * 1000))
         }
       }
@@ -785,11 +832,53 @@ export default function CampaignDetailPage() {
           </Button>
         )}
 
-        {(campaign.status === "ready" || campaign.status === "paused") && !sending && (
-          <Button onClick={handleStartSending}>
-            <Play className="mr-2 h-4 w-4" />
-            Start Sending
-          </Button>
+        {(campaign.status === "ready" || campaign.status === "paused") && !sending && !showScheduleForm && (
+          <div className="flex items-center gap-2">
+            <Button onClick={() => handleStartSending(true)}>
+              <Play className="mr-2 h-4 w-4" />
+              Send Now
+            </Button>
+            <Button variant="outline" onClick={() => setShowScheduleForm(true)}>
+              <Calendar className="mr-2 h-4 w-4" />
+              Schedule
+            </Button>
+          </div>
+        )}
+
+        {showScheduleForm && !sending && (
+          <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-4 py-3">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Input
+              type="date"
+              value={scheduledDate}
+              onChange={(e) => setScheduledDate(e.target.value)}
+              className="w-40 h-8"
+              min={new Date().toISOString().split("T")[0]}
+            />
+            <Input
+              type="time"
+              value={scheduledTime}
+              onChange={(e) => setScheduledTime(e.target.value)}
+              className="w-32 h-8"
+            />
+            <span className="text-xs text-muted-foreground">local time</span>
+            <Button
+              size="sm"
+              onClick={() => {
+                if (!scheduledDate) {
+                  alert("Please select a date")
+                  return
+                }
+                handleStartSending(false)
+              }}
+            >
+              <Play className="mr-1 h-3 w-3" />
+              Schedule Send
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setShowScheduleForm(false)}>
+              <X className="h-3 w-3" />
+            </Button>
+          </div>
         )}
 
         {sending && (

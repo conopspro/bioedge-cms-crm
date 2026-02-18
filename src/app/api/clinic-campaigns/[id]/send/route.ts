@@ -49,6 +49,29 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       )
     }
 
+    // Enforce send window (EST timezone)
+    const sendWindowStart = campaign.send_window_start ?? 9
+    const sendWindowEnd = campaign.send_window_end ?? 17
+    const nowEST = new Date(new Date().toLocaleString("en-US", { timeZone: "America/New_York" }))
+    const currentHour = nowEST.getHours()
+
+    if (currentHour < sendWindowStart || currentHour >= sendWindowEnd) {
+      let waitUntilHour = sendWindowStart
+      if (currentHour >= sendWindowEnd) {
+        waitUntilHour = sendWindowStart + 24
+      }
+      const hoursToWait = waitUntilHour - currentHour
+      const secondsToWait = hoursToWait * 3600
+
+      return NextResponse.json({
+        outside_send_window: true,
+        current_hour_est: currentHour,
+        send_window: `${sendWindowStart}:00 - ${sendWindowEnd}:00 EST`,
+        retry_after_seconds: secondsToWait,
+        message: `Outside send window (${sendWindowStart}:00 - ${sendWindowEnd}:00 EST). Current time: ${currentHour}:00 EST.`,
+      })
+    }
+
     const senderProfile = campaign.sender_profile
     if (!senderProfile) {
       return NextResponse.json(

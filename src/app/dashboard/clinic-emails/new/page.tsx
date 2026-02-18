@@ -121,6 +121,10 @@ const COMMON_SLOP_WORDS = [
   "thought leadership",
   "mission-driven",
   "forward-thinking",
+  "biohacker",
+  "biohacking",
+  "hacking",
+  "hack",
 ]
 
 // Metro areas → cities for quick selection
