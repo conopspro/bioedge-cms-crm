@@ -552,4 +552,7 @@ export default function HormonalSystemPage() {
 export const metadata = {
   title: "Hormonal System | bioEDGE Decoder",
   description: "Your Body's Orchestra. The Hormonal System orchestrates your biology through chemical messengers—coordinating metabolism, stress response, blood sugar, reproduction, growth, sleep-wake cycles, and mood.",
+  alternates: {
+    canonical: "/systems/hormonal",
+  },
 }

@@ -34,6 +34,9 @@ export async function generateMetadata({
   return {
     title: `Longevity News — ${parsed.label}`,
     description: `Longevity research and health optimization news from ${parsed.label}, curated and analyzed through the EDGE Framework.`,
+    alternates: {
+      canonical: `/news/${monthSlug}`,
+    },
     openGraph: {
       title: `Longevity News — ${parsed.label}`,
       description: `Longevity research and health optimization news from ${parsed.label}.`,

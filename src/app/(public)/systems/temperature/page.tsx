@@ -549,4 +549,7 @@ export const metadata = {
   title: "Temperature System | bioEDGE Decoder",
   description:
     "Your Body's Thermostat. Explore the bioEDGE Decoder framework for understanding heat regulation, cold tolerance, and metabolic temperature.",
+  alternates: {
+    canonical: "/systems/temperature",
+  },
 }

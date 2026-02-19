@@ -550,4 +550,7 @@ export default function EmotionalSystemPage() {
 export const metadata = {
   title: "Emotional System | bioEDGE Decoder",
   description: "Your Body's Meaning Maker. The Emotional System governs the felt experience of being alive—taking raw experience and transforming it into meaning you can feel.",
+  alternates: {
+    canonical: "/systems/emotional",
+  },
 }

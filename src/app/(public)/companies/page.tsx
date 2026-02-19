@@ -6,6 +6,9 @@ import { Suspense } from "react"
 export const metadata = {
   title: "Longevity Solutions",
   description: "Organizations and solutions that support longevity and health optimization.",
+  alternates: {
+    canonical: "/companies",
+  },
   openGraph: {
     title: "Longevity Solutions",
     description: "Organizations and solutions that support longevity and health optimization.",

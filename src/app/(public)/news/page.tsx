@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: "Longevity News",
   description:
     "The latest longevity research, curated and analyzed through the EDGE Framework. Stay informed on breakthroughs in health optimization and aging science.",
+  alternates: {
+    canonical: "/news",
+  },
   openGraph: {
     title: "Longevity News",
     description:

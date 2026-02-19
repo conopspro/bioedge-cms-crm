@@ -582,4 +582,7 @@ export const metadata = {
   title: "Nervous System | bioEDGE Decoder",
   description:
     "Your Body's Communication Network. Explore the bioEDGE Decoder framework for understanding brain-body connection, neural pathways, and signal transmission.",
+  alternates: {
+    canonical: "/systems/nervous-system",
+  },
 }

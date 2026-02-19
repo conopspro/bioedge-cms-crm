@@ -583,4 +583,7 @@ export default function ConsciousnessSystemPage() {
 export const metadata = {
   title: "Consciousness System | bioEDGE Decoder",
   description: "Your Body's Inner Witness. The Consciousness System is your body's capacity for awareness itself: the quality of your attention, the clarity of your inner observation, the degree to which you can witness your own experience.",
+  alternates: {
+    canonical: "/systems/consciousness",
+  },
 }

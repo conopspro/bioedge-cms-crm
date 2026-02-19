@@ -256,4 +256,7 @@ export default function EdgeFrameworkPage() {
 export const metadata = {
   title: "The EDGE Framework | Biological EDGE",
   description: "Eliminate interference, Decode your body's signals, Gain strategic tools, Execute with consistency. A sequential methodology for biological optimization from Biological EDGE: A Practical Guide to Longevity.",
+  alternates: {
+    canonical: "/framework",
+  },
 }

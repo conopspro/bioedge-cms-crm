@@ -6,6 +6,9 @@ import { Suspense } from "react"
 export const metadata = {
   title: "Longevity Spotlight",
   description: "Curated video library featuring the best longevity, biohacking, and health optimization content.",
+  alternates: {
+    canonical: "/spotlight",
+  },
   openGraph: {
     title: "Longevity Spotlight",
     description: "Curated video library featuring the best longevity, biohacking, and health optimization content.",

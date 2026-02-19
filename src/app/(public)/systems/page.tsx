@@ -260,4 +260,7 @@ export default function SystemsIndexPage() {
 export const metadata = {
   title: "15 Biological Systems | bioEDGE Decoder",
   description: "A framework for understanding your body's signals. Each system represents a domain of function that produces observable patterns when supported or stressed.",
+  alternates: {
+    canonical: "/systems",
+  },
 }

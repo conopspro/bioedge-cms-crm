@@ -578,4 +578,7 @@ export const metadata = {
   title: "Regeneration System | bioEDGE Decoder",
   description:
     "Your Body's Rebuild Crew. Explore the bioEDGE Decoder framework for understanding cellular repair, sleep restoration, and recovery processes.",
+  alternates: {
+    canonical: "/systems/regeneration",
+  },
 }

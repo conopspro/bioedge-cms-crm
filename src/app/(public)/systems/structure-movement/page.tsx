@@ -553,4 +553,7 @@ export const metadata = {
   title: "Structure & Movement | bioEDGE Decoder",
   description:
     "Your Body's Living Architecture. Explore the bioEDGE Decoder framework for understanding bones, joints, connective tissue, muscles, and mobility.",
+  alternates: {
+    canonical: "/systems/structure-movement",
+  },
 }

@@ -551,4 +551,7 @@ export default function EnergyProductionSystemPage() {
 export const metadata = {
   title: "Energy Production | bioEDGE Decoder",
   description: "Your Body's Power Grid. The Energy Production system governs mitochondrial function and ATP production—fueling all other systems with the universal energy currency that powers every cellular process.",
+  alternates: {
+    canonical: "/systems/energy-production",
+  },
 }

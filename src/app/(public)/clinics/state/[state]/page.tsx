@@ -31,6 +31,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: `Longevity Clinics in ${stateName} | bioEDGE`,
     description: `Find longevity, anti-aging, and functional medicine clinics in ${stateName}. Browse ratings, services, and contact information.`,
+    alternates: {
+      canonical: `/clinics/state/${stateSlug}`,
+    },
     openGraph: {
       title: `Longevity Clinics in ${stateName}`,
       description: `Find longevity and anti-aging clinics in ${stateName}.`,

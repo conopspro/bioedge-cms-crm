@@ -6,6 +6,9 @@ import { Suspense } from "react"
 export const metadata = {
   title: "Presentations",
   description: "Explore our library of presentations, panels, and talks on longevity and health optimization.",
+  alternates: {
+    canonical: "/presentations",
+  },
   openGraph: {
     title: "Presentations",
     description: "Explore our library of presentations, panels, and talks on longevity and health optimization.",

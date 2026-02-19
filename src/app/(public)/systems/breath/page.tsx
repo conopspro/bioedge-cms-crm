@@ -549,4 +549,7 @@ export default function BreathSystemPage() {
 export const metadata = {
   title: "Breath System | bioEDGE Decoder",
   description: "Your Body's Bridge. The Breath System governs oxygen delivery, carbon dioxide removal, and blood pH regulation. It is the only vital function that operates both automatically and consciously.",
+  alternates: {
+    canonical: "/systems/breath",
+  },
 }

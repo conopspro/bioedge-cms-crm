@@ -568,4 +568,7 @@ export default function CirculationSystemPage() {
 export const metadata = {
   title: "Circulation System | bioEDGE Decoder",
   description: "Your Body's Delivery Network. The Circulation System transports oxygen from lungs to cells, carries nutrients from digestion to where they're needed, and clears metabolic waste.",
+  alternates: {
+    canonical: "/systems/circulation",
+  },
 }

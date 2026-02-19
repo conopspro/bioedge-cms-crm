@@ -559,4 +559,7 @@ export default function DefenseSystemPage() {
 export const metadata = {
   title: "Defense System | bioEDGE Decoder",
   description: "Your Body's Intelligent Shield. The Defense System governs protection against pathogens and the management of inflammation—identifying what doesn't belong, neutralizing threats, and repairing damage.",
+  alternates: {
+    canonical: "/systems/defense",
+  },
 }

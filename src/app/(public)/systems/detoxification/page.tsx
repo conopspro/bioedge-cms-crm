@@ -563,4 +563,7 @@ export default function DetoxificationSystemPage() {
 export const metadata = {
   title: "Detoxification System | bioEDGE Decoder",
   description: "Your Body's Clearing House. The Detoxification System identifies, neutralizes, and eliminates substances that don't belong—governing toxic load and clearance capacity through liver, kidneys, lymph, and skin.",
+  alternates: {
+    canonical: "/systems/detoxification",
+  },
 }

@@ -523,4 +523,7 @@ export const metadata = {
   title: "Hydration System | bioEDGE Decoder",
   description:
     "Your Body's Internal Ocean. Explore the bioEDGE Decoder framework for understanding fluid balance, electrolytes, and cellular hydration signals.",
+  alternates: {
+    canonical: "/systems/hydration",
+  },
 }

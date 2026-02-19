@@ -13,6 +13,9 @@ export const metadata: Metadata = {
   title: "Longevity Clinics Directory | bioEDGE",
   description:
     "Find longevity, anti-aging, and functional medicine clinics near you. Browse our directory of 20,000+ clinics across the US.",
+  alternates: {
+    canonical: "/clinics",
+  },
   openGraph: {
     title: "Longevity Clinics Directory",
     description:

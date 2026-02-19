@@ -557,4 +557,7 @@ export const metadata = {
   title: "Stress Response System | bioEDGE Decoder",
   description:
     "Your Body's Alert System. Explore the bioEDGE Decoder framework for understanding fight or flight, cortisol regulation, and stress adaptation.",
+  alternates: {
+    canonical: "/systems/stress-response",
+  },
 }

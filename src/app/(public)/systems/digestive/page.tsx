@@ -542,4 +542,7 @@ export default function DigestiveSystemPage() {
 export const metadata = {
   title: "Digestive System | bioEDGE Decoder",
   description: "Your Body's Transformation Engine. The Digestive System converts food into nutrients, energy substrates, and signaling molecules—housing 70-80% of your immune system and producing 90% of your serotonin.",
+  alternates: {
+    canonical: "/systems/digestive",
+  },
 }
