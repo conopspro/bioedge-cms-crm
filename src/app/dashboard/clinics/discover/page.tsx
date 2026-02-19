@@ -705,7 +705,7 @@ export default function DiscoverClinicsPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             action: "approve",
-            batchSize: 50,
+            batchSize: 200,
             ...(filterPerplexity ? { filter: { perplexity_status: filterPerplexity } } : {}),
           }),
         })
