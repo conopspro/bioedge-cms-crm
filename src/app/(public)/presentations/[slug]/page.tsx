@@ -44,6 +44,9 @@ export async function generateMetadata({ params }: PresentationPageProps) {
   return {
     title: presentation.title,
     description: presentation.short_description,
+    alternates: {
+      canonical: `/presentations/${slug}`,
+    },
     openGraph: {
       title: presentation.title,
       description: presentation.short_description || undefined,

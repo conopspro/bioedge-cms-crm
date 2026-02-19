@@ -37,6 +37,9 @@ export async function generateMetadata({ params }: ArticlePageProps) {
   return {
     title: article.title,
     description: article.excerpt,
+    alternates: {
+      canonical: `/articles/${slug}`,
+    },
     openGraph: {
       title: article.title,
       description: article.excerpt || undefined,

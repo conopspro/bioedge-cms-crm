@@ -44,6 +44,9 @@ export async function generateMetadata({ params }: SpotlightPageProps) {
   return {
     title: spotlight.title,
     description: spotlight.short_description,
+    alternates: {
+      canonical: `/spotlight/${slug}`,
+    },
     openGraph: {
       title: spotlight.title,
       description: spotlight.short_description || undefined,

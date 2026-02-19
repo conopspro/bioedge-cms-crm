@@ -706,7 +706,7 @@ export async function generateMetadata({ params }: PageProps) {
   let contact = null
   const { data: contactBySlug } = await supabase
     .from("contacts")
-    .select("first_name, last_name, title, bio, avatar_url, linkedin_avatar_url")
+    .select("slug, first_name, last_name, title, bio, avatar_url, linkedin_avatar_url")
     .eq("slug", slug)
     .eq("show_on_articles", true)
     .single()
@@ -716,7 +716,7 @@ export async function generateMetadata({ params }: PageProps) {
   } else {
     const { data: contactById } = await supabase
       .from("contacts")
-      .select("first_name, last_name, title, bio, avatar_url, linkedin_avatar_url")
+      .select("slug, first_name, last_name, title, bio, avatar_url, linkedin_avatar_url")
       .eq("id", slug)
       .eq("show_on_articles", true)
       .single()
@@ -737,6 +737,9 @@ export async function generateMetadata({ params }: PageProps) {
   return {
     title: `${fullName} | Longevity Leaders`,
     description,
+    alternates: {
+      canonical: `/leaders/${contact.slug || slug}`,
+    },
     openGraph: {
       title: fullName,
       description,
