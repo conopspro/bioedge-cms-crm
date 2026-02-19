@@ -112,6 +112,15 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
     proximityLabel = "New York City"
   }
 
+  // Non-proximity filters take priority — if the user has selected a state,
+  // city, tag, or typed a search query, use the standard DB query path even
+  // if geo params are still present in the URL (e.g. leftover from geolocation).
+  const hasNonProximityFilters = params.state || params.city || params.tag || params.q
+  if (hasNonProximityFilters) {
+    lat = null
+    lng = null
+  }
+
   // Proximity search path — triggered by zip, geolocation, or default NYC
   if (lat && lng && (params.zip || params.near || isDefaultNYC)) {
     isProximitySearch = true
