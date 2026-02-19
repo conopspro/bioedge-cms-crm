@@ -15,35 +15,54 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     const { id } = await params
     const supabase = await createClient()
 
-    const { data: campaign, error } = await supabase
+    // Optional server-side filter: ?recipientStatus=generated
+    const { searchParams } = new URL(request.url)
+    const recipientStatus = searchParams.get("recipientStatus")
+
+    const recipientQuery = recipientStatus
+      ? `id, clinic_id, recipient_email, recipient_name, subject, body, body_html, status, approved, generated_at, sent_at, delivered_at, opened_at, clicked_at, resend_id, error, created_at`
+      : `id, clinic_id, recipient_email, recipient_name, subject, body, body_html, status, approved, generated_at, sent_at, delivered_at, opened_at, clicked_at, resend_id, error, created_at`
+
+    let campaignQuery = supabase
       .from("clinic_campaigns")
       .select(`
         *,
         sender_profile:sender_profiles (id, name, email, title, phone, signature),
-        clinic_campaign_recipients (
-          id,
-          clinic_id,
-          recipient_email,
-          recipient_name,
-          subject,
-          body,
-          body_html,
-          status,
-          approved,
-          generated_at,
-          sent_at,
-          delivered_at,
-          opened_at,
-          clicked_at,
-          resend_id,
-          error,
-          created_at
-        )
+        clinic_campaign_recipients!inner (${recipientQuery})
       `)
       .eq("id", id)
-      .single()
+
+    if (recipientStatus) {
+      campaignQuery = campaignQuery.eq(
+        "clinic_campaign_recipients.status",
+        recipientStatus
+      )
+    }
+
+    const { data: campaign, error } = await campaignQuery.single()
 
     if (error) {
+      // PGRST116 = no rows found. When filtering with !inner and no matching
+      // recipients exist, Supabase also returns no rows — fall back to a
+      // recipient-less fetch so the campaign shell still loads.
+      if (error.code === "PGRST116" && recipientStatus) {
+        const { data: campaignShell, error: shellError } = await supabase
+          .from("clinic_campaigns")
+          .select(`*, sender_profile:sender_profiles (id, name, email, title, phone, signature)`)
+          .eq("id", id)
+          .single()
+
+        if (shellError) {
+          return NextResponse.json(
+            { error: "Clinic campaign not found" },
+            { status: 404 }
+          )
+        }
+        campaignShell.clinic_campaign_recipients = []
+        campaignShell.clinic_campaign_events = []
+        return NextResponse.json(campaignShell)
+      }
+
       if (error.code === "PGRST116") {
         return NextResponse.json(
           { error: "Clinic campaign not found" },
@@ -57,24 +76,26 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Fetch campaign events separately
-    const { data: campaignEvents, error: eventsError } = await supabase
-      .from("clinic_campaign_events")
-      .select(`
-        id,
-        event_id,
-        events:events (id, name, start_date, end_date, city, state, slug, registration_url)
-      `)
-      .eq("clinic_campaign_id", id)
+    // Fetch campaign events separately (skip when filtering recipients — not needed for review queue)
+    if (!recipientStatus) {
+      const { data: campaignEvents, error: eventsError } = await supabase
+        .from("clinic_campaign_events")
+        .select(`
+          id,
+          event_id,
+          events:events (id, name, start_date, end_date, city, state, slug, registration_url)
+        `)
+        .eq("clinic_campaign_id", id)
 
-    if (eventsError) {
-      console.warn("clinic_campaign_events query failed:", eventsError.message)
-      campaign.clinic_campaign_events = []
-    } else {
-      campaign.clinic_campaign_events = campaignEvents || []
+      if (eventsError) {
+        console.warn("clinic_campaign_events query failed:", eventsError.message)
+        campaign.clinic_campaign_events = []
+      } else {
+        campaign.clinic_campaign_events = campaignEvents || []
+      }
     }
 
-    // If we have recipients, enrich with clinic data
+    // Enrich with clinic data (only for the recipients actually returned)
     if (campaign.clinic_campaign_recipients?.length > 0) {
       const clinicIds = campaign.clinic_campaign_recipients.map(
         (r: { clinic_id: string }) => r.clinic_id

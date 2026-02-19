@@ -104,10 +104,10 @@ export default function ClinicReviewQueuePage() {
   const [sendingTest, setSendingTest] = useState(false)
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
 
-  // Load campaign data and build queue
+  // Load campaign data and build queue — only fetches generated recipients
   const loadCampaign = useCallback(async () => {
     try {
-      const res = await fetch(`/api/clinic-campaigns/${campaignId}`)
+      const res = await fetch(`/api/clinic-campaigns/${campaignId}?recipientStatus=generated`)
       if (!res.ok) return
 
       const data = await res.json()
@@ -121,9 +121,8 @@ export default function ClinicReviewQueuePage() {
         setTestEmail(data.sender_profile.email)
       }
 
-      // Filter to generated recipients, sort by clinic name
+      // Recipients are already filtered to generated server-side; just sort
       const generated = (data.clinic_campaign_recipients || [])
-        .filter((r: QueueRecipient) => r.status === "generated")
         .sort((a: QueueRecipient, b: QueueRecipient) => {
           const aName = a.recipient_name || ""
           const bName = b.recipient_name || ""

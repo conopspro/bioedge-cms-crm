@@ -239,7 +239,17 @@ export default function ClinicCampaignDetailPage() {
       })
 
       if (res.ok) {
-        await fetchCampaign()
+        const data = await res.json()
+        const updatedIds = new Set((data.recipients || []).map((r: { id: string }) => r.id))
+        setCampaign((prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            clinic_campaign_recipients: prev.clinic_campaign_recipients.map((r) =>
+              updatedIds.has(r.id) ? { ...r, status: "approved" as const, approved: true } : r
+            ),
+          }
+        })
       }
     } catch (error) {
       console.error("Approval failed:", error)
@@ -251,6 +261,7 @@ export default function ClinicCampaignDetailPage() {
   const handleApproveOne = async (recipientId: string, approve: boolean) => {
     setActionLoading(recipientId)
     try {
+      const newStatus = approve ? "approved" : "generated"
       const res = await fetch(
         `/api/clinic-campaigns/${campaignId}/recipients/${recipientId}`,
         {
@@ -258,12 +269,23 @@ export default function ClinicCampaignDetailPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             approved: approve,
-            status: approve ? "approved" : "generated",
+            status: newStatus,
           }),
         }
       )
       if (res.ok) {
-        await fetchCampaign()
+        setCampaign((prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            clinic_campaign_recipients: prev.clinic_campaign_recipients.map((r) =>
+              r.id === recipientId ? { ...r, status: newStatus as EnrichedRecipient["status"], approved: approve } : r
+            ),
+          }
+        })
+        setSelectedRecipient((prev) =>
+          prev?.id === recipientId ? { ...prev, status: newStatus as EnrichedRecipient["status"], approved: approve } : prev
+        )
         setShowPreview(false)
       }
     } catch (error) {
@@ -281,7 +303,23 @@ export default function ClinicCampaignDetailPage() {
         { method: "POST" }
       )
       if (res.ok) {
-        await fetchCampaign()
+        const updated = await res.json()
+        setCampaign((prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            clinic_campaign_recipients: prev.clinic_campaign_recipients.map((r) =>
+              r.id === recipientId
+                ? { ...r, subject: updated.subject, body: updated.body, body_html: updated.body_html, status: "generated" as const, approved: false }
+                : r
+            ),
+          }
+        })
+        setSelectedRecipient((prev) =>
+          prev?.id === recipientId
+            ? { ...prev, subject: updated.subject, body: updated.body, body_html: updated.body_html, status: "generated" as const, approved: false }
+            : prev
+        )
         setShowPreview(false)
       }
     } catch (error) {
@@ -391,12 +429,22 @@ export default function ClinicCampaignDetailPage() {
 
   const handleRemoveRecipient = async (recipientId: string) => {
     try {
-      await fetch(
+      const res = await fetch(
         `/api/clinic-campaigns/${campaignId}/recipients/${recipientId}`,
         { method: "DELETE" }
       )
-      await fetchCampaign()
-      setShowPreview(false)
+      if (res.ok) {
+        setCampaign((prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            clinic_campaign_recipients: prev.clinic_campaign_recipients.filter(
+              (r) => r.id !== recipientId
+            ),
+          }
+        })
+        setShowPreview(false)
+      }
     } catch (error) {
       console.error("Remove failed:", error)
     }
@@ -431,7 +479,20 @@ export default function ClinicCampaignDetailPage() {
         }
       )
       if (res.ok) {
-        await fetchCampaign()
+        setCampaign((prev) => {
+          if (!prev) return prev
+          return {
+            ...prev,
+            clinic_campaign_recipients: prev.clinic_campaign_recipients.map((r) =>
+              r.id === selectedRecipient.id
+                ? { ...r, subject: editSubject, body: editBody, body_html: bodyHtml }
+                : r
+            ),
+          }
+        })
+        setSelectedRecipient((prev) =>
+          prev ? { ...prev, subject: editSubject, body: editBody, body_html: bodyHtml } : prev
+        )
         setIsEditing(false)
       }
     } catch (error) {

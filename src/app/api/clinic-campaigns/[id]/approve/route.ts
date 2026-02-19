@@ -38,7 +38,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .eq("clinic_campaign_id", campaignId)
       .in("id", recipientIds)
       .in("status", ["generated", "approved"]) // Only update generated or approved
-      .select()
+      .select("id, status, approved")
 
     if (error) {
       console.error("Error updating approval:", error)
@@ -51,6 +51,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       updated: data?.length || 0,
       approved,
+      recipients: data || [],
     })
   } catch (error) {
     console.error("Unexpected error:", error)
