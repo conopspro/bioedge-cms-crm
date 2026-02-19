@@ -37,6 +37,11 @@ export function ClinicFilters({ states, cities, allTags }: ClinicFiltersProps) {
       } else {
         params.delete(key)
       }
+      // State/city/tag filters are incompatible with proximity search —
+      // drop geo params so the standard query path is used instead.
+      params.delete("lat")
+      params.delete("lng")
+      params.delete("near")
       // Reset to page 1 when filtering
       params.delete("page")
       router.push(`/clinics?${params.toString()}`)
@@ -55,6 +60,10 @@ export function ClinicFilters({ states, cities, allTags }: ClinicFiltersProps) {
       // Clear city when state changes
       params.delete("city")
       params.delete("page")
+      // State filter is incompatible with proximity search — drop geo params
+      params.delete("lat")
+      params.delete("lng")
+      params.delete("near")
       router.push(`/clinics?${params.toString()}`)
 
       // Fetch cities for new state
