@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { ClinicCard } from "@/components/clinics/clinic-card"
 import { ClinicFilters } from "@/components/clinics/clinic-filters"
 import { GeoRedirect } from "@/components/clinics/geo-redirect"
+import { METRO_AREAS } from "@/lib/metro-areas"
 import { Suspense } from "react"
 import type { Metadata } from "next"
 
@@ -23,6 +24,7 @@ interface PageProps {
   searchParams: Promise<{
     state?: string
     city?: string
+    metro?: string
     tag?: string
     q?: string
     page?: string
@@ -104,7 +106,7 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
   }
 
   // Default to New York City when no location or filters are set
-  const hasAnyFilters = params.state || params.city || params.tag || params.q || params.zip || params.near || params.lat || params.lng
+  const hasAnyFilters = params.state || params.city || params.metro || params.tag || params.q || params.zip || params.near || params.lat || params.lng
   const isDefaultNYC = !hasAnyFilters
   if (isDefaultNYC && !lat && !lng) {
     lat = 40.7128
@@ -113,9 +115,9 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
   }
 
   // Non-proximity filters take priority — if the user has selected a state,
-  // city, tag, or typed a search query, use the standard DB query path even
-  // if geo params are still present in the URL (e.g. leftover from geolocation).
-  const hasNonProximityFilters = params.state || params.city || params.tag || params.q
+  // city, metro, tag, or typed a search query, use the standard DB query path
+  // even if geo params are still present in the URL (e.g. leftover from geolocation).
+  const hasNonProximityFilters = params.state || params.city || params.metro || params.tag || params.q
   if (hasNonProximityFilters) {
     lat = null
     lng = null
@@ -185,7 +187,10 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
       )
     }
 
-    if (params.state) {
+    if (params.metro && METRO_AREAS[params.metro]) {
+      const metroStates = METRO_AREAS[params.metro].states
+      query = query.in("state", metroStates)
+    } else if (params.state) {
       query = query.eq("state", params.state)
     }
 
@@ -253,7 +258,7 @@ export default async function ClinicsDirectoryPage({ searchParams }: PageProps) 
     cities = (citiesData || []) as { city: string; clinic_count: number }[]
   }
 
-  const hasFilters = params.state || params.tag || params.q || params.city || params.zip || params.radius || params.near
+  const hasFilters = params.state || params.metro || params.tag || params.q || params.city || params.zip || params.radius || params.near
 
   return (
     <div className="min-h-screen bg-off-white">
@@ -410,6 +415,7 @@ function buildQueryString(
   page: number
 ): string {
   const qs = new URLSearchParams()
+  if (params.metro) qs.set("metro", params.metro)
   if (params.state) qs.set("state", params.state)
   if (params.city) qs.set("city", params.city)
   if (params.tag) qs.set("tag", params.tag)

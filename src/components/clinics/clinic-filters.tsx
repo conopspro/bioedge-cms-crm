@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useState, useEffect } from "react"
 import { Search, MapPin } from "lucide-react"
+import { METRO_AREAS, METRO_AREA_NAMES } from "@/lib/metro-areas"
 
 interface ClinicFiltersProps {
   states: string[]
@@ -23,6 +24,7 @@ export function ClinicFilters({ states, cities, allTags }: ClinicFiltersProps) {
   const activeTag = searchParams.get("tag")
   const activeRadius = searchParams.get("radius") || "25"
   const activeZip = searchParams.get("zip")
+  const activeMetro = searchParams.get("metro")
 
   // Update city options when server-provided cities change (e.g., page navigation)
   useEffect(() => {
@@ -57,8 +59,9 @@ export function ClinicFilters({ states, cities, allTags }: ClinicFiltersProps) {
       } else {
         params.delete("state")
       }
-      // Clear city when state changes
+      // Clear city and metro when state changes
       params.delete("city")
+      params.delete("metro")
       params.delete("page")
       // State filter is incompatible with proximity search — drop geo params
       params.delete("lat")
@@ -91,6 +94,26 @@ export function ClinicFilters({ states, cities, allTags }: ClinicFiltersProps) {
     (value: string) => {
       const params = new URLSearchParams(searchParams.toString())
       params.set("radius", value)
+      params.delete("page")
+      router.push(`/clinics?${params.toString()}`)
+    },
+    [router, searchParams]
+  )
+
+  const handleMetroChange = useCallback(
+    (value: string | null) => {
+      const params = new URLSearchParams(searchParams.toString())
+      if (value) {
+        params.set("metro", value)
+      } else {
+        params.delete("metro")
+      }
+      // Metro overrides state/city and is incompatible with proximity search
+      params.delete("state")
+      params.delete("city")
+      params.delete("lat")
+      params.delete("lng")
+      params.delete("near")
       params.delete("page")
       router.push(`/clinics?${params.toString()}`)
     },
@@ -147,6 +170,20 @@ export function ClinicFilters({ states, cities, allTags }: ClinicFiltersProps) {
             className="w-44 rounded-md border bg-white pl-8 pr-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
           />
         </div>
+
+        {/* Metro Area filter */}
+        <select
+          value={activeMetro || ""}
+          onChange={(e) => handleMetroChange(e.target.value || null)}
+          className="rounded-md border bg-white px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+        >
+          <option value="">Metro Area</option>
+          {METRO_AREA_NAMES.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
 
         {/* State filter */}
         <select
