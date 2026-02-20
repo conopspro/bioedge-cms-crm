@@ -161,6 +161,7 @@ export default function CompanyImportPage() {
   const [approving, setApproving] = useState(false)
   const [rejecting, setRejecting] = useState(false)
   const [actionResult, setActionResult] = useState<string | null>(null)
+  const [actionErrors, setActionErrors] = useState<string[]>([])
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [retryingId, setRetryingId] = useState<string | null>(null)
 
@@ -323,6 +324,7 @@ export default function CompanyImportPage() {
     if (ids.length === 0) return
     setApproving(true)
     setActionResult(null)
+    setActionErrors([])
     try {
       const res = await fetch("/api/company-queue/approve", {
         method: "POST",
@@ -333,9 +335,9 @@ export default function CompanyImportPage() {
       if (!res.ok) { alert(data.error || "Approve failed"); return }
       setActionResult(
         `Approved ${data.companiesCreated} companies, created ${data.contactsCreated} contacts.` +
-        (data.skipped?.length ? ` Skipped ${data.skipped.length} duplicates.` : "") +
-        (data.errors?.length ? ` ${data.errors.length} errors.` : "")
+        (data.skipped?.length ? ` Skipped ${data.skipped.length} duplicates.` : "")
       )
+      if (data.errors?.length) setActionErrors(data.errors)
       clearSelection()
       await refreshItems()
     } catch {
@@ -675,7 +677,16 @@ export default function CompanyImportPage() {
           {actionResult && (
             <div className="rounded-md bg-green-50 border border-green-200 p-3 flex items-center justify-between">
               <p className="text-sm text-green-800 font-medium">{actionResult}</p>
-              <button onClick={() => setActionResult(null)}><X className="h-4 w-4 text-green-700" /></button>
+              <button onClick={() => { setActionResult(null); setActionErrors([]) }}><X className="h-4 w-4 text-green-700" /></button>
+            </div>
+          )}
+
+          {actionErrors.length > 0 && (
+            <div className="rounded-md bg-amber-50 border border-amber-200 p-3 space-y-1">
+              <p className="text-sm font-medium text-amber-800">{actionErrors.length} error{actionErrors.length !== 1 ? "s" : ""} during approval:</p>
+              {actionErrors.map((e, i) => (
+                <p key={i} className="text-sm text-amber-700">{e}</p>
+              ))}
             </div>
           )}
 
