@@ -387,6 +387,27 @@ export default function CompanyImportPage() {
     await refreshItems()
   }
 
+  const handleRemove = async (ids: string[]) => {
+    if (ids.length === 0) return
+    try {
+      const res = await fetch("/api/company-queue", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids }),
+      })
+      const data = await res.json()
+      if (!res.ok) { alert(data.error || "Remove failed"); return }
+      setSelected((prev) => {
+        const next = new Set(prev)
+        ids.forEach((id) => next.delete(id))
+        return next
+      })
+      await refreshItems()
+    } catch {
+      alert("Remove failed unexpectedly")
+    }
+  }
+
   // ─── Status badge helpers ─────────────────────────────────────────────────
 
   const enrichBadge = (item: QueueItem) => {
@@ -740,6 +761,15 @@ export default function CompanyImportPage() {
                 {rejecting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Reject Selected
               </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-muted-foreground hover:text-destructive"
+                onClick={() => handleRemove(Array.from(selected))}
+                disabled={approving || rejecting}
+              >
+                Remove Selected
+              </Button>
               <div className="ml-auto">
                 <Button
                   size="sm"
@@ -925,6 +955,14 @@ export default function CompanyImportPage() {
                                   >
                                     {retryingId === item.id && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
                                     Retry Enrich
+                                  </Button>
+                                  <Button
+                                    size="sm"
+                                    variant="ghost"
+                                    className="text-muted-foreground hover:text-destructive"
+                                    onClick={() => handleRemove([item.id])}
+                                  >
+                                    Remove
                                   </Button>
                                 </div>
                               )}

@@ -182,3 +182,39 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
+
+/**
+ * DELETE /api/company-queue
+ *
+ * Permanently remove queue items (only pending/error rows — never approved).
+ *
+ * Body: { ids: string[] }
+ * Response: { deleted: number }
+ */
+export async function DELETE(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+    const body = await request.json()
+    const { ids } = body as { ids: string[] }
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json({ error: "ids array is required" }, { status: 400 })
+    }
+
+    const { data, error } = await supabase
+      .from("company_queue")
+      .delete()
+      .in("id", ids)
+      .in("status", ["pending", "rejected"])  // never delete approved rows
+      .select("id")
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ deleted: data?.length || 0 })
+  } catch (error) {
+    console.error("[company-queue DELETE]", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}

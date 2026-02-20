@@ -159,21 +159,22 @@ export async function POST(request: NextRequest) {
       const companyId = insertedCompany.id
       const contactsToInsert: object[] = []
 
-      // Collect Perplexity contacts
+      // Collect Perplexity contacts (email is NOT NULL in contacts table — skip rows without one)
       if (Array.isArray(item.discovered_contacts)) {
         for (const contact of item.discovered_contacts as {
           name: string; title?: string; email?: string; linkedin_url?: string
         }[]) {
           if (!contact.name) continue
+          if (!contact.email) continue  // contacts table requires email NOT NULL
           const parts = contact.name.trim().split(" ")
-          const firstName = parts[0]
-          const lastName = parts.slice(1).join(" ") || parts[0]
+          const firstName = parts[0] || "Unknown"
+          const lastName = parts.slice(1).join(" ") || "-"
           contactsToInsert.push({
             company_id: companyId,
             first_name: firstName,
             last_name: lastName,
             title: contact.title || null,
-            email: contact.email || null,
+            email: contact.email,
             linkedin_url: contact.linkedin_url || null,
             source: "ai_research",
             outreach_status: "not_contacted",
@@ -192,7 +193,7 @@ export async function POST(request: NextRequest) {
           contactsToInsert.push({
             company_id: companyId,
             first_name: contact.first_name || "Unknown",
-            last_name: contact.last_name || "",
+            last_name: contact.last_name || "-",
             title: contact.title || null,
             email: contact.email,
             linkedin_url: contact.linkedin || null,
