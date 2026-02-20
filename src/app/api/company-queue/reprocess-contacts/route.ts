@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
         }[]) {
           if (!contact.name || !contact.email) continue
           const parts = contact.name.trim().split(" ")
-          const firstName = parts[0] || "Unknown"
+          const firstName = parts[0] || contact.email.split("@")[0]
           const lastName = parts.slice(1).join(" ") || "-"
           contactsToInsert.push({
             company_id: companyId,
@@ -93,7 +93,9 @@ export async function POST(request: NextRequest) {
           title?: string; confidence?: number; seniority?: string; linkedin?: string; phone?: string
         }[]) {
           if (!contact.email) continue
-          const emailLocal = contact.email.split("@")[0]
+          const emailLocal = contact.email.split("@")[0].toLowerCase()
+          const GENERIC_LOCALS = new Set(["info","contact","hello","hi","hey","support","help","admin","administrator","office","team","staff","hr","sales","marketing","media","press","pr","enquiries","enquiry","enquire","queries","query","general","mail","email","webmaster","postmaster","noreply","no-reply","donotreply","do-not-reply","billing","finance","accounting","accounts","legal","privacy","security","careers","jobs","recruiting","recruitment","talent","partnerships","partners","affiliate","affiliates","vendor","vendors","ops","operations"])
+          if (!contact.first_name && !contact.last_name && GENERIC_LOCALS.has(emailLocal)) continue
           const firstName = contact.first_name || (emailLocal.charAt(0).toUpperCase() + emailLocal.slice(1))
           const lastName = contact.last_name || null
           const fullName = lastName ? `${firstName} ${lastName}`.trim() : firstName

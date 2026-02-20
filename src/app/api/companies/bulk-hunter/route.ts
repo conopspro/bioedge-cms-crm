@@ -104,10 +104,28 @@ export async function POST(request: NextRequest) {
           limit: 50,
         })
 
-        // Filter to confidence >= 80
-        const contacts = (hunterData.emails || []).filter(
-          (e) => e.email && e.confidence >= 80
-        )
+        // Generic role-based email local-parts that aren't real people
+        const GENERIC_LOCALS = new Set([
+          "info","contact","hello","hi","hey","support","help","admin","administrator",
+          "office","team","staff","hr","sales","marketing","media","press","pr",
+          "enquiries","enquiry","enquire","queries","query","general","mail","email",
+          "webmaster","postmaster","noreply","no-reply","donotreply","do-not-reply",
+          "billing","finance","accounting","accounts","legal","privacy","security",
+          "careers","jobs","recruiting","recruitment","talent","partnerships",
+          "partners","affiliate","affiliates","vendor","vendors","ops","operations",
+        ])
+
+        // Filter to confidence >= 80, then skip emails that would produce no usable name:
+        // - Hunter has no first/last name AND
+        // - the email local-part is a generic role address
+        const contacts = (hunterData.emails || []).filter((e) => {
+          if (!e.email || e.confidence < 80) return false
+          if (!e.firstName && !e.lastName) {
+            const local = e.email.split("@")[0].toLowerCase()
+            if (GENERIC_LOCALS.has(local)) return false
+          }
+          return true
+        })
 
         if (contacts.length === 0) {
           skipped++
@@ -115,14 +133,15 @@ export async function POST(request: NextRequest) {
           continue
         }
 
-        // Build contact rows
+        // Build contact rows.
+        // When Hunter has no name, use the email local-part capitalised as first_name.
+        // We never store "Unknown" — generic locals are already filtered out above.
         const contactRows = contacts.map((e) => {
-          // When Hunter has no name, derive one from the email local-part
-          // e.g. "rob@ammortal.com" → first_name "Rob", last_name null
           const emailLocal = e.email ? e.email.split("@")[0] : null
           const firstName = e.firstName || (emailLocal
             ? emailLocal.charAt(0).toUpperCase() + emailLocal.slice(1)
-            : "Unknown")
+            : null)
+          if (!firstName) return null
           const lastName = e.lastName || null
           const fullName = lastName ? `${firstName} ${lastName}`.trim() : firstName
           return {
@@ -140,7 +159,7 @@ export async function POST(request: NextRequest) {
             hunter_confidence: e.confidence,
             seniority: e.seniority || null,
           }
-        })
+        }).filter((r): r is NonNullable<typeof r> => r !== null)
 
         // Dedup by email against existing contacts table
         const emailsToCheck = contactRows.map((c) => c.email).filter(Boolean)

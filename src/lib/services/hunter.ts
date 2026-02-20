@@ -162,6 +162,7 @@ export interface DomainSearchResult {
   headcount: string | null
   companyType: string | null
   country: string | null
+  acceptAll: boolean
   socialProfiles: {
     linkedin: string | null
     twitter: string | null
@@ -274,6 +275,7 @@ class HunterService {
       headcount: data.headcount,
       companyType: data.company_type,
       country: data.country,
+      acceptAll: data.accept_all,
       socialProfiles: {
         linkedin: data.linkedin,
         twitter: data.twitter,
