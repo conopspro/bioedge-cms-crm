@@ -171,6 +171,30 @@ async function handleContactSearch(params: ContactSearchParams) {
       : eventIds
   }
 
+  // Option E: Filter by company added_within (companies.created_at)
+  if (addedWithin && addedWithin !== "all") {
+    const days = parseInt(addedWithin.replace("d", ""), 10)
+    if (!isNaN(days)) {
+      // Snap to start of calendar day (UTC) so "1d" = since midnight today
+      const cutoff = new Date()
+      cutoff.setUTCHours(0, 0, 0, 0)
+      cutoff.setUTCDate(cutoff.getUTCDate() - (days - 1))
+
+      const { data: recentCompanies } = await supabase
+        .from("companies")
+        .select("id")
+        .gte("created_at", cutoff.toISOString())
+
+      const recentIds = (recentCompanies || []).map((c) => c.id)
+      if (recentIds.length === 0) {
+        return NextResponse.json({ contacts: [] })
+      }
+      companyIdFilter = companyIdFilter
+        ? companyIdFilter.filter((id) => recentIds.includes(id))
+        : recentIds
+    }
+  }
+
   // Option D: Filter by category or edge_category (get company IDs)
   if (
     (category && category !== "all") ||
@@ -246,17 +270,6 @@ async function handleContactSearch(params: ContactSearchParams) {
     }
     if (titleSearch) {
       filtered = filtered.ilike("title", `%${titleSearch}%`)
-    }
-    if (addedWithin && addedWithin !== "all") {
-      const days = parseInt(addedWithin.replace("d", ""), 10)
-      if (!isNaN(days)) {
-        // Snap to start of day (UTC) N days ago so "1 day" means since midnight today,
-        // "2 days" means since midnight yesterday, etc. — not a rolling 24/48hr window
-        const cutoff = new Date()
-        cutoff.setUTCHours(0, 0, 0, 0)
-        cutoff.setUTCDate(cutoff.getUTCDate() - (days - 1))
-        filtered = filtered.gte("created_at", cutoff.toISOString())
-      }
     }
     return filtered
   }

@@ -387,6 +387,28 @@ export default function CompanyImportPage() {
     await refreshItems()
   }
 
+  const handleReprocessContacts = async () => {
+    setActionResult(null)
+    setActionErrors([])
+    try {
+      const res = await fetch("/api/company-queue/reprocess-contacts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: batchIds }),
+      })
+      const data = await res.json()
+      if (!res.ok) { alert(data.error || "Reprocess failed"); return }
+      setActionResult(
+        `Recovered ${data.contactsCreated} contacts across ${data.processed} companies.` +
+        (data.skipped ? ` ${data.skipped} already had contacts or no data.` : "")
+      )
+      if (data.errors?.length) setActionErrors(data.errors)
+      await refreshItems()
+    } catch {
+      alert("Reprocess failed unexpectedly")
+    }
+  }
+
   const handleRemove = async (ids: string[]) => {
     if (ids.length === 0) return
     try {
@@ -699,6 +721,18 @@ export default function CompanyImportPage() {
             <div className="rounded-md bg-green-50 border border-green-200 p-3 flex items-center justify-between">
               <p className="text-sm text-green-800 font-medium">{actionResult}</p>
               <button onClick={() => { setActionResult(null); setActionErrors([]) }}><X className="h-4 w-4 text-green-700" /></button>
+            </div>
+          )}
+
+          {/* Recover contacts button — shown when errors occurred during approval */}
+          {actionErrors.length > 0 && (
+            <div className="rounded-md bg-amber-50 border border-amber-200 p-3 flex items-center justify-between gap-4">
+              <p className="text-sm text-amber-800">
+                Some contact inserts failed. Click to retry contact creation for approved companies that have no contacts yet.
+              </p>
+              <Button size="sm" variant="outline" onClick={handleReprocessContacts} className="shrink-0">
+                Recover Contacts
+              </Button>
             </div>
           )}
 
