@@ -206,13 +206,14 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
     let totalCreated = 0
     const allErrors: string[] = []
     let remaining = allIds.length
+    const attempted: string[] = [] // accumulates processed IDs across calls
 
     while (remaining > 0 && !hunterAbortRef.current) {
       try {
         const res = await fetch("/api/companies/bulk-hunter", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ids: allIds, batchSize: 5 }),
+          body: JSON.stringify({ ids: allIds, batchSize: 5, attempted }),
         })
         if (!res.ok) {
           const data = await res.json().catch(() => ({}))
@@ -223,18 +224,19 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
         totalProcessed += data.processed || 0
         totalCreated += data.contactsCreated || 0
         if (Array.isArray(data.errors)) allErrors.push(...data.errors)
+        if (Array.isArray(data.attemptedIds)) attempted.push(...data.attemptedIds)
         remaining = data.remaining ?? 0
 
         setHunterProgress({
-          processed: totalProcessed,
+          processed: attempted.length,
           contactsCreated: totalCreated,
           total: allIds.length,
           errors: allErrors,
           done: remaining === 0,
         })
 
-        // If no progress was made but remaining > 0, avoid infinite loop
-        if ((data.processed ?? 0) === 0 && remaining > 0) break
+        // Safety: if no new IDs were attempted, break to avoid infinite loop
+        if (!data.attemptedIds?.length && remaining > 0) break
       } catch (err) {
         allErrors.push(err instanceof Error ? err.message : "Unknown error")
         break

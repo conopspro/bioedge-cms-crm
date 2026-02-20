@@ -41,31 +41,27 @@ export async function POST(request: NextRequest) {
 
     const batchSize = Math.min(10, Math.max(1, rawBatchSize ?? 5))
 
-    // Find companies from the provided IDs that still have 0 contacts
-    const { data: existingContacts } = await supabase
-      .from("contacts")
-      .select("company_id")
-      .in("company_id", ids)
+    // `attempted` is the set of IDs the frontend has already sent to us in prior calls.
+    // We exclude these so we don't re-process them and so `remaining` converges to 0
+    // even for companies where Hunter finds nothing (no domain, 0 results, all duped).
+    const attempted: string[] = Array.isArray(body.attempted) ? body.attempted : []
+    const attemptedSet = new Set(attempted)
 
-    const companiesWithContacts = new Set(
-      (existingContacts || []).map((c) => c.company_id)
-    )
+    const notYetAttempted = ids.filter((id) => !attemptedSet.has(id))
 
-    const needsHunter = ids.filter((id) => !companiesWithContacts.has(id))
-    const remaining_after = needsHunter.length // will be updated at end
-
-    if (needsHunter.length === 0) {
+    if (notYetAttempted.length === 0) {
       return NextResponse.json({
         processed: 0,
         contactsCreated: 0,
         skipped: 0,
         errors: [],
         remaining: 0,
+        attemptedIds: [],
       })
     }
 
-    // Take next batch from the queue that needs Hunter
-    const batch = needsHunter.slice(0, batchSize)
+    // Take next batch
+    const batch = notYetAttempted.slice(0, batchSize)
 
     // Fetch company records for this batch
     const { data: companies, error: fetchError } = await supabase
@@ -182,21 +178,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Recount remaining companies still needing Hunter
-    const { data: stillHasContacts } = await supabase
-      .from("contacts")
-      .select("company_id")
-      .in("company_id", needsHunter)
-
-    const doneSet = new Set((stillHasContacts || []).map((c) => c.company_id))
-    const remaining = needsHunter.filter((id) => !doneSet.has(id)).length
+    // IDs processed in this batch — frontend accumulates these across calls
+    const attemptedIds = companies.map((c) => c.id)
+    const totalAttempted = attempted.length + attemptedIds.length
+    const remaining = ids.length - totalAttempted
 
     return NextResponse.json({
       processed,
       contactsCreated,
       skipped,
       errors,
-      remaining,
+      remaining: Math.max(0, remaining),
+      attemptedIds,
     })
   } catch (error) {
     console.error("[companies/bulk-hunter]", error)
