@@ -105,6 +105,7 @@ export async function POST(request: NextRequest) {
         status: "researching",
         is_draft: true,
         researched_at: item.enriched_at || new Date().toISOString(),
+        events: item.source_event ? [item.source_event] : [],
       })
       itemsToInsert.push(item)
     }

@@ -130,6 +130,7 @@ export default function CompanyImportPage() {
 
   // Step 1 state
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [sourceEvent, setSourceEvent] = useState("")
   const [parsedRows, setParsedRows] = useState<ParsedRow[]>([])
   const [parseErrors, setParseErrors] = useState<string[]>([])
   const [importing, setImporting] = useState(false)
@@ -186,7 +187,7 @@ export default function CompanyImportPage() {
       const res = await fetch("/api/company-queue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companies: parsedRows }),
+        body: JSON.stringify({ companies: parsedRows, event: sourceEvent.trim() || undefined }),
       })
       const data = await res.json()
       if (!res.ok) { alert(data.error || "Import failed"); return }
@@ -469,6 +470,23 @@ export default function CompanyImportPage() {
               className="hidden"
               onChange={handleFileChange}
             />
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-sm font-medium" htmlFor="source-event">
+              Event / Conference <span className="text-muted-foreground font-normal">(optional)</span>
+            </label>
+            <input
+              id="source-event"
+              type="text"
+              placeholder="e.g., Biohacking Conference 2025"
+              value={sourceEvent}
+              onChange={(e) => setSourceEvent(e.target.value)}
+              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+            <p className="text-xs text-muted-foreground">
+              Where these companies were discovered — saved to the Events field on each approved company.
+            </p>
           </div>
 
           {parseErrors.length > 0 && (
