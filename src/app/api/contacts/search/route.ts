@@ -250,8 +250,12 @@ async function handleContactSearch(params: ContactSearchParams) {
     if (addedWithin && addedWithin !== "all") {
       const days = parseInt(addedWithin.replace("d", ""), 10)
       if (!isNaN(days)) {
-        const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
-        filtered = filtered.gte("created_at", cutoff)
+        // Snap to start of day (UTC) N days ago so "1 day" means since midnight today,
+        // "2 days" means since midnight yesterday, etc. — not a rolling 24/48hr window
+        const cutoff = new Date()
+        cutoff.setUTCHours(0, 0, 0, 0)
+        cutoff.setUTCDate(cutoff.getUTCDate() - (days - 1))
+        filtered = filtered.gte("created_at", cutoff.toISOString())
       }
     }
     return filtered
