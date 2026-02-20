@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Star,
   Loader2,
+  Search,
 } from "lucide-react"
 import { FeaturedToggle } from "@/components/ui/featured-toggle"
 import type { Company } from "@/types/database"
@@ -70,12 +71,34 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
   const [edgeFilter, setEdgeFilter] = useState<string>("all")
   const [accessFilter, setAccessFilter] = useState<string>("all")
   const [affiliateFilter, setAffiliateFilter] = useState<string>("all")
+  const [addedWithinFilter, setAddedWithinFilter] = useState<string>("all")
 
   // Multi-select state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [isBulkUpdating, setIsBulkUpdating] = useState(false)
 
-  // Filter companies based on search, status, draft mode, and EDGE classifications
+  // Hunter bulk run state
+  const [isRunningHunter, setIsRunningHunter] = useState(false)
+  const [hunterProgress, setHunterProgress] = useState<{
+    processed: number
+    contactsCreated: number
+    total: number
+    errors: string[]
+    done: boolean
+  } | null>(null)
+  const hunterAbortRef = useRef(false)
+
+  // Compute cutoff date for "Added Within" filter
+  const addedWithinCutoff: Date | null = (() => {
+    if (addedWithinFilter === "all") return null
+    const days = parseInt(addedWithinFilter.replace("d", ""), 10)
+    const cutoff = new Date()
+    cutoff.setUTCHours(0, 0, 0, 0)
+    cutoff.setUTCDate(cutoff.getUTCDate() - (days - 1))
+    return cutoff
+  })()
+
+  // Filter companies based on search, status, draft mode, EDGE classifications, and added date
   // Use derivedStatus if available (computed from articles), otherwise fall back to status
   const filteredCompanies = companies.filter((company) => {
     const effectiveStatus = (company as any).derivedStatus || company.status
@@ -96,7 +119,11 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
       affiliateFilter === "all" ||
       (affiliateFilter === "yes" && company.has_affiliate === true) ||
       (affiliateFilter === "no" && !company.has_affiliate)
-    return matchesSearch && matchesStatus && matchesDraft && matchesEdge && matchesAccess && matchesAffiliate
+    const matchesAddedWithin =
+      addedWithinCutoff === null ||
+      (company.created_at != null &&
+        new Date(company.created_at) >= addedWithinCutoff)
+    return matchesSearch && matchesStatus && matchesDraft && matchesEdge && matchesAccess && matchesAffiliate && matchesAddedWithin
   })
 
   // Selection helpers
@@ -158,6 +185,66 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
       alert("Failed to update companies")
     }
     setIsBulkUpdating(false)
+  }
+
+  // Bulk Hunter: run Hunter on selected companies that have no contacts
+  const handleRunHunter = async () => {
+    if (selectedIds.size === 0) return
+    const allIds = Array.from(selectedIds)
+
+    hunterAbortRef.current = false
+    setIsRunningHunter(true)
+    setHunterProgress({
+      processed: 0,
+      contactsCreated: 0,
+      total: allIds.length,
+      errors: [],
+      done: false,
+    })
+
+    let totalProcessed = 0
+    let totalCreated = 0
+    const allErrors: string[] = []
+    let remaining = allIds.length
+
+    while (remaining > 0 && !hunterAbortRef.current) {
+      try {
+        const res = await fetch("/api/companies/bulk-hunter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: allIds, batchSize: 5 }),
+        })
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          allErrors.push(data.error || "Hunter request failed")
+          break
+        }
+        const data = await res.json()
+        totalProcessed += data.processed || 0
+        totalCreated += data.contactsCreated || 0
+        if (Array.isArray(data.errors)) allErrors.push(...data.errors)
+        remaining = data.remaining ?? 0
+
+        setHunterProgress({
+          processed: totalProcessed,
+          contactsCreated: totalCreated,
+          total: allIds.length,
+          errors: allErrors,
+          done: remaining === 0,
+        })
+
+        // If no progress was made but remaining > 0, avoid infinite loop
+        if ((data.processed ?? 0) === 0 && remaining > 0) break
+      } catch (err) {
+        allErrors.push(err instanceof Error ? err.message : "Unknown error")
+        break
+      }
+    }
+
+    setIsRunningHunter(false)
+    setHunterProgress((prev) => prev ? { ...prev, done: true, errors: allErrors } : null)
+    // Refresh to show updated contact counts
+    router.refresh()
   }
 
   // Handle delete with confirmation
@@ -243,6 +330,20 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
           <option value="yes">Has Affiliate</option>
           <option value="no">No Affiliate</option>
         </select>
+        <select
+          value={addedWithinFilter}
+          onChange={(e) => {
+            setAddedWithinFilter(e.target.value)
+            setHunterProgress(null)
+          }}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">Any Time</option>
+          <option value="1d">Added Today</option>
+          <option value="2d">Last 2 Days</option>
+          <option value="3d">Last 3 Days</option>
+          <option value="7d">Last 7 Days</option>
+        </select>
       </div>
 
       {/* Results count + bulk action bar */}
@@ -261,7 +362,7 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
               variant="outline"
               className="h-7 gap-1 text-xs"
               onClick={() => handleBulkUpdate(false)}
-              disabled={isBulkUpdating}
+              disabled={isBulkUpdating || isRunningHunter}
             >
               {isBulkUpdating ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -275,7 +376,7 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
               variant="outline"
               className="h-7 gap-1 text-xs"
               onClick={() => handleBulkUpdate(true)}
-              disabled={isBulkUpdating}
+              disabled={isBulkUpdating || isRunningHunter}
             >
               {isBulkUpdating ? (
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -286,15 +387,75 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
             </Button>
             <Button
               size="sm"
+              variant="outline"
+              className="h-7 gap-1 text-xs text-blue-600 border-blue-300 hover:bg-blue-50"
+              onClick={isRunningHunter ? () => { hunterAbortRef.current = true } : handleRunHunter}
+              disabled={isBulkUpdating}
+            >
+              {isRunningHunter ? (
+                <>
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Stop Hunter
+                </>
+              ) : (
+                <>
+                  <Search className="h-3 w-3" />
+                  Run Hunter
+                </>
+              )}
+            </Button>
+            <Button
+              size="sm"
               variant="ghost"
               className="h-7 text-xs text-muted-foreground"
               onClick={clearSelection}
+              disabled={isRunningHunter}
             >
               Clear
             </Button>
           </div>
         )}
       </div>
+
+      {/* Hunter progress banner */}
+      {hunterProgress && (
+        <div className={`rounded-lg border px-4 py-3 text-sm ${
+          hunterProgress.done
+            ? hunterProgress.errors.length > 0
+              ? "border-amber-200 bg-amber-50"
+              : "border-green-200 bg-green-50"
+            : "border-blue-200 bg-blue-50"
+        }`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {!hunterProgress.done && <Loader2 className="h-4 w-4 animate-spin text-blue-600" />}
+              <span className={hunterProgress.done ? "font-medium" : "text-blue-700"}>
+                {hunterProgress.done
+                  ? `Hunter complete — ${hunterProgress.contactsCreated} contacts created`
+                  : `Running Hunter... ${hunterProgress.processed} / ${hunterProgress.total} companies processed, ${hunterProgress.contactsCreated} contacts found`}
+              </span>
+            </div>
+            {hunterProgress.done && (
+              <button
+                onClick={() => setHunterProgress(null)}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Dismiss
+              </button>
+            )}
+          </div>
+          {hunterProgress.errors.length > 0 && (
+            <ul className="mt-2 space-y-0.5 text-xs text-amber-800">
+              {hunterProgress.errors.slice(0, 5).map((e, i) => (
+                <li key={i}>• {e}</li>
+              ))}
+              {hunterProgress.errors.length > 5 && (
+                <li>• …and {hunterProgress.errors.length - 5} more errors</li>
+              )}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* Table */}
       <div className="rounded-md border">
