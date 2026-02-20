@@ -30,6 +30,7 @@ import {
 interface ParsedRow {
   name: string
   website: string
+  event?: string
 }
 
 interface QueueItem {
@@ -61,6 +62,7 @@ function parseCSV(text: string): { rows: ParsedRow[]; errors: string[] } {
   const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""))
   const nameIdx = headers.findIndex((h) => h === "name" || h === "company" || h === "company name")
   const websiteIdx = headers.findIndex((h) => h === "website" || h === "url" || h === "domain")
+  const eventIdx = headers.findIndex((h) => h === "event" || h === "conference" || h === "found at" || h === "source event" || h === "source_event")
 
   if (nameIdx === -1) return { rows: [], errors: ["CSV must have a 'name' column"] }
   if (websiteIdx === -1) return { rows: [], errors: ["CSV must have a 'website' column"] }
@@ -85,11 +87,12 @@ function parseCSV(text: string): { rows: ParsedRow[]; errors: string[] } {
 
     const name = cols[nameIdx]?.trim()
     const website = cols[websiteIdx]?.trim()
+    const event = eventIdx !== -1 ? cols[eventIdx]?.trim() || undefined : undefined
 
     if (!name) { errors.push(`Row ${i + 1}: missing name`); continue }
     if (!website) { errors.push(`Row ${i + 1}: missing website`); continue }
 
-    rows.push({ name, website })
+    rows.push({ name, website, event })
   }
 
   return { rows, errors }
@@ -187,7 +190,13 @@ export default function CompanyImportPage() {
       const res = await fetch("/api/company-queue", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ companies: parsedRows, event: sourceEvent.trim() || undefined }),
+        body: JSON.stringify({
+          companies: parsedRows.map((row) => ({
+            ...row,
+            // Per-row event takes priority; fall back to the global field
+            event: row.event || sourceEvent.trim() || undefined,
+          })),
+        }),
       })
       const data = await res.json()
       if (!res.ok) { alert(data.error || "Import failed"); return }
@@ -457,8 +466,9 @@ export default function CompanyImportPage() {
           <div className="rounded-lg border-2 border-dashed border-muted-foreground/25 p-8 text-center">
             <Upload className="mx-auto h-10 w-10 text-muted-foreground mb-3" />
             <p className="text-sm text-muted-foreground mb-2">
-              CSV must have <code className="bg-muted px-1 rounded">name</code> and{" "}
-              <code className="bg-muted px-1 rounded">website</code> columns
+              Required: <code className="bg-muted px-1 rounded">name</code> and{" "}
+              <code className="bg-muted px-1 rounded">website</code> columns.{" "}
+              Optional: <code className="bg-muted px-1 rounded">event</code> column for per-row event source.
             </p>
             <Button variant="outline" onClick={() => fileInputRef.current?.click()}>
               Choose CSV file
@@ -485,7 +495,7 @@ export default function CompanyImportPage() {
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             />
             <p className="text-xs text-muted-foreground">
-              Where these companies were discovered — saved to the Events field on each approved company.
+              Applied to all rows that don't have their own <code className="bg-muted px-1 rounded">event</code> column value.
             </p>
           </div>
 
@@ -512,6 +522,7 @@ export default function CompanyImportPage() {
                     <TableRow>
                       <TableHead>Name</TableHead>
                       <TableHead>Website</TableHead>
+                      {parsedRows.some((r) => r.event) && <TableHead>Event</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -519,6 +530,9 @@ export default function CompanyImportPage() {
                       <TableRow key={i}>
                         <TableCell className="font-medium">{row.name}</TableCell>
                         <TableCell className="text-muted-foreground text-sm">{row.website}</TableCell>
+                        {parsedRows.some((r) => r.event) && (
+                          <TableCell className="text-muted-foreground text-sm">{row.event || sourceEvent || "—"}</TableCell>
+                        )}
                       </TableRow>
                     ))}
                   </TableBody>

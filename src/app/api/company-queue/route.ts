@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     const body = await request.json()
-    const { companies, event } = body as { companies: { name: string; website: string }[]; event?: string }
+    const { companies } = body as { companies: { name: string; website: string; event?: string }[] }
 
     if (!Array.isArray(companies) || companies.length === 0) {
       return NextResponse.json({ error: "companies array is required" }, { status: 400 })
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
         name: company.name.trim(),
         website: company.website?.trim() || null,
         domain,
-        source_event: event?.trim() || null,
+        source_event: company.event?.trim() || null,
       })
 
       // Track in-batch to prevent duplicate rows from same CSV
