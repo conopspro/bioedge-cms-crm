@@ -409,6 +409,24 @@ export default function CompanyImportPage() {
     }
   }
 
+  const [isCleaningUp, setIsCleaningUp] = useState(false)
+  const handleCleanupUnknown = async () => {
+    setIsCleaningUp(true)
+    try {
+      const res = await fetch("/api/contacts/cleanup-unknown", { method: "POST" })
+      const data = await res.json()
+      if (!res.ok) { alert(data.error || "Cleanup failed"); return }
+      setActionResult(
+        `Cleanup complete: ${data.fixed} contacts fixed, ${data.deleted} generic/role contacts removed.` +
+        (data.errors?.length ? ` ${data.errors.length} errors.` : "")
+      )
+    } catch {
+      alert("Cleanup failed unexpectedly")
+    } finally {
+      setIsCleaningUp(false)
+    }
+  }
+
   const handleRemove = async (ids: string[]) => {
     if (ids.length === 0) return
     try {
@@ -744,6 +762,16 @@ export default function CompanyImportPage() {
               ))}
             </div>
           )}
+
+          {/* One-time cleanup for contacts with Unknown/generic names */}
+          <div className="rounded-md bg-muted/50 border p-3 flex items-center justify-between gap-4">
+            <p className="text-sm text-muted-foreground">
+              Fix existing contacts where name shows as "Unknown" or first/last name is missing — replaces with email local-part and removes generic role addresses.
+            </p>
+            <Button size="sm" variant="outline" onClick={handleCleanupUnknown} disabled={isCleaningUp} className="shrink-0">
+              {isCleaningUp ? <><Loader2 className="h-3 w-3 animate-spin mr-1" />Cleaning…</> : "Clean Up Unknown Names"}
+            </Button>
+          </div>
 
           {/* Filters + actions bar */}
           <div className="flex items-center justify-between flex-wrap gap-3">
