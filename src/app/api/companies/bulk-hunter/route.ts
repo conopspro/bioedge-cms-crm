@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
             company_id: company.id,
             name: fullName,
             first_name: firstName,
-            last_name: lastName || "-",
+            last_name: lastName || null,
             title: e.position || null,
             email: e.email,
             linkedin_url: e.linkedin || null,

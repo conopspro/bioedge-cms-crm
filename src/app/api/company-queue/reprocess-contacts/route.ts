@@ -70,7 +70,7 @@ export async function POST(request: NextRequest) {
           if (!contact.name || !contact.email) continue
           const parts = contact.name.trim().split(" ")
           const firstName = parts[0] || contact.email.split("@")[0]
-          const lastName = parts.slice(1).join(" ") || "-"
+          const lastName = parts.slice(1).join(" ") || null
           contactsToInsert.push({
             company_id: companyId,
             name: `${firstName} ${lastName}`.trim(),
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
             company_id: companyId,
             name: fullName,
             first_name: firstName,
-            last_name: lastName || "-",
+            last_name: lastName || null,
             title: contact.title || null,
             email: contact.email,
             linkedin_url: contact.linkedin || null,

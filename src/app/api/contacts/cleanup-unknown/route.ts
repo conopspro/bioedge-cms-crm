@@ -22,15 +22,28 @@ const GENERIC_LOCALS = new Set([
   "partners","affiliate","affiliates","vendor","vendors","ops","operations",
 ])
 
+// A last_name is a placeholder (not a real name) if it's one of these sentinel values
+function isPlaceholderLastName(v: string | null): boolean {
+  if (!v) return true
+  const t = v.trim()
+  return t === "-" || t === ""
+}
+
+function isPlaceholderFirstName(v: string | null): boolean {
+  if (!v) return true
+  const t = v.trim()
+  return t === "Unknown" || t === ""
+}
+
 export async function POST() {
   try {
     const supabase = await createClient()
 
-    // Fetch all contacts where first_name OR last_name OR name contains "Unknown" or is "-"
+    // Fetch contacts with any placeholder value in first_name, last_name, or name
     const { data: contacts, error } = await supabase
       .from("contacts")
       .select("id, first_name, last_name, name, email")
-      .or('first_name.eq.Unknown,last_name.eq.-,name.ilike.%Unknown%')
+      .or('first_name.eq.Unknown,last_name.eq.-,name.ilike.%Unknown%,name.ilike.% -%')
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     if (!contacts || contacts.length === 0) {
@@ -46,10 +59,7 @@ export async function POST() {
 
       const emailLocal = contact.email.split("@")[0].toLowerCase()
       const isGeneric = GENERIC_LOCALS.has(emailLocal)
-      const hasNoRealName = (
-        (!contact.first_name || contact.first_name === "Unknown") &&
-        (!contact.last_name || contact.last_name === "-")
-      )
+      const hasNoRealName = isPlaceholderFirstName(contact.first_name) && isPlaceholderLastName(contact.last_name)
 
       // Delete generic role contacts with no real name
       if (isGeneric && hasNoRealName) {
@@ -62,16 +72,20 @@ export async function POST() {
         continue
       }
 
-      // Fix contacts with "Unknown" first_name — derive from email local-part
-      const needsFirstName = !contact.first_name || contact.first_name === "Unknown"
-      const needsLastName = !contact.last_name || contact.last_name === "-"
+      const needsFirstName = isPlaceholderFirstName(contact.first_name)
+      const needsLastName = isPlaceholderLastName(contact.last_name)
 
       if (!needsFirstName && !needsLastName) continue
 
+      // Derive first name from email local-part if missing
       const derivedFirst = needsFirstName
         ? emailLocal.charAt(0).toUpperCase() + emailLocal.slice(1)
-        : contact.first_name
+        : contact.first_name!
+
+      // Last name: clear the placeholder — store null (displayed as empty, not "-")
       const derivedLast = needsLastName ? null : contact.last_name
+
+      // Rebuild the full name without any trailing " -" dash
       const derivedName = derivedLast
         ? `${derivedFirst} ${derivedLast}`.trim()
         : derivedFirst
@@ -80,7 +94,7 @@ export async function POST() {
         .from("contacts")
         .update({
           first_name: derivedFirst,
-          last_name: derivedLast || "-",
+          last_name: derivedLast,   // null when no real last name — no more "-"
           name: derivedName,
         })
         .eq("id", contact.id)
