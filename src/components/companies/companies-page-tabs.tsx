@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Plus } from "lucide-react"
+import { Plus, Upload } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CompaniesTable } from "@/components/companies/companies-table"
@@ -61,7 +61,13 @@ export function CompaniesPageTabs({ companies }: CompaniesPageTabsProps) {
       </div>
 
       <TabsContent value="companies" className="space-y-4">
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" asChild>
+            <Link href="/dashboard/companies/import">
+              <Upload className="mr-2 h-4 w-4" />
+              Import Companies
+            </Link>
+          </Button>
           <Button asChild>
             <Link href="/dashboard/companies/new/edit">
               <Plus className="mr-2 h-4 w-4" />
