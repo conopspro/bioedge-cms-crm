@@ -301,7 +301,10 @@ export default function NewCampaignPage() {
 
   // Step 2: Search contacts for selected companies
   const searchContacts = useCallback(async () => {
-    if (!recipientsOpen || selectedCompanyIds.size === 0) {
+    // Allow search without company selection when "Added Within" is set —
+    // that filter alone is enough to scope the results meaningfully
+    const hasAddedWithinFilter = contactAddedWithin !== "all"
+    if (!recipientsOpen || (selectedCompanyIds.size === 0 && !hasAddedWithinFilter)) {
       setSearchResults([])
       return
     }
@@ -309,8 +312,10 @@ export default function NewCampaignPage() {
     setSearchLoading(true)
     try {
       // Use POST to avoid HTTP 431 when many company IDs are selected
-      const body: Record<string, unknown> = {
-        company_ids: Array.from(selectedCompanyIds),
+      const body: Record<string, unknown> = {}
+      // Only send company_ids if companies are selected; omit to search across all
+      if (selectedCompanyIds.size > 0) {
+        body.company_ids = Array.from(selectedCompanyIds)
       }
       if (contactSearch) body.search = contactSearch
       if (contactNotWithin !== "all") body.not_within = contactNotWithin
@@ -1384,7 +1389,10 @@ export default function NewCampaignPage() {
                       </div>
 
                       <div className="space-y-1">
-                        <Label className="text-xs">Added Within</Label>
+                        <Label className="text-xs">
+                          Added Within{" "}
+                          <span className="text-muted-foreground font-normal">(works without company filter)</span>
+                        </Label>
                         <Select
                           value={contactAddedWithin}
                           onValueChange={setContactAddedWithin}
@@ -1394,8 +1402,8 @@ export default function NewCampaignPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">Any Time</SelectItem>
-                            <SelectItem value="1d">Last 1 Day</SelectItem>
-                            <SelectItem value="2d">Last 2 Days</SelectItem>
+                            <SelectItem value="1d">Today</SelectItem>
+                            <SelectItem value="2d">Today &amp; Yesterday</SelectItem>
                             <SelectItem value="3d">Last 3 Days</SelectItem>
                             <SelectItem value="7d">Last 7 Days</SelectItem>
                           </SelectContent>
