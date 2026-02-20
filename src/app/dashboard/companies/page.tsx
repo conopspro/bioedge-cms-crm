@@ -11,12 +11,13 @@ import { CompaniesPageTabs } from "@/components/companies/companies-page-tabs"
 export default async function CompaniesPage() {
   const supabase = await createClient()
 
-  // Fetch all companies with article counts (sorted alphabetically by name)
+  // Fetch all companies with article counts and contact counts (sorted alphabetically by name)
   const { data: companies, error } = await supabase
     .from("companies")
     .select(`
       *,
-      articles:articles(id, status)
+      articles:articles(id, status),
+      contacts:contacts(id, source)
     `)
     .order("name", { ascending: true })
 
@@ -45,10 +46,17 @@ export default async function CompaniesPage() {
       derivedStatus = company.status
     }
 
+    const contacts = company.contacts || []
+    const contactCount = contacts.length
+    const hunterContactCount = contacts.filter((c: any) => c.source === "hunter").length
+
     return {
       ...company,
       derivedStatus,
-      articles: undefined, // Remove articles array from passed data
+      contactCount,
+      hunterContactCount,
+      articles: undefined,
+      contacts: undefined,
     }
   })
 

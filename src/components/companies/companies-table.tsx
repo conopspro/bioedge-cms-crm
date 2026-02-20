@@ -325,6 +325,7 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
               <TableHead className="w-[280px]">Company</TableHead>
               <TableHead>Visibility</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Contacts</TableHead>
               <TableHead>Website</TableHead>
               <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
@@ -332,7 +333,7 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
           <TableBody>
             {filteredCompanies.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   {companies.length === 0 ? (
                     <div className="text-muted-foreground">
                       No companies yet.{" "}
@@ -422,6 +423,30 @@ export function CompaniesTable({ companies }: CompaniesTableProps) {
                       <Badge variant={statusColors[effectiveStatus] || "default"}>
                         {statusLabels[effectiveStatus] || effectiveStatus}
                       </Badge>
+                    </TableCell>
+
+                    {/* Contacts */}
+                    <TableCell>
+                      {(() => {
+                        const total = (company as any).contactCount ?? 0
+                        const hunter = (company as any).hunterContactCount ?? 0
+                        if (total === 0) return <span className="text-muted-foreground">—</span>
+                        return (
+                          <div className="flex items-center gap-1.5">
+                            <Link
+                              href={`/dashboard/companies/${company.id}#contacts`}
+                              className="text-sm font-medium hover:underline"
+                            >
+                              {total}
+                            </Link>
+                            {hunter > 0 && (
+                              <span className="text-xs text-muted-foreground">
+                                ({hunter} Hunter)
+                              </span>
+                            )}
+                          </div>
+                        )
+                      })()}
                     </TableCell>
 
                     {/* Website */}
