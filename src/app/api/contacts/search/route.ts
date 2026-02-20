@@ -19,6 +19,7 @@ interface ContactSearchParams {
   not_within?: string | null // 7d, 30d, 90d — exclude contacts contacted within this window
   converted?: string | null // only, exclude — filter by converted status
   catch_all?: string | null // only, exclude — filter by catch-all email type
+  added_within?: string | null // 7d, 14d, 30d, 60d, 90d — only contacts created within this window
 }
 
 /**
@@ -42,6 +43,7 @@ async function handleContactSearch(params: ContactSearchParams) {
     not_within: notWithin,
     converted,
     catch_all: catchAll,
+    added_within: addedWithin,
   } = params
 
   // "Not Contacted Within" filter — exclude contacts with outreach_log entries within X days
@@ -245,6 +247,13 @@ async function handleContactSearch(params: ContactSearchParams) {
     if (titleSearch) {
       filtered = filtered.ilike("title", `%${titleSearch}%`)
     }
+    if (addedWithin && addedWithin !== "all") {
+      const days = parseInt(addedWithin.replace("d", ""), 10)
+      if (!isNaN(days)) {
+        const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
+        filtered = filtered.gte("created_at", cutoff)
+      }
+    }
     return filtered
   }
 
@@ -413,6 +422,7 @@ export async function POST(request: NextRequest) {
       not_within: body.not_within || null,
       converted: body.converted || null,
       catch_all: body.catch_all || null,
+      added_within: body.added_within || null,
     })
   } catch (error) {
     console.error("Unexpected error:", error)

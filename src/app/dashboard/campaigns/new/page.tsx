@@ -138,6 +138,7 @@ export default function NewCampaignPage() {
   const [contactTitleSearch, setContactTitleSearch] = useState("")
   const [contactHasEmail, setContactHasEmail] = useState(true)
   const [contactOutreachTimeRange, setContactOutreachTimeRange] = useState("all")
+  const [contactAddedWithin, setContactAddedWithin] = useState("all")
 
   const [searchResults, setSearchResults] = useState<ContactResult[]>([])
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(
@@ -319,6 +320,7 @@ export default function NewCampaignPage() {
       if (contactTitleSearch) body.title_search = contactTitleSearch
       if (contactHasEmail) body.has_email = true
       if (contactOutreachTimeRange !== "all") body.outreach = contactOutreachTimeRange
+      if (contactAddedWithin !== "all") body.added_within = contactAddedWithin
 
       const res = await fetch("/api/contacts/search", {
         method: "POST",
@@ -348,6 +350,7 @@ export default function NewCampaignPage() {
     contactTitleSearch,
     contactHasEmail,
     contactOutreachTimeRange,
+    contactAddedWithin,
   ])
 
   useEffect(() => {
@@ -1378,6 +1381,26 @@ export default function NewCampaignPage() {
                             setContactTitleSearch(e.target.value)
                           }
                         />
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs">Added Within</Label>
+                        <Select
+                          value={contactAddedWithin}
+                          onValueChange={setContactAddedWithin}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Any time" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">Any Time</SelectItem>
+                            <SelectItem value="7d">Last 7 Days</SelectItem>
+                            <SelectItem value="14d">Last 14 Days</SelectItem>
+                            <SelectItem value="30d">Last 30 Days</SelectItem>
+                            <SelectItem value="60d">Last 60 Days</SelectItem>
+                            <SelectItem value="90d">Last 90 Days</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
 
                       <div className="flex items-end pb-1 gap-2">
