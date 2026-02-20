@@ -1394,11 +1394,10 @@ export default function NewCampaignPage() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="all">Any Time</SelectItem>
+                            <SelectItem value="1d">Last 1 Day</SelectItem>
+                            <SelectItem value="2d">Last 2 Days</SelectItem>
+                            <SelectItem value="3d">Last 3 Days</SelectItem>
                             <SelectItem value="7d">Last 7 Days</SelectItem>
-                            <SelectItem value="14d">Last 14 Days</SelectItem>
-                            <SelectItem value="30d">Last 30 Days</SelectItem>
-                            <SelectItem value="60d">Last 60 Days</SelectItem>
-                            <SelectItem value="90d">Last 90 Days</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
