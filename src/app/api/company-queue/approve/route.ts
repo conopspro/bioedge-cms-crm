@@ -171,6 +171,7 @@ export async function POST(request: NextRequest) {
           const lastName = parts.slice(1).join(" ") || "-"
           contactsToInsert.push({
             company_id: companyId,
+            name: `${firstName} ${lastName}`.trim(),
             first_name: firstName,
             last_name: lastName,
             title: contact.title || null,
@@ -190,10 +191,13 @@ export async function POST(request: NextRequest) {
           title?: string; confidence?: number; seniority?: string; linkedin?: string; phone?: string
         }[]) {
           if (!contact.email) continue
+          const firstName = contact.first_name || "Unknown"
+          const lastName = contact.last_name || "-"
           contactsToInsert.push({
             company_id: companyId,
-            first_name: contact.first_name || "Unknown",
-            last_name: contact.last_name || "-",
+            name: `${firstName} ${lastName}`.trim(),
+            first_name: firstName,
+            last_name: lastName,
             title: contact.title || null,
             email: contact.email,
             linkedin_url: contact.linkedin || null,

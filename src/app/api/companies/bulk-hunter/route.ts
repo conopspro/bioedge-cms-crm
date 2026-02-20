@@ -120,20 +120,25 @@ export async function POST(request: NextRequest) {
         }
 
         // Build contact rows
-        const contactRows = contacts.map((e) => ({
-          company_id: company.id,
-          first_name: e.firstName || "Unknown",
-          last_name: e.lastName || "-",
-          title: e.position || null,
-          email: e.email,
-          linkedin_url: e.linkedin || null,
-          phone: e.phone || null,
-          source: "hunter" as const,
-          outreach_status: "not_contacted",
-          show_on_articles: false,
-          hunter_confidence: e.confidence,
-          seniority: e.seniority || null,
-        }))
+        const contactRows = contacts.map((e) => {
+          const firstName = e.firstName || "Unknown"
+          const lastName = e.lastName || "-"
+          return {
+            company_id: company.id,
+            name: `${firstName} ${lastName}`.trim(),
+            first_name: firstName,
+            last_name: lastName,
+            title: e.position || null,
+            email: e.email,
+            linkedin_url: e.linkedin || null,
+            phone: e.phone || null,
+            source: "hunter" as const,
+            outreach_status: "not_contacted",
+            show_on_articles: false,
+            hunter_confidence: e.confidence,
+            seniority: e.seniority || null,
+          }
+        })
 
         // Dedup by email against existing contacts table
         const emailsToCheck = contactRows.map((c) => c.email).filter(Boolean)

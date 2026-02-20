@@ -69,10 +69,13 @@ export async function POST(request: NextRequest) {
         }[]) {
           if (!contact.name || !contact.email) continue
           const parts = contact.name.trim().split(" ")
+          const firstName = parts[0] || "Unknown"
+          const lastName = parts.slice(1).join(" ") || "-"
           contactsToInsert.push({
             company_id: companyId,
-            first_name: parts[0] || "Unknown",
-            last_name: parts.slice(1).join(" ") || "-",
+            name: `${firstName} ${lastName}`.trim(),
+            first_name: firstName,
+            last_name: lastName,
             title: contact.title || null,
             email: contact.email,
             linkedin_url: contact.linkedin_url || null,
@@ -90,10 +93,13 @@ export async function POST(request: NextRequest) {
           title?: string; confidence?: number; seniority?: string; linkedin?: string; phone?: string
         }[]) {
           if (!contact.email) continue
+          const firstName = contact.first_name || "Unknown"
+          const lastName = contact.last_name || "-"
           contactsToInsert.push({
             company_id: companyId,
-            first_name: contact.first_name || "Unknown",
-            last_name: contact.last_name || "-",
+            name: `${firstName} ${lastName}`.trim(),
+            first_name: firstName,
+            last_name: lastName,
             title: contact.title || null,
             email: contact.email,
             linkedin_url: contact.linkedin || null,
