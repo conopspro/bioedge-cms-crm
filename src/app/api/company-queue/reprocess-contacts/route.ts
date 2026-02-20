@@ -93,13 +93,15 @@ export async function POST(request: NextRequest) {
           title?: string; confidence?: number; seniority?: string; linkedin?: string; phone?: string
         }[]) {
           if (!contact.email) continue
-          const firstName = contact.first_name || "Unknown"
-          const lastName = contact.last_name || "-"
+          const emailLocal = contact.email.split("@")[0]
+          const firstName = contact.first_name || (emailLocal.charAt(0).toUpperCase() + emailLocal.slice(1))
+          const lastName = contact.last_name || null
+          const fullName = lastName ? `${firstName} ${lastName}`.trim() : firstName
           contactsToInsert.push({
             company_id: companyId,
-            name: `${firstName} ${lastName}`.trim(),
+            name: fullName,
             first_name: firstName,
-            last_name: lastName,
+            last_name: lastName || "-",
             title: contact.title || null,
             email: contact.email,
             linkedin_url: contact.linkedin || null,

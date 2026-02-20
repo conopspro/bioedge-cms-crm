@@ -117,13 +117,19 @@ export async function POST(request: NextRequest) {
 
         // Build contact rows
         const contactRows = contacts.map((e) => {
-          const firstName = e.firstName || "Unknown"
-          const lastName = e.lastName || "-"
+          // When Hunter has no name, derive one from the email local-part
+          // e.g. "rob@ammortal.com" → first_name "Rob", last_name null
+          const emailLocal = e.email ? e.email.split("@")[0] : null
+          const firstName = e.firstName || (emailLocal
+            ? emailLocal.charAt(0).toUpperCase() + emailLocal.slice(1)
+            : "Unknown")
+          const lastName = e.lastName || null
+          const fullName = lastName ? `${firstName} ${lastName}`.trim() : firstName
           return {
             company_id: company.id,
-            name: `${firstName} ${lastName}`.trim(),
+            name: fullName,
             first_name: firstName,
-            last_name: lastName,
+            last_name: lastName || "-",
             title: e.position || null,
             email: e.email,
             linkedin_url: e.linkedin || null,
