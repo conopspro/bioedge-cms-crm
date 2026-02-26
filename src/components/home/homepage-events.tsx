@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Calendar, MapPin, ArrowRight } from "lucide-react"
+import { Calendar, MapPin } from "lucide-react"
 
 interface Event {
   id: string
@@ -104,17 +104,17 @@ export function HomepageEvents({
     "bg-white"
   )
 
-  // Get grid columns class
+  // Get grid columns class — banners are always full-width
   const getGridCols = () => {
-    if (events.length === 0) return "max-w-lg mx-auto"
+    if (events.length === 0) return ""
     const effectiveColumns = Math.min(columns, events.length)
     switch (effectiveColumns) {
-      case 1:
-        return "max-w-lg mx-auto"
       case 2:
-        return "grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto"
-      default:
+        return "grid-cols-1 md:grid-cols-2"
+      case 3:
         return "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      default:
+        return "grid-cols-1"
     }
   }
 
@@ -194,63 +194,64 @@ export function HomepageEvents({
               <Link
                 key={fe.id}
                 href={`/${event.slug}`}
-                className="group relative overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+                className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(13,89,138,0.25)]"
               >
-                {/* Featured Image */}
-                <div className="relative h-48 overflow-hidden">
+                <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
+                <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
+
+                  {/* Event image thumbnail */}
                   {displayImage ? (
                     <img
                       src={displayImage}
                       alt={displayTitle}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="h-28 w-44 flex-shrink-0 rounded object-cover shadow-xl transition-transform duration-300 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-navy via-deep-blue to-electric-blue" />
+                    <div className="flex h-28 w-44 flex-shrink-0 items-center justify-center rounded bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105">
+                      <Calendar className="h-10 w-10 text-electric-blue/50" />
+                    </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-xl font-bold text-white drop-shadow-lg">
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xl font-bold text-white md:text-2xl">
                       {displayTitle}
                     </h3>
+                    <div className="mt-3 hidden sm:block space-y-1.5">
+                      {displayTagline && (
+                        <p className="text-sm italic text-white/80">
+                          &ldquo;{displayTagline}&rdquo;
+                        </p>
+                      )}
+                      {event.start_date && (
+                        <div className="flex items-center gap-1.5 text-xs text-white/50">
+                          <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span>
+                            {formatDate(event.start_date)}
+                            {event.end_date && formatDate(event.end_date) !== formatDate(event.start_date) && (
+                              <> &ndash; {formatDate(event.end_date)}</>
+                            )}
+                          </span>
+                        </div>
+                      )}
+                      {(event.city || event.venue_name) && (
+                        <div className="flex items-center gap-1.5 text-xs text-white/50">
+                          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                          <span>{event.venue_name || `${event.city}${event.state ? `, ${event.state}` : ""}`}</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
+
+                  {/* CTA */}
+                  <span className="hidden flex-shrink-0 items-center gap-2 rounded-full bg-electric-blue px-5 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-white group-hover:text-navy sm:inline-flex">
+                    Learn More
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </span>
+
                 </div>
-
-                {/* Card Content */}
-                <div className="p-6">
-                  {displayTagline && (
-                    <p className="text-deep-blue mb-4 line-clamp-2">
-                      {displayTagline}
-                    </p>
-                  )}
-
-                  <div className="space-y-2 mb-4">
-                    {event.start_date && (
-                      <div className="flex items-center gap-2 text-[15px] text-gray-600">
-                        <Calendar className="h-4 w-4 text-electric-blue" />
-                        <span>
-                          {formatDate(event.start_date)}
-                          {event.end_date && formatDate(event.end_date) !== formatDate(event.start_date) && (
-                            <> – {formatDate(event.end_date)}</>
-                          )}
-                        </span>
-                      </div>
-                    )}
-                    {(event.city || event.venue_name) && (
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <MapPin className="h-4 w-4 text-electric-blue" />
-                        <span>{event.venue_name || `${event.city}${event.state ? `, ${event.state}` : ""}`}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex items-center gap-2 text-electric-blue font-semibold group-hover:text-navy transition-colors">
-                    <span>Learn More</span>
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </div>
-
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gold origin-left scale-x-0 transition-transform duration-300 group-hover:scale-x-100" />
               </Link>
             )
           })}
