@@ -36,7 +36,7 @@ export function FeaturedCardSlider({ children, className }: FeaturedCardSliderPr
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
-      const scrollAmount = 304 // ~280px card + 24px gap
+      const scrollAmount = 224 // ~200px card + 24px gap
       scrollContainerRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
