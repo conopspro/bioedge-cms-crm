@@ -86,12 +86,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .eq("clinic_campaign_id", campaignId)
       .eq("status", "pending")
 
-    // Count already-generated recipients
+    // Count already-generated recipients (including errored — they're no longer pending)
     const { count: alreadyGenerated } = await supabase
       .from("clinic_campaign_recipients")
       .select("id", { count: "exact", head: true })
       .eq("clinic_campaign_id", campaignId)
-      .in("status", ["generated", "approved", "sent", "delivered", "opened", "clicked"])
+      .in("status", ["generated", "approved", "sent", "delivered", "opened", "clicked", "error"])
 
     const totalRecipients = (totalPending || 0) + (alreadyGenerated || 0)
 
@@ -212,9 +212,12 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         )
         errors++
 
+        // Set status to "error" so this recipient is NOT picked up again on the
+        // next batch call — leaving it as "pending" causes an infinite retry loop.
         await supabase
           .from("clinic_campaign_recipients")
           .update({
+            status: "error",
             error: err instanceof Error ? err.message : "Generation failed",
           })
           .eq("id", recipient.id)

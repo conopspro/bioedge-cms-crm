@@ -74,6 +74,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       "status",
       "approved",
       "recipient_email",
+      "error",  // allow clearing the error field when retrying
     ]
 
     const updateData: Record<string, unknown> = {}

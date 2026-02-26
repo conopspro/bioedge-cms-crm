@@ -98,6 +98,7 @@ const RECIPIENT_STATUS_BADGES: Record<string, { label: string; variant: "default
   clicked: { label: "Clicked", variant: "success" },
   bounced: { label: "Bounced", variant: "destructive" },
   failed: { label: "Failed", variant: "destructive" },
+  error: { label: "Error", variant: "destructive" },
   suppressed: { label: "Suppressed", variant: "warning" },
 }
 
@@ -109,6 +110,7 @@ export default function ClinicCampaignDetailPage() {
   const [campaign, setCampaign] = useState<CampaignDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [generating, setGenerating] = useState(false)
+  const [retrying, setRetrying] = useState(false)
   const [approving, setApproving] = useState(false)
   const [selectedRecipient, setSelectedRecipient] = useState<EnrichedRecipient | null>(null)
   const [showPreview, setShowPreview] = useState(false)
@@ -167,6 +169,7 @@ export default function ClinicCampaignDetailPage() {
 
     try {
       let remaining = 1
+      let prevRemaining = Infinity
 
       while (remaining > 0 && !generateAbortRef.current) {
         const res = await fetch(`/api/clinic-campaigns/${campaignId}/generate`, {
@@ -183,6 +186,15 @@ export default function ClinicCampaignDetailPage() {
 
         const data = await res.json()
         remaining = data.remaining || 0
+
+        // Safety: if remaining didn't decrease and nothing was generated this
+        // batch, the loop is stuck (likely Anthropic errors on every recipient).
+        // Break rather than spinning forever.
+        if (remaining >= prevRemaining && (data.generated || 0) === 0) {
+          await fetchCampaign()
+          break
+        }
+        prevRemaining = remaining
 
         setGenerateProgress({
           done: (data.total || 0) - remaining,
@@ -214,6 +226,33 @@ export default function ClinicCampaignDetailPage() {
 
   const handleCancelGenerate = () => {
     generateAbortRef.current = true
+  }
+
+  const handleRetryErrors = async () => {
+    if (!campaign) return
+    const errorRecipients = campaign.clinic_campaign_recipients.filter(
+      (r) => r.status === "error"
+    )
+    if (errorRecipients.length === 0) return
+
+    setRetrying(true)
+    try {
+      // Reset each errored recipient back to pending so generation will retry them
+      await Promise.all(
+        errorRecipients.map((r) =>
+          fetch(`/api/clinic-campaigns/${campaignId}/recipients/${r.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: "pending", error: null }),
+          })
+        )
+      )
+      await fetchCampaign()
+    } catch (err) {
+      console.error("Retry reset failed:", err)
+    } finally {
+      setRetrying(false)
+    }
   }
 
   const handleApproveAll = async () => {
@@ -527,6 +566,7 @@ export default function ClinicCampaignDetailPage() {
   const generatedCount = recipients.filter((r) => r.status === "generated").length
   const approvedCount = recipients.filter((r) => r.status === "approved").length
   const sentCount = recipients.filter((r) => ["sent", "delivered", "opened", "clicked"].includes(r.status)).length
+  const errorCount = recipients.filter((r) => r.status === "error").length
 
   const statusBadge = STATUS_BADGES[campaign.status] || { label: campaign.status, variant: "secondary" as const }
 
@@ -647,6 +687,14 @@ export default function ClinicCampaignDetailPage() {
             <div className="text-xs text-muted-foreground">Sent</div>
           </CardContent>
         </Card>
+        {errorCount > 0 && (
+          <Card className="flex-1 min-w-[150px] border-destructive/40">
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-2xl font-bold text-destructive">{errorCount}</div>
+              <div className="text-xs text-muted-foreground">Errors</div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Action buttons */}
@@ -668,6 +716,19 @@ export default function ClinicCampaignDetailPage() {
               </Button>
             )}
           </div>
+        )}
+
+        {errorCount > 0 && !generating && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRetryErrors}
+            disabled={retrying}
+            className="border-destructive/40 text-destructive hover:bg-destructive/10"
+          >
+            <RefreshCw className={`mr-2 h-3.5 w-3.5 ${retrying ? "animate-spin" : ""}`} />
+            {retrying ? "Resetting…" : `Retry Failed (${errorCount})`}
+          </Button>
         )}
 
         {generatedCount > 0 && (
