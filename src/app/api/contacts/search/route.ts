@@ -46,6 +46,22 @@ async function handleContactSearch(params: ContactSearchParams) {
     added_within: addedWithin,
   } = params
 
+  // "Never outreached" filter — exclude contacts that appear anywhere in outreach_log.
+  // Uses post-filtering (same as notWithin below) to avoid HTTP 431 / PostgREST URL
+  // size limits when the ever-contacted list is large (thousands of UUIDs).
+  let outreachNeverExcludeSet: Set<string> | null = null
+  if (outreach === "never") {
+    const { data: contactedIds } = await supabase
+      .from("outreach_log")
+      .select("contact_id")
+      .limit(50000)
+
+    outreachNeverExcludeSet = new Set(
+      (contactedIds || []).map((r) => r.contact_id).filter(Boolean)
+    )
+    // outreach stays as "never" — the inline filter block below is guarded with !== "never"
+  }
+
   // "Not Contacted Within" filter — exclude contacts with outreach_log entries within X days
   // Uses post-filtering (not inline query) to avoid HTTP 431 with large ID lists
   let notWithinExcludeSet: Set<string> | null = null
@@ -75,7 +91,7 @@ async function handleContactSearch(params: ContactSearchParams) {
   // Outreach recency filter — find contact IDs from outreach_log
   let outreachContactIds: string[] | null = null
   let outreachFilterMode: "include" | "exclude" | null = null
-  if (outreach && outreach !== "all") {
+  if (outreach && outreach !== "all" && outreach !== "never") {
     if (outreach === "never") {
       const { data: contactedIds } = await supabase
         .from("outreach_log")
@@ -331,6 +347,11 @@ async function handleContactSearch(params: ContactSearchParams) {
   let filteredContacts = allContacts || []
   if (notWithinExcludeSet && notWithinExcludeSet.size > 0) {
     filteredContacts = filteredContacts.filter((c) => !notWithinExcludeSet!.has(c.id))
+  }
+
+  // Post-filter: "Never outreached" — keep only contacts with no outreach_log entry at all
+  if (outreachNeverExcludeSet) {
+    filteredContacts = filteredContacts.filter((c) => !outreachNeverExcludeSet!.has(c.id))
   }
 
   // Sort merged results (batched queries each sort independently, need final sort)
