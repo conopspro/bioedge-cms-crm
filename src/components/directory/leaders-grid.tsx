@@ -86,7 +86,7 @@ export function LeadersGrid({ initialLeaders, initialHasMore }: LeadersGridProps
           <Link
             key={leader.id}
             href={`/leaders/${leader.slug || leader.id}`}
-            className="group overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+            className="group overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]"
           >
             <div className="p-6">
               <div className="flex items-start gap-4">
