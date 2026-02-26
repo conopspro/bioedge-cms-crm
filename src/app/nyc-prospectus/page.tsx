@@ -36,12 +36,14 @@ export default function NYCProspectusPage() {
               <div className="prospectus-hero-detail-value">NYC Metropolitan Pavilion</div>
             </div>
             <div className="prospectus-hero-detail">
-              <div className="prospectus-hero-detail-label">Setup & VIP Dinner</div>
-              <div className="prospectus-hero-detail-value">July 10, 2026</div>
+              <div className="prospectus-hero-detail-label">Day 1 — July 10, 2026</div>
+              <div className="prospectus-hero-detail-value">2:00 PM – 6:00 PM</div>
+              <div className="prospectus-hero-detail-sub">Exhibitor setup from 8:00 AM</div>
             </div>
             <div className="prospectus-hero-detail">
-              <div className="prospectus-hero-detail-label">Main Event</div>
-              <div className="prospectus-hero-detail-value">July 11, 2026</div>
+              <div className="prospectus-hero-detail-label">Day 2 — July 11, 2026</div>
+              <div className="prospectus-hero-detail-value">9:00 AM – 5:00 PM</div>
+              <div className="prospectus-hero-detail-sub">Breakdown until 11:00 PM</div>
             </div>
           </div>
 
