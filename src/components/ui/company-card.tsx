@@ -74,7 +74,7 @@ export function CompanyCard({
       <Link
         href={linkHref}
         className={cn(
-          "be-card flex items-center justify-center p-3 hover:shadow-lg transition-shadow",
+          "be-card flex items-center justify-center p-3 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)] transition-shadow",
           className
         )}
       >
@@ -100,7 +100,7 @@ export function CompanyCard({
       <Link
         href={linkHref}
         className={cn(
-          "be-card hover:shadow-lg transition-shadow flex items-center gap-4 group",
+          "be-card hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)] transition-shadow flex items-center gap-4 group",
           className
         )}
         style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
@@ -149,7 +149,7 @@ export function CompanyCard({
     <Link
       href={linkHref}
       className={cn(
-        "be-card hover:shadow-lg transition-shadow block",
+        "be-card hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)] transition-shadow block",
         className
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}

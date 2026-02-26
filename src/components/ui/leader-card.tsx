@@ -58,7 +58,7 @@ export function LeaderCard({
       <Link
         href={linkHref}
         className={cn(
-          "be-card hover:shadow-lg transition-shadow flex items-start gap-4 group",
+          "be-card hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)] transition-shadow flex items-start gap-4 group",
           className
         )}
         style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
@@ -123,7 +123,7 @@ export function LeaderCard({
     <Link
       href={linkHref}
       className={cn(
-        "be-card hover:shadow-lg transition-shadow text-center group block",
+        "be-card hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)] transition-shadow text-center group block",
         className
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}

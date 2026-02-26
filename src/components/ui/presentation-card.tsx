@@ -34,7 +34,7 @@ export function PresentationCard({
     <Link
       href={linkHref}
       className={cn(
-        "bg-white rounded-lg overflow-hidden hover:shadow-lg transition-shadow group flex flex-col sm:flex-row",
+        "bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)] transition-shadow group flex flex-col sm:flex-row",
         className
       )}
       style={{ boxShadow: "0 0 0 2px rgba(1, 122, 178, 0.3)" }}
