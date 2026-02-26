@@ -748,6 +748,112 @@ section {
   margin-bottom: 0;
 }
 
+/* Pricing Guide Section */
+.prospectus-pricing {
+  background: #f8f9fa;
+}
+
+.prospectus-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+.prospectus-pricing-category-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.prospectus-pricing-category {
+  background: white;
+  border-radius: 8px;
+  padding: 28px;
+  border: 1px solid #e2e8f0;
+  position: relative;
+  overflow: hidden;
+}
+
+.prospectus-pricing-category::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #0d598a, #017ab2);
+}
+
+.prospectus-pricing-cat-title {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0d2840;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #ff914d;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.prospectus-pricing-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.prospectus-pricing-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.prospectus-pricing-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.prospectus-pricing-item-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.prospectus-pricing-item-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 3px;
+  line-height: 1.3;
+}
+
+.prospectus-pricing-item-desc {
+  font-size: 12px;
+  color: #95a5a6;
+  line-height: 1.4;
+}
+
+.prospectus-pricing-item-price {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d598a;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.prospectus-pricing-cta {
+  text-align: center;
+  margin-top: 48px;
+}
+
+@media (max-width: 968px) {
+  .prospectus-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Testimonials */
 .prospectus-testimonials {
   background: white;
