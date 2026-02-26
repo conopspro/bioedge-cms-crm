@@ -227,14 +227,19 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
           >
             <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
             <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
-              <div className="flex h-32 w-24 flex-shrink-0 items-center justify-center rounded bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105">
-                <ScanLine className="h-12 w-12 text-electric-blue" />
+              <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105">
+                <ScanLine className="h-10 w-10 text-electric-blue" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-xl font-bold text-white md:text-2xl">
-                  bioEDGE Decoder<span className="font-normal text-white"> — Free</span>
+                  bioEDGE Decoder
                 </h3>
                 <div className="mt-3 hidden sm:block">
+                  <div className="flex items-center gap-0.5 mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
                   <p className="text-sm italic text-white/80">
                     &ldquo;When Something Feels Off, This Helps You Understand Why&rdquo;
                   </p>
