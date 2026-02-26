@@ -74,6 +74,68 @@ export async function GET(request: Request) {
   }
 }
 
+// DELETE /api/outreach-contacts
+// Bulk-delete contacts by ID.
+// Body: { ids: string[] }
+export async function DELETE(request: Request) {
+  try {
+    const supabase = await createClient()
+    const body = await request.json()
+    const ids: string[] = Array.isArray(body.ids) ? body.ids : []
+
+    if (ids.length === 0) {
+      return NextResponse.json({ error: "ids array is required" }, { status: 400 })
+    }
+
+    const { error } = await supabase
+      .from("outreach_contacts")
+      .delete()
+      .in("id", ids)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ deleted: ids.length })
+  } catch (err) {
+    console.error("Unexpected error deleting outreach contacts:", err)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
+
+// PATCH /api/outreach-contacts
+// Bulk-update business_type on multiple contacts.
+// Body: { ids: string[], business_type: string | null }
+export async function PATCH(request: Request) {
+  try {
+    const supabase = await createClient()
+    const body = await request.json()
+    const ids: string[] = Array.isArray(body.ids) ? body.ids : []
+    const business_type: string | null =
+      typeof body.business_type === "string" && body.business_type.trim()
+        ? body.business_type.trim()
+        : null
+
+    if (ids.length === 0) {
+      return NextResponse.json({ error: "ids array is required" }, { status: 400 })
+    }
+
+    const { error } = await supabase
+      .from("outreach_contacts")
+      .update({ business_type })
+      .in("id", ids)
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ updated: ids.length })
+  } catch (err) {
+    console.error("Unexpected error updating outreach contacts:", err)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
+
 // POST /api/outreach-contacts
 // Create a single contact
 export async function POST(request: Request) {

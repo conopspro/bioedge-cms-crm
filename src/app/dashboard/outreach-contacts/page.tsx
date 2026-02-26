@@ -2,10 +2,11 @@
 
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { ArrowLeft, Upload, RefreshCw, Search, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, Upload, RefreshCw, Search, ChevronLeft, ChevronRight, Trash2, Tag } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
 import {
   Table,
   TableBody,
@@ -102,6 +103,13 @@ export default function OutreachContactsPage() {
   const [businessTypeFilter, setBusinessTypeFilter] = useState("")
   const [businessTypes, setBusinessTypes] = useState<BusinessTypeCount[]>([])
 
+  // Multi-select state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
+  const [tagDialogOpen, setTagDialogOpen] = useState(false)
+  const [tagInput, setTagInput] = useState("")
+  const [bulkTagging, setBulkTagging] = useState(false)
+
   // Import state
   const [importOpen, setImportOpen] = useState(false)
   const [csvHeaders, setCsvHeaders] = useState<string[]>([])
@@ -153,6 +161,79 @@ export default function OutreachContactsPage() {
   useEffect(() => {
     fetchBusinessTypes()
   }, [fetchBusinessTypes])
+
+  // ── Multi-select helpers ─────────────────────────────────────────────────
+  const allPageSelected = contacts.length > 0 && contacts.every((c) => selectedIds.has(c.id))
+  const somePageSelected = contacts.length > 0 && contacts.some((c) => selectedIds.has(c.id))
+
+  const toggleSelectAll = () => {
+    if (allPageSelected) {
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        contacts.forEach((c) => next.delete(c.id))
+        return next
+      })
+    } else {
+      setSelectedIds((prev) => {
+        const next = new Set(prev)
+        contacts.forEach((c) => next.add(c.id))
+        return next
+      })
+    }
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+
+  const handleBulkDelete = async () => {
+    if (!selectedIds.size) return
+    setBulkDeleting(true)
+    try {
+      const res = await fetch("/api/outreach-contacts", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds) }),
+      })
+      if (res.ok) {
+        setSelectedIds(new Set())
+        await fetchContacts()
+        await fetchBusinessTypes()
+      }
+    } catch (err) {
+      console.error("Bulk delete failed:", err)
+    } finally {
+      setBulkDeleting(false)
+    }
+  }
+
+  const handleBulkTag = async (tag: string) => {
+    if (!selectedIds.size || !tag.trim()) return
+    setBulkTagging(true)
+    try {
+      const res = await fetch("/api/outreach-contacts", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: Array.from(selectedIds), business_type: tag.trim() }),
+      })
+      if (res.ok) {
+        setTagDialogOpen(false)
+        setTagInput("")
+        setSelectedIds(new Set())
+        await fetchContacts()
+        await fetchBusinessTypes()
+      }
+    } catch (err) {
+      console.error("Bulk tag failed:", err)
+    } finally {
+      setBulkTagging(false)
+    }
+  }
 
   // ── CSV parsing ────────────────────────────────────────────────────────────
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -455,11 +536,112 @@ export default function OutreachContactsPage() {
         )}
       </div>
 
+      {/* Bulk action bar */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 rounded-lg border bg-muted/40 px-4 py-2.5">
+          <span className="text-sm font-medium">
+            {selectedIds.size.toLocaleString()} selected
+          </span>
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Set Tag */}
+            <Dialog open={tagDialogOpen} onOpenChange={(o) => { setTagDialogOpen(o); if (!o) setTagInput("") }}>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <Tag className="mr-1.5 h-3.5 w-3.5" />
+                  Set Tag
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-sm">
+                <DialogHeader>
+                  <DialogTitle>Set Business Type Tag</DialogTitle>
+                  <DialogDescription>
+                    Apply a tag to {selectedIds.size.toLocaleString()} selected contact{selectedIds.size !== 1 ? "s" : ""}.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 mt-2">
+                  {/* Existing tags */}
+                  {businessTypes.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Existing tags</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {businessTypes
+                          .filter((bt) => bt.business_type)
+                          .map((bt) => (
+                            <button
+                              key={bt.business_type}
+                              onClick={() => setTagInput(bt.business_type!)}
+                              className={`rounded-full border px-2.5 py-0.5 text-xs transition-colors
+                                ${tagInput === bt.business_type
+                                  ? "bg-primary text-primary-foreground border-primary"
+                                  : "bg-background hover:bg-muted"
+                                }`}
+                            >
+                              {bt.business_type}
+                            </button>
+                          ))}
+                      </div>
+                    </div>
+                  )}
+                  {/* Custom input */}
+                  <div className="space-y-1.5">
+                    <Label htmlFor="tag-input">Or enter a new tag</Label>
+                    <Input
+                      id="tag-input"
+                      placeholder="e.g. Chiropractor"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && tagInput.trim()) handleBulkTag(tagInput)
+                      }}
+                    />
+                  </div>
+                  <Button
+                    className="w-full"
+                    onClick={() => handleBulkTag(tagInput)}
+                    disabled={!tagInput.trim() || bulkTagging}
+                  >
+                    {bulkTagging ? "Applying…" : `Apply Tag to ${selectedIds.size.toLocaleString()} Contact${selectedIds.size !== 1 ? "s" : ""}`}
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            {/* Delete */}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleBulkDelete}
+              disabled={bulkDeleting}
+            >
+              <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+              {bulkDeleting ? "Deleting…" : `Delete ${selectedIds.size.toLocaleString()}`}
+            </Button>
+
+            {/* Clear selection */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setSelectedIds(new Set())}
+            >
+              Clear
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Contacts table */}
       <div className="rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-10">
+                <Checkbox
+                  checked={allPageSelected}
+                  data-state={somePageSelected && !allPageSelected ? "indeterminate" : undefined}
+                  onCheckedChange={toggleSelectAll}
+                  aria-label="Select all on page"
+                />
+              </TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Business Type</TableHead>
               <TableHead>Practice Name</TableHead>
@@ -470,14 +652,14 @@ export default function OutreachContactsPage() {
           <TableBody>
             {loading && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   Loading contacts…
                 </TableCell>
               </TableRow>
             )}
             {!loading && contacts.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   {total === 0
                     ? "No contacts yet. Import a CSV to get started."
                     : "No contacts match your filters."}
@@ -486,8 +668,19 @@ export default function OutreachContactsPage() {
             )}
             {!loading && contacts.map((contact) => {
               const eng = getEngagementLabel(contact.total_opens, contact.total_clicks)
+              const isSelected = selectedIds.has(contact.id)
               return (
-                <TableRow key={contact.id}>
+                <TableRow
+                  key={contact.id}
+                  className={isSelected ? "bg-muted/40" : undefined}
+                >
+                  <TableCell>
+                    <Checkbox
+                      checked={isSelected}
+                      onCheckedChange={() => toggleSelect(contact.id)}
+                      aria-label={`Select ${contact.email}`}
+                    />
+                  </TableCell>
                   <TableCell className="font-mono text-sm">{contact.email}</TableCell>
                   <TableCell>
                     {contact.business_type ? (
