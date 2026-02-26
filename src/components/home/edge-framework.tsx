@@ -5,7 +5,7 @@ import Link from "next/link"
 import {
   Zap, Heart, Wind, Droplets, Apple, Shield, Gauge,
   Bone, Brain, Smile, Lightbulb, RefreshCw, AlertTriangle,
-  Thermometer, Waves, Star,
+  Thermometer, Waves, Star, ScanLine,
 } from "lucide-react"
 
 const biologicalSystems = [
@@ -216,6 +216,56 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
             })}
           </div>
         </div>
+
+        {/* bioEDGE Decoder Promo */}
+        <div className="mt-12">
+          <a
+            href="https://bioedgedecoder.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group relative block overflow-hidden rounded-2xl border border-electric-blue/20 bg-gradient-to-br from-[#031b2d] via-[#012240] to-[#003352] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(1,122,178,0.30)]"
+          >
+            {/* Hover bar */}
+            <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
+            {/* Background glow orb */}
+            <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-electric-blue/10 blur-3xl" />
+
+            <div className="relative flex items-center gap-6 px-6 py-5 md:gap-8 md:px-8">
+
+              {/* Icon block */}
+              <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-electric-blue/10 ring-1 ring-electric-blue/30 transition-all duration-300 group-hover:bg-electric-blue/20 group-hover:ring-electric-blue/60">
+                {/* Subtle ping animation ring */}
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-2xl bg-electric-blue/10 duration-1000 opacity-50" />
+                <ScanLine className="relative h-9 w-9 text-electric-blue" />
+              </div>
+
+              {/* Text */}
+              <div className="flex-1 min-w-0">
+                <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-electric-blue">
+                  Free Interactive Tool
+                </p>
+                <h3 className="text-xl font-bold text-white md:text-2xl">
+                  bioEDGE Decoder
+                </h3>
+                <div className="mt-2 hidden sm:block">
+                  <p className="text-sm text-white/70 max-w-lg">
+                    Identify which of your 15 biological systems need attention most. Answer a short set of questions and get a prioritized read on your biology.
+                  </p>
+                  <p className="mt-1.5 text-xs text-white/35">bioedgedecoder.com</p>
+                </div>
+              </div>
+
+              {/* CTA */}
+              <span className="hidden flex-shrink-0 items-center gap-2 rounded-full bg-electric-blue px-5 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-white group-hover:text-navy sm:inline-flex">
+                Decode Your Biology
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </span>
+            </div>
+          </a>
+        </div>
+
       </div>
     </section>
   )
