@@ -747,7 +747,7 @@ export default function ClinicCampaignDetailPage() {
           </Button>
         )}
 
-        {campaign.status === "draft" && approvedCount > 0 && (
+        {(campaign.status === "draft" || (campaign.status === "generating" && pendingCount === 0)) && approvedCount > 0 && (
           <Button variant="outline" onClick={() => handleUpdateStatus("ready")}>
             <Check className="mr-2 h-4 w-4" />
             Mark Ready
@@ -914,7 +914,7 @@ export default function ClinicCampaignDetailPage() {
                                 </Button>
                               </>
                             )}
-                            {["pending", "generated"].includes(recipient.status) && (
+                            {["pending", "generated", "error"].includes(recipient.status) && (
                               <Button
                                 variant="ghost"
                                 size="icon"
@@ -1044,7 +1044,7 @@ export default function ClinicCampaignDetailPage() {
                       </Button>
                     )}
 
-                    {["pending", "generated"].includes(selectedRecipient.status) && (
+                    {["pending", "generated", "error"].includes(selectedRecipient.status) && (
                       <Button
                         variant="destructive"
                         size="sm"
