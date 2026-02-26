@@ -1,3 +1,4 @@
+import React from "react"
 import { createClient } from "@/lib/supabase/server"
 
 export const revalidate = 60
@@ -13,6 +14,7 @@ import { HomepageHtml } from "@/components/home/homepage-html"
 import { HomepageCta } from "@/components/home/homepage-cta"
 import { HomepageFeaturedLeaders } from "@/components/home/homepage-featured-leaders"
 import { HomepageFeaturedCompanies } from "@/components/home/homepage-featured-companies"
+import { ClinicPromoSection } from "@/components/home/clinic-promo-section"
 import { HomepageFeaturedPresentations } from "@/components/home/homepage-featured-presentations"
 import { HomepageFeaturedArticles } from "@/components/home/homepage-featured-articles"
 import { HomepageFeaturedSpotlight } from "@/components/home/homepage-featured-spotlight"
@@ -47,6 +49,7 @@ export default async function HomePage() {
     { count: totalPresentationsCount },
     { count: totalArticlesCount },
     { count: totalSpotlightsCount },
+    { count: totalClinicsCount },
     { data: latestNews },
   ] = await Promise.all([
     // Homepage settings
@@ -188,6 +191,11 @@ export default async function HomePage() {
       .from("spotlights")
       .select("id", { count: "exact", head: true })
       .eq("status", "published"),
+
+    supabase
+      .from("clinics")
+      .select("id", { count: "exact", head: true })
+      .or("is_draft.is.null,is_draft.eq.false"),
 
     // Latest news articles for homepage
     supabase
@@ -365,7 +373,14 @@ export default async function HomePage() {
         <HomepageHero settings={settings} />
 
         {/* Dynamic sections */}
-        {(sections || []).map(renderSection)}
+        {(sections || []).map((section) => (
+          <React.Fragment key={section.id}>
+            {renderSection(section)}
+            {section.section_type === "featured_companies" && (
+              <ClinicPromoSection totalClinics={totalClinicsCount} />
+            )}
+          </React.Fragment>
+        ))}
 
         {/* Latest news — always at the bottom */}
         <HomepageFeaturedNews articles={(latestNews || []) as any} />
