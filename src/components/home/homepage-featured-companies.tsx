@@ -120,7 +120,7 @@ export function HomepageFeaturedCompanies({
             <Link
               key={company.id}
               href={`/companies/${company.slug || company.domain || company.id}`}
-              className="group flex-shrink-0 w-[85vw] sm:w-[200px] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
+              className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
               style={{ scrollSnapAlign: "start" }}
             >
               <div className="p-6">
