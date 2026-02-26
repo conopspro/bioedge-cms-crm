@@ -242,7 +242,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
               {/* Text */}
               <div className="flex-1 min-w-0">
                 <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-electric-blue">
-                  Free &mdash; No Credit Card Required
+                  Free
                 </p>
                 <h3 className="text-xl font-bold text-white md:text-2xl">
                   bioEDGE Decoder
