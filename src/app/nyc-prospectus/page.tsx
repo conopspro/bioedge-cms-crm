@@ -38,12 +38,12 @@ export default function NYCProspectusPage() {
             <div className="prospectus-hero-detail">
               <div className="prospectus-hero-detail-label">Day 1 — July 10, 2026</div>
               <div className="prospectus-hero-detail-value">2:00 PM – 6:00 PM</div>
-              <div className="prospectus-hero-detail-sub">Exhibitor setup from 8:00 AM</div>
+              <div className="prospectus-hero-detail-sub">Exhibitor setup 8:00 AM – 1:30 PM</div>
             </div>
             <div className="prospectus-hero-detail">
               <div className="prospectus-hero-detail-label">Day 2 — July 11, 2026</div>
               <div className="prospectus-hero-detail-value">9:00 AM – 5:00 PM</div>
-              <div className="prospectus-hero-detail-sub">Breakdown until 11:00 PM</div>
+              <div className="prospectus-hero-detail-sub">Breakdown 5:30 PM – 11:00 PM</div>
             </div>
           </div>
 
