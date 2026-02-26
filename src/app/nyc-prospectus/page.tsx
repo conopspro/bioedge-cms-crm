@@ -107,7 +107,7 @@ export default function NYCProspectusPage() {
 
           <div className="prospectus-audience-grid">
             <div className="prospectus-audience-card optimizers">
-              <div className="prospectus-audience-percent">75%</div>
+              <div className="prospectus-audience-percent">50%</div>
               <div className="prospectus-audience-type">Health Optimizers</div>
               <p className="prospectus-audience-desc">
                 Status-driven high performers who view their biology as a strategic asset. These are executives, founders, and professionals who invest significantly in their health and make fast purchasing decisions.
@@ -120,7 +120,7 @@ export default function NYCProspectusPage() {
               </div>
             </div>
             <div className="prospectus-audience-card practitioners">
-              <div className="prospectus-audience-percent">25%</div>
+              <div className="prospectus-audience-percent">50%</div>
               <div className="prospectus-audience-type">Clinical Practitioners</div>
               <p className="prospectus-audience-desc">
                 Licensed healthcare providers seeking advanced protocols and technologies for their practices.
@@ -198,26 +198,17 @@ export default function NYCProspectusPage() {
               <div className="prospectus-booth-header premier">
                 <p className="prospectus-booth-tier">8x8 Corner Booth in Prime Location</p>
               </div>
-              <div className="prospectus-booth-body">
-                <p className="prospectus-booth-price">$5,000</p>
-              </div>
             </div>
 
             <div className="prospectus-booth-card">
               <div className="prospectus-booth-header corner">
                 <p className="prospectus-booth-tier">8x8 Corner Booth</p>
               </div>
-              <div className="prospectus-booth-body">
-                <p className="prospectus-booth-price">$3,500</p>
-              </div>
             </div>
 
             <div className="prospectus-booth-card">
               <div className="prospectus-booth-header table">
                 <p className="prospectus-booth-tier">6 Foot Skirted Table</p>
-              </div>
-              <div className="prospectus-booth-body">
-                <p className="prospectus-booth-price">$2,500</p>
               </div>
             </div>
           </div>
@@ -232,7 +223,6 @@ export default function NYCProspectusPage() {
             </ul>
           </div>
 
-          <p className="prospectus-booth-note">Additional exhibitor badges: $199 each • Lead retrieval: $400</p>
         </div>
       </section>
 
