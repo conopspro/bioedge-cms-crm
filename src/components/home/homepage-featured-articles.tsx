@@ -130,7 +130,7 @@ export function HomepageFeaturedArticles({
               <Link
                 key={article.id}
                 href={`/articles/${article.slug}`}
-                className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]"
+                className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]"
                 style={{ scrollSnapAlign: "start" }}
               >
                 {imageUrl && (
