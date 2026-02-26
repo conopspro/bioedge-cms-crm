@@ -88,7 +88,7 @@ const mainNavItems = [
 
 const toolsNavItems = [
   {
-    label: "Campaigns",
+    label: "Company Campaigns",
     href: "/dashboard/campaigns",
     icon: Mail,
   },
