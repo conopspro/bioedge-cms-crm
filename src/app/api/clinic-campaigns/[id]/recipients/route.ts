@@ -72,6 +72,44 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
+ * DELETE /api/clinic-campaigns/[id]/recipients
+ *
+ * Bulk-delete recipients by ID array.
+ * Only removes recipients in deletable statuses (pending, generated, error).
+ *
+ * Body: { ids: string[] }
+ */
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  try {
+    const { id: campaignId } = await params
+    const supabase = await createClient()
+    const body = await request.json()
+    const { ids } = body as { ids: string[] }
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return NextResponse.json({ error: "ids array is required" }, { status: 400 })
+    }
+
+    const { error } = await supabase
+      .from("clinic_campaign_recipients")
+      .delete()
+      .eq("clinic_campaign_id", campaignId)
+      .in("id", ids)
+      .in("status", ["pending", "generated", "error"])  // safety: never bulk-delete sent/approved
+
+    if (error) {
+      console.error("Error bulk-deleting recipients:", error)
+      return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ deleted: ids.length })
+  } catch (error) {
+    console.error("Unexpected error:", error)
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 })
+  }
+}
+
+/**
  * POST /api/clinic-campaigns/[id]/recipients
  *
  * Add clinics as recipients to a clinic campaign.

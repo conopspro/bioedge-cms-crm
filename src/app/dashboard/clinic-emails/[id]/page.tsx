@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import type { ClinicCampaign, ClinicCampaignRecipient } from "@/types/database"
 
 interface EnrichedRecipient extends ClinicCampaignRecipient {
@@ -112,6 +113,8 @@ export default function ClinicCampaignDetailPage() {
   const [generating, setGenerating] = useState(false)
   const [retrying, setRetrying] = useState(false)
   const [approving, setApproving] = useState(false)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [bulkDeleting, setBulkDeleting] = useState(false)
   const [selectedRecipient, setSelectedRecipient] = useState<EnrichedRecipient | null>(null)
   const [showPreview, setShowPreview] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null)
@@ -252,6 +255,34 @@ export default function ClinicCampaignDetailPage() {
       console.error("Retry reset failed:", err)
     } finally {
       setRetrying(false)
+    }
+  }
+
+  const handleBulkDelete = async (idsToDelete: string[]) => {
+    if (idsToDelete.length === 0) return
+    setBulkDeleting(true)
+    try {
+      const res = await fetch(`/api/clinic-campaigns/${campaignId}/recipients`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: idsToDelete }),
+      })
+      if (res.ok) {
+        const deletedSet = new Set(idsToDelete)
+        setCampaign((prev) =>
+          prev ? {
+            ...prev,
+            clinic_campaign_recipients: prev.clinic_campaign_recipients.filter(
+              (r) => !deletedSet.has(r.id)
+            ),
+          } : prev
+        )
+        setSelectedIds(new Set())
+      }
+    } catch (err) {
+      console.error("Bulk delete failed:", err)
+    } finally {
+      setBulkDeleting(false)
     }
   }
 
@@ -719,15 +750,44 @@ export default function ClinicCampaignDetailPage() {
         )}
 
         {errorCount > 0 && !generating && (
+          <>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRetryErrors}
+              disabled={retrying || bulkDeleting}
+              className="border-destructive/40 text-destructive hover:bg-destructive/10"
+            >
+              <RefreshCw className={`mr-2 h-3.5 w-3.5 ${retrying ? "animate-spin" : ""}`} />
+              {retrying ? "Resetting…" : `Retry Failed (${errorCount})`}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                const errorIds = recipients
+                  .filter((r) => r.status === "error")
+                  .map((r) => r.id)
+                handleBulkDelete(errorIds)
+              }}
+              disabled={bulkDeleting || retrying}
+              className="border-destructive/40 text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="mr-2 h-3.5 w-3.5" />
+              {bulkDeleting ? "Deleting…" : `Delete All Failed (${errorCount})`}
+            </Button>
+          </>
+        )}
+
+        {selectedIds.size > 0 && (
           <Button
-            variant="outline"
+            variant="destructive"
             size="sm"
-            onClick={handleRetryErrors}
-            disabled={retrying}
-            className="border-destructive/40 text-destructive hover:bg-destructive/10"
+            onClick={() => handleBulkDelete(Array.from(selectedIds))}
+            disabled={bulkDeleting}
           >
-            <RefreshCw className={`mr-2 h-3.5 w-3.5 ${retrying ? "animate-spin" : ""}`} />
-            {retrying ? "Resetting…" : `Retry Failed (${errorCount})`}
+            <Trash2 className="mr-2 h-3.5 w-3.5" />
+            {bulkDeleting ? "Deleting…" : `Delete Selected (${selectedIds.size})`}
           </Button>
         )}
 
@@ -834,6 +894,32 @@ export default function ClinicCampaignDetailPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-10">
+                      {/* Select-all checkbox — only targets deletable rows */}
+                      {(() => {
+                        const deletable = recipients.filter((r) =>
+                          ["pending", "generated", "error"].includes(r.status)
+                        )
+                        const allSelected =
+                          deletable.length > 0 &&
+                          deletable.every((r) => selectedIds.has(r.id))
+                        return (
+                          <Checkbox
+                            checked={allSelected}
+                            onCheckedChange={(checked) => {
+                              if (checked) {
+                                setSelectedIds(
+                                  new Set(deletable.map((r) => r.id))
+                                )
+                              } else {
+                                setSelectedIds(new Set())
+                              }
+                            }}
+                            aria-label="Select all deletable recipients"
+                          />
+                        )
+                      })()}
+                    </TableHead>
                     <TableHead>Clinic</TableHead>
                     <TableHead>Location</TableHead>
                     <TableHead>Email</TableHead>
@@ -850,10 +936,15 @@ export default function ClinicCampaignDetailPage() {
                       variant: "secondary" as const,
                     }
 
+                    const isDeletable = ["pending", "generated", "error"].includes(
+                      recipient.status
+                    )
+                    const isChecked = selectedIds.has(recipient.id)
+
                     return (
                       <TableRow
                         key={recipient.id}
-                        className="cursor-pointer"
+                        className={`cursor-pointer ${isChecked ? "bg-muted/40" : ""}`}
                         onClick={() => {
                           if (recipient.body) {
                             setSelectedRecipient(recipient)
@@ -863,6 +954,25 @@ export default function ClinicCampaignDetailPage() {
                           }
                         }}
                       >
+                        <TableCell
+                          className="w-10"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {isDeletable && (
+                            <Checkbox
+                              checked={isChecked}
+                              onCheckedChange={(checked) => {
+                                setSelectedIds((prev) => {
+                                  const next = new Set(prev)
+                                  if (checked) next.add(recipient.id)
+                                  else next.delete(recipient.id)
+                                  return next
+                                })
+                              }}
+                              aria-label={`Select ${recipient.recipient_name}`}
+                            />
+                          )}
+                        </TableCell>
                         <TableCell>
                           <div className="font-medium">{recipient.recipient_name || "Unknown"}</div>
                           {recipient.clinic?.tags && recipient.clinic.tags.length > 0 && (
