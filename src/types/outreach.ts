@@ -109,6 +109,9 @@ export interface OutreachCampaign {
   track_opens: boolean
   track_clicks: boolean
 
+  // Per-campaign signature override (overrides sender_profile.signature at send time)
+  signature_override: string | null
+
   created_at: string
   updated_at: string
 }

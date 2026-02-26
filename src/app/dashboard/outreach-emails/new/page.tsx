@@ -81,6 +81,7 @@ interface SenderProfile {
   name: string
   email: string
   title: string | null
+  signature: string | null
 }
 
 interface BusinessTypeCount {
@@ -147,6 +148,7 @@ export default function NewOutreachCampaignPage() {
   const [senderProfiles, setSenderProfiles] = useState<SenderProfile[]>([])
   const [senderProfileId, setSenderProfileId] = useState<string>("")
   const [replyTo, setReplyTo] = useState("")
+  const [signatureOverride, setSignatureOverride] = useState<string>("")
 
   // ── UI state ──────────────────────────────────────────────────────────────
   const [contextOpen, setContextOpen] = useState(false)
@@ -160,7 +162,7 @@ export default function NewOutreachCampaignPage() {
       const [btRes, presetsRes, sendersRes] = await Promise.all([
         fetch("/api/outreach-contacts/business-types"),
         fetch("/api/promotion-presets"),
-        fetch("/api/settings/sender-profiles").catch(() => null),
+        fetch("/api/sender-profiles").catch(() => null),
       ])
 
       if (btRes.ok) {
@@ -175,9 +177,13 @@ export default function NewOutreachCampaignPage() {
 
       if (sendersRes?.ok) {
         const data = await sendersRes.json()
-        setSenderProfiles(data.profiles ?? data ?? [])
-        if (data.profiles?.[0]?.id || data[0]?.id) {
-          setSenderProfileId(data.profiles?.[0]?.id ?? data[0]?.id)
+        const profiles: SenderProfile[] = data.profiles ?? data ?? []
+        setSenderProfiles(profiles)
+        // Auto-select the first profile and pre-populate signature
+        const first = profiles[0]
+        if (first) {
+          setSenderProfileId(first.id)
+          setSignatureOverride(first.signature ?? "")
         }
       }
     }
@@ -219,6 +225,14 @@ export default function NewOutreachCampaignPage() {
   useEffect(() => {
     fetchCount()
   }, [fetchCount])
+
+  // When sender selection changes, pre-populate signature from that profile
+  useEffect(() => {
+    const profile = senderProfiles.find((p) => p.id === senderProfileId)
+    if (profile) {
+      setSignatureOverride(profile.signature ?? "")
+    }
+  }, [senderProfileId, senderProfiles])
 
   // ── Toggle business type selection ─────────────────────────────────────────
   const toggleBusinessType = (bt: string) => {
@@ -310,6 +324,7 @@ export default function NewOutreachCampaignPage() {
         min_delay_seconds: parseInt(minDelay, 10) || 120,
         max_delay_seconds: parseInt(maxDelay, 10) || 300,
         daily_send_limit: parseInt(dailyLimit, 10) || 50,
+        signature_override: signatureOverride.trim() || null,
       }
 
       const res = await fetch("/api/outreach-campaigns", {
@@ -889,25 +904,47 @@ export default function NewOutreachCampaignPage() {
         <CardHeader>
           <CardTitle>Sender Profile</CardTitle>
           <CardDescription>
-            Who is sending these emails? The sender&rsquo;s name and email are used in From address.
+            Who is sending these emails? The sender&rsquo;s name and email are used in the From address.
+            You can customize the signature for this campaign below.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label>Sender Profile</Label>
-            <Select value={senderProfileId} onValueChange={setSenderProfileId}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select a sender…" />
-              </SelectTrigger>
-              <SelectContent>
-                {senderProfiles.map((profile) => (
-                  <SelectItem key={profile.id} value={profile.id}>
-                    {profile.name} &lt;{profile.email}&gt;
-                    {profile.title ? ` — ${profile.title}` : ""}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Sender</Label>
+            {senderProfiles.length === 0 ? (
+              <p className="text-sm text-destructive">
+                No sender profiles found.{" "}
+                <a href="/dashboard/settings/sender-profiles" target="_blank" className="underline underline-offset-2">
+                  Create one in Settings.
+                </a>
+              </p>
+            ) : (
+              <Select value={senderProfileId} onValueChange={setSenderProfileId}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a sender…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {senderProfiles.map((profile) => (
+                    <SelectItem key={profile.id} value={profile.id}>
+                      {profile.name} &lt;{profile.email}&gt;
+                      {profile.title ? ` — ${profile.title}` : ""}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          </div>
+          <div className="space-y-1.5">
+            <Label>Email Signature</Label>
+            <p className="text-xs text-muted-foreground">
+              Pre-filled from your sender profile. Edit here to use a different signature for this campaign only.
+            </p>
+            <Textarea
+              value={signatureOverride}
+              onChange={(e) => setSignatureOverride(e.target.value)}
+              rows={4}
+              placeholder={"Sandy Martin\nFounder, bioEDGE Longevity\nbioedgelongevity.com"}
+            />
           </div>
           <div className="space-y-1.5">
             <Label>Reply-To Override (optional)</Label>

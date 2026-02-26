@@ -162,8 +162,10 @@ export async function POST(
       recipient.body_html ||
       `<p>${(recipient.body || "").replace(/\n\n/g, "</p><p>").replace(/\n/g, "<br>")}</p>`
 
-    if (senderProfile.signature) {
-      const signatureHtml = senderProfile.signature
+    // campaign.signature_override takes precedence over the sender profile's signature
+    const signature = (campaign as { signature_override?: string | null }).signature_override || senderProfile.signature
+    if (signature) {
+      const signatureHtml = signature
         .split("\n")
         .map((line: string) => line.trim())
         .join("<br>")

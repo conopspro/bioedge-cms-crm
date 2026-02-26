@@ -103,6 +103,7 @@ export async function POST(request: Request) {
       track_opens = true,
       track_clicks = true,
       contact_limit,   // optional cap: only take the first N matching contacts
+      signature_override,
     } = body
 
     if (!name) {
@@ -142,6 +143,9 @@ export async function POST(request: Request) {
         daily_send_limit,
         track_opens,
         track_clicks,
+        // signature_override is only included when non-empty.
+        // Requires migration: ALTER TABLE outreach_campaigns ADD COLUMN signature_override TEXT;
+        ...(signature_override ? { signature_override } : {}),
       })
       .select()
       .single()
