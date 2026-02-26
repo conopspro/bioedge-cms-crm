@@ -127,7 +127,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
               ref={(el) => {
                 cardsRef.current[index] = el
               }}
-              className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-8 text-center opacity-0 translate-y-5 transition-all duration-600 ease-out hover:-translate-y-2 hover:shadow-[0_20px_40px_rgba(13,89,138,0.15)]"
+              className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-8 text-center opacity-0 translate-y-5 transition-all duration-600 ease-out hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]"
             >
               {/* Top border animation */}
               <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-navy transition-transform duration-400 group-hover:scale-x-100" />
@@ -145,7 +145,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
             href="https://www.amazon.com/Biological-EDGE-Practical-Guide-Longevity-ebook/dp/B0GJQ5NDGF/ref=sr_1_1"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1"
+            className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(13,89,138,0.25)]"
           >
             <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
             <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
@@ -194,7 +194,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
               const Icon = system.icon
               return (
                 <Link key={system.slug} href={`/systems/${system.slug}`}>
-                  <div className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(13,89,138,0.15)]">
+                  <div className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]">
                     <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-navy transition-transform duration-400 group-hover:scale-x-100" />
                     <div className="flex items-start gap-4">
                       <span
@@ -223,7 +223,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
             href="https://bioedgedecoder.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1"
+            className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(13,89,138,0.25)]"
           >
             <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
             <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
