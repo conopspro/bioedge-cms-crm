@@ -46,9 +46,14 @@ interface ImportResult {
   errors: string[]
 }
 
+// Sentinel value used by the "Skip this column" SelectItem.
+// Radix UI Select throws if SelectItem value is an empty string, so we use a
+// non-empty sentinel instead and treat it as "no mapping" in handleImport.
+const SKIP_VALUE = "__skip__"
+
 // CSV column → our field mapping
 const CSV_FIELD_OPTIONS = [
-  { value: "", label: "— Skip —" },
+  { value: SKIP_VALUE, label: "— Skip —" },
   { value: "email", label: "Email" },
   { value: "first_name", label: "First Name" },
   { value: "last_name", label: "Last Name" },
@@ -67,7 +72,9 @@ const CSV_FIELD_OPTIONS = [
 // Best-guess auto-mapping from common CSV header names
 function autoMapHeader(header: string): string {
   const h = header.toLowerCase().trim()
-  if (h.includes("email") || h === "subscriber") return "email"
+  // Email — exact names only; avoid false-positives like "EmailType"
+  if (h === "email" || h === "email address" || h === "emailaddress" ||
+      h === "e-mail" || h === "subscriber" || h === "email_address") return "email"
   if (h === "name" || h === "first name" || h === "first" || h === "firstname") return "first_name"
   if (h === "last name" || h === "last" || h === "lastname") return "last_name"
   if (h.includes("company") || h.includes("practice") || h.includes("organization") || h.includes("business name")) return "practice_name"
@@ -78,9 +85,10 @@ function autoMapHeader(header: string): string {
   if (h === "website" || h === "url" || h.includes("web")) return "website"
   if (h === "phone" || h === "telephone" || h === "mobile") return "phone"
   if (h === "notes" || h === "comments") return "notes"
-  if (h === "opens" || h === "total_opens" || h.includes("open")) return "total_opens"
-  if (h === "clicks" || h === "total_clicks" || h.includes("click")) return "total_clicks"
-  return ""
+  // Opens/Clicks — exact names only to avoid vague includes matches
+  if (h === "opens" || h === "total_opens" || h === "total opens" || h === "open count") return "total_opens"
+  if (h === "clicks" || h === "total_clicks" || h === "total clicks" || h === "click count") return "total_clicks"
+  return SKIP_VALUE
 }
 
 export default function OutreachContactsPage() {
@@ -208,7 +216,7 @@ export default function OutreachContactsPage() {
       const mappedRows = csvRows.map((row) => {
         const mapped: Record<string, string | number | null> = {}
         for (const [csvCol, ourField] of Object.entries(columnMapping)) {
-          if (!ourField) continue
+          if (!ourField || ourField === SKIP_VALUE) continue
           mapped[ourField] = row[csvCol] ?? null
         }
         return mapped
@@ -309,7 +317,7 @@ export default function OutreachContactsPage() {
                           {header}
                         </span>
                         <Select
-                          value={columnMapping[header] ?? ""}
+                          value={columnMapping[header] ?? SKIP_VALUE}
                           onValueChange={(val) =>
                             setColumnMapping((prev) => ({ ...prev, [header]: val }))
                           }
@@ -338,13 +346,13 @@ export default function OutreachContactsPage() {
 
                   <Button
                     onClick={handleImport}
-                    disabled={importing || !Object.values(columnMapping).includes("email")}
+                    disabled={importing || !Object.values(columnMapping).some((v) => v === "email")}
                     className="w-full"
                   >
                     {importing ? "Importing…" : `Import ${csvRows.length.toLocaleString()} rows`}
                   </Button>
 
-                  {!Object.values(columnMapping).includes("email") && (
+                  {!Object.values(columnMapping).some((v) => v === "email") && (
                     <p className="text-xs text-destructive">
                       You must map at least one column to &ldquo;Email&rdquo; before importing.
                     </p>
