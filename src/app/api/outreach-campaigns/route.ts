@@ -43,21 +43,46 @@ export async function GET() {
       }
     }
 
+    const stuckIds: string[] = []
+
     const enriched = (campaigns ?? []).map((campaign) => {
       const statusMap = countsMap[campaign.id] ?? {}
       const total = Object.values(statusMap).reduce((a, b) => a + b, 0)
       const sent = (statusMap.sent ?? 0) + (statusMap.delivered ?? 0) +
         (statusMap.opened ?? 0) + (statusMap.clicked ?? 0)
 
+      // Auto-correct campaigns stuck in "sending" when all recipients are sent
+      const approvedRemaining = statusMap.approved ?? 0
+      let resolvedStatus = campaign.status
+      if (
+        campaign.status === "sending" &&
+        total > 0 &&
+        approvedRemaining === 0 &&
+        sent === total
+      ) {
+        resolvedStatus = "completed"
+        stuckIds.push(campaign.id)
+      }
+
       return {
         ...campaign,
+        status: resolvedStatus,
         recipient_count: total,
         pending_count: statusMap.pending ?? 0,
         generated_count: statusMap.generated ?? 0,
-        approved_count: statusMap.approved ?? 0,
+        approved_count: approvedRemaining,
         sent_count: sent,
       }
     })
+
+    // Persist auto-corrections to DB in the background
+    if (stuckIds.length > 0) {
+      supabase
+        .from("outreach_campaigns")
+        .update({ status: "completed" })
+        .in("id", stuckIds)
+        .then(() => {})
+    }
 
     return NextResponse.json({ campaigns: enriched })
   } catch (err) {
