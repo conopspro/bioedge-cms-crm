@@ -1640,6 +1640,7 @@ export type ClinicCampaignRecipientStatus =
   | "clicked"
   | "bounced"
   | "failed"
+  | "error"
   | "suppressed"
 
 /** Clinic campaign — outreach to clinics for event attendance */
