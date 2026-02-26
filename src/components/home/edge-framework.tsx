@@ -223,41 +223,26 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
             href="https://bioedgedecoder.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative block overflow-hidden rounded-2xl border border-electric-blue/20 bg-gradient-to-br from-[#031b2d] via-[#012240] to-[#003352] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(1,122,178,0.30)]"
+            className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(13,89,138,0.25)]"
           >
-            {/* Hover bar */}
             <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
-            {/* Background glow orb */}
-            <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full bg-electric-blue/10 blur-3xl" />
-
-            <div className="relative flex items-center gap-6 px-6 py-5 md:gap-8 md:px-8">
-
-              {/* Icon block */}
-              <div className="relative flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-electric-blue/10 ring-1 ring-electric-blue/30 transition-all duration-300 group-hover:bg-electric-blue/20 group-hover:ring-electric-blue/60">
-                {/* Subtle ping animation ring */}
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-2xl bg-electric-blue/10 duration-1000 opacity-50" />
-                <ScanLine className="relative h-9 w-9 text-electric-blue" />
+            <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
+              <div className="flex h-32 w-24 flex-shrink-0 items-center justify-center rounded bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105">
+                <ScanLine className="h-12 w-12 text-electric-blue" />
               </div>
-
-              {/* Text */}
               <div className="flex-1 min-w-0">
-                <p className="mb-1 text-xs font-semibold uppercase tracking-widest text-electric-blue">
-                  Free
-                </p>
                 <h3 className="text-xl font-bold text-white md:text-2xl">
-                  bioEDGE Decoder
+                  bioEDGE Decoder<span className="font-normal text-white"> — Free</span>
                 </h3>
-                <div className="mt-2 hidden sm:block">
-                  <p className="text-sm font-medium text-white/90">
-                    When Something Feels Off, This Helps You Understand Why
+                <div className="mt-3 hidden sm:block">
+                  <p className="text-sm italic text-white/80">
+                    &ldquo;When Something Feels Off, This Helps You Understand Why&rdquo;
                   </p>
-                  <p className="mt-1 text-sm text-white/60">
+                  <p className="mt-1 text-xs text-white/50">
                     A simple way to interpret your signals so you can make clearer health decisions.
                   </p>
                 </div>
               </div>
-
-              {/* CTA */}
               <span className="hidden flex-shrink-0 items-center gap-2 rounded-full bg-electric-blue px-5 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-white group-hover:text-navy sm:inline-flex">
                 Get Clarity
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
