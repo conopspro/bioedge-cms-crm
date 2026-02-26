@@ -223,6 +223,8 @@ export default function OutreachCampaignDetailPage() {
       } else {
         setSending(false)
         setSendDelay(0)
+        await fetchCampaign()
+        await fetchRecipients()
       }
     } catch {
       setSending(false)

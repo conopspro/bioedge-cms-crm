@@ -231,6 +231,14 @@ export async function POST(
       .eq("status", "approved")
       .eq("approved", true)
 
+    // ── Mark campaign completed if nothing left ───────────────────────────────
+    if (!remainingApproved || remainingApproved === 0) {
+      await supabase
+        .from("outreach_campaigns")
+        .update({ status: "completed" })
+        .eq("id", id)
+    }
+
     return NextResponse.json({
       sent: true,
       recipient_email: recipient.recipient_email,
