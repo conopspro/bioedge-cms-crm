@@ -227,8 +227,8 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
           >
             <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
             <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
-              <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105">
-                <ScanLine className="h-10 w-10 text-electric-blue" />
+              <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-white/15 shadow-xl transition-transform duration-300 group-hover:scale-105">
+                <ScanLine className="h-10 w-10 text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-xl font-bold text-white md:text-2xl">

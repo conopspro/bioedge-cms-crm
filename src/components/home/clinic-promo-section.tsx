@@ -19,8 +19,8 @@ export function ClinicPromoSection({ totalClinics }: ClinicPromoSectionProps) {
           <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
 
             {/* Icon */}
-            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105">
-              <MapPin className="h-10 w-10 text-electric-blue" />
+            <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-white/15 shadow-xl transition-transform duration-300 group-hover:scale-105">
+              <MapPin className="h-10 w-10 text-white" />
             </div>
 
             {/* Text */}
