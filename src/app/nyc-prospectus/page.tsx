@@ -184,49 +184,6 @@ export default function NYCProspectusPage() {
         </div>
       </section>
 
-      {/* Booth Packages Section */}
-      <section className="prospectus-booths">
-        <div className="prospectus-container">
-          <div className="prospectus-section-label">Exhibiting Opportunities</div>
-          <h2 className="prospectus-section-title">Booth Packages</h2>
-          <p className="prospectus-section-subtitle">
-            Connect face-to-face with 750+ high-intent health optimizers and practitioners actively seeking solutions.
-          </p>
-
-          <div className="prospectus-booths-grid">
-            <div className="prospectus-booth-card">
-              <div className="prospectus-booth-header premier">
-                <p className="prospectus-booth-tier">8x8 Corner Booth in Prime Location</p>
-              </div>
-            </div>
-
-            <div className="prospectus-booth-card">
-              <div className="prospectus-booth-header corner">
-                <p className="prospectus-booth-tier">8x8 Corner Booth</p>
-              </div>
-            </div>
-
-            <div className="prospectus-booth-card">
-              <div className="prospectus-booth-header table">
-                <p className="prospectus-booth-tier">6 Foot Skirted Table</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="prospectus-all-exhibitors">
-            <p className="prospectus-all-exhibitors-label">All Exhibitors Get</p>
-            <ul className="prospectus-all-exhibitors-list">
-              <li>1 Skirted 6 Foot Table</li>
-              <li>1 Chair</li>
-              <li>4 Exhibitor Badges</li>
-              <li>Logo on bioedgelongevity.com</li>
-            </ul>
-          </div>
-
-        </div>
-      </section>
-
-
       {/* Pricing Guide */}
       <section className="prospectus-pricing">
         <div className="prospectus-container">
@@ -238,18 +195,22 @@ export default function NYCProspectusPage() {
 
           <div className="prospectus-pricing-grid">
 
-            {/* Summit Exhibitions */}
+            {/* Magazine & Mailer */}
             <div className="prospectus-pricing-category">
-              <h3 className="prospectus-pricing-cat-title">Exhibition Spaces</h3>
+              <h3 className="prospectus-pricing-cat-title">Magazine & Mailer</h3>
               <div className="prospectus-pricing-items">
                 {[
-                  { name: "Premier Front Corner Booth", price: "$5,000", desc: "Highest-traffic position. Corner placement with visibility from multiple entry points." },
-                  { name: "Premier Front Inline Booth", price: "$3,500", desc: "Premier front inline. Strong foot traffic with dedicated display area." },
-                  { name: "Center Inline Booth", price: "$3,000", desc: "Solid attendee flow. Well-suited for demos and practitioner engagement." },
-                  { name: "8-Foot Table – Premier Front", price: "$3,000", desc: "Streamlined table presence in the highest-traffic zone of the expo hall." },
-                  { name: "8-Foot Table – Center", price: "$2,500", desc: "Consistent attendee access. Well-suited for sampling and demos." },
-                  { name: "Rear Inline Booth", price: "$2,000", desc: "Dedicated expo presence. Strategic entry point for first-time summit exhibitors." },
-                  { name: "8-Foot Table – Rear", price: "$2,000", desc: "Accessible table presence at an approachable investment level." },
+                  { name: "Front Cover Feature", price: "$6,500", desc: "Positions your brand alongside the leaders and chief scientists shaping longevity." },
+                  { name: "Back Cover Advertisement", price: "$4,000", desc: "Most-viewed exterior surface. Maximum exposure during distribution and display." },
+                  { name: "Inside Front Cover Advertisement", price: "$2,000", desc: "Seen before any editorial content, capturing attention at peak reader engagement." },
+                  { name: "Inside Back Cover Advertisement", price: "$2,000", desc: "High-visibility closing position for lasting recall as readers finish each issue." },
+                  { name: "Envelope Logo Placement", price: "$2,000", desc: "Logo on the mailing envelope. Brand visibility before the magazine is even opened." },
+                  { name: "Magazine Bag Stuffer", price: "$1,000", desc: "Insert into the clinic mailer alongside each issue. Max 8.5×11″. Samples welcome." },
+                  { name: "Full-Page Advertisement", price: "$1,000", desc: "Maximum visual real estate reaching practitioners across 2,000+ clinic distribution points." },
+                  { name: "Native Article Placement", price: "$1,000", desc: "One-page editorial in the bioEDGE voice, distributed to 2,000+ longevity clinics." },
+                  { name: "Half-Page Advertisement", price: "$750", desc: "Targeted visibility to the longevity clinic network. Ideal for launches and brand awareness." },
+                  { name: "Quarter-Page Advertisement", price: "$500", desc: "Efficient placement for directory listings or supporting a larger editorial presence." },
+                  { name: "Local Directory Listing", price: "$200", desc: "Curated listing with company name, category, location, and contact. 2,000+ clinic reach." },
                 ].map((item) => (
                   <div key={item.name} className="prospectus-pricing-item">
                     <div className="prospectus-pricing-item-info">
@@ -295,6 +256,70 @@ export default function NYCProspectusPage() {
               </div>
             </div>
 
+            {/* Summit Exhibitions */}
+            <div className="prospectus-pricing-category">
+              <h3 className="prospectus-pricing-cat-title">Exhibition Spaces</h3>
+              <div className="prospectus-pricing-items">
+                {[
+                  { name: "Premier Front Corner Booth", price: "$5,000", desc: "Highest-traffic position. Corner placement with visibility from multiple entry points." },
+                  { name: "Premier Front Inline Booth", price: "$3,500", desc: "Premier front inline. Strong foot traffic with dedicated display area." },
+                  { name: "Center Inline Booth", price: "$3,000", desc: "Solid attendee flow. Well-suited for demos and practitioner engagement." },
+                  { name: "8-Foot Table – Premier Front", price: "$3,000", desc: "Streamlined table presence in the highest-traffic zone of the expo hall." },
+                  { name: "8-Foot Table – Center", price: "$2,500", desc: "Consistent attendee access. Well-suited for sampling and demos." },
+                  { name: "Rear Inline Booth", price: "$2,000", desc: "Dedicated expo presence. Strategic entry point for first-time summit exhibitors." },
+                  { name: "8-Foot Table – Rear", price: "$2,000", desc: "Accessible table presence at an approachable investment level." },
+                ].map((item) => (
+                  <div key={item.name} className="prospectus-pricing-item">
+                    <div className="prospectus-pricing-item-info">
+                      <div className="prospectus-pricing-item-name">{item.name}</div>
+                      <div className="prospectus-pricing-item-desc">{item.desc}</div>
+                    </div>
+                    <div className="prospectus-pricing-item-price">{item.price}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Store NYC + Video Content stacked */}
+            <div className="prospectus-pricing-category-stack">
+              <div className="prospectus-pricing-category">
+                <h3 className="prospectus-pricing-cat-title">On-Site Store</h3>
+                <div className="prospectus-pricing-items">
+                  {[
+                    { name: "Branded Face-Out Display", price: "$3,000", desc: "Fully branded face-out display. Maximum shelf visibility for high-intent attendees." },
+                    { name: "Single Shelf Display", price: "$500", desc: "Dedicated shelf in a curated retail environment. 750+ health optimizers over two days." },
+                    { name: "Literature Rack Placement", price: "$250", desc: "Brochures or sell sheets placed where attendees actively browse solutions." },
+                  ].map((item) => (
+                    <div key={item.name} className="prospectus-pricing-item">
+                      <div className="prospectus-pricing-item-info">
+                        <div className="prospectus-pricing-item-name">{item.name}</div>
+                        <div className="prospectus-pricing-item-desc">{item.desc}</div>
+                      </div>
+                      <div className="prospectus-pricing-item-price">{item.price}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="prospectus-pricing-category" style={{ marginTop: '24px' }}>
+                <h3 className="prospectus-pricing-cat-title">Video Content</h3>
+                <div className="prospectus-pricing-items">
+                  {[
+                    { name: "Professional Exhibitor Interview", price: "$1,000", desc: "On-site video interview capturing your brand story and product highlights for your channels." },
+                    { name: "Professional Testimonial Interview", price: "$500", desc: "Structured testimonial interviews filmed on-site and delivered as brand-ready content." },
+                  ].map((item) => (
+                    <div key={item.name} className="prospectus-pricing-item">
+                      <div className="prospectus-pricing-item-info">
+                        <div className="prospectus-pricing-item-name">{item.name}</div>
+                        <div className="prospectus-pricing-item-desc">{item.desc}</div>
+                      </div>
+                      <div className="prospectus-pricing-item-price">{item.price}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* Summit Speaking */}
             <div className="prospectus-pricing-category">
               <h3 className="prospectus-pricing-cat-title">Speaking Slots</h3>
@@ -337,74 +362,6 @@ export default function NYCProspectusPage() {
                     <div className="prospectus-pricing-item-price">{item.price}</div>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Magazine & Mailer */}
-            <div className="prospectus-pricing-category">
-              <h3 className="prospectus-pricing-cat-title">Magazine & Mailer</h3>
-              <div className="prospectus-pricing-items">
-                {[
-                  { name: "Front Cover Feature", price: "$6,500", desc: "Positions your brand alongside the leaders and chief scientists shaping longevity." },
-                  { name: "Back Cover Advertisement", price: "$4,000", desc: "Most-viewed exterior surface. Maximum exposure during distribution and display." },
-                  { name: "Inside Front Cover Advertisement", price: "$2,000", desc: "Seen before any editorial content, capturing attention at peak reader engagement." },
-                  { name: "Inside Back Cover Advertisement", price: "$2,000", desc: "High-visibility closing position for lasting recall as readers finish each issue." },
-                  { name: "Envelope Logo Placement", price: "$2,000", desc: "Logo on the mailing envelope. Brand visibility before the magazine is even opened." },
-                  { name: "Magazine Bag Stuffer", price: "$1,000", desc: "Insert into the clinic mailer alongside each issue. Max 8.5×11″. Samples welcome." },
-                  { name: "Full-Page Advertisement", price: "$1,000", desc: "Maximum visual real estate reaching practitioners across 2,000+ clinic distribution points." },
-                  { name: "Native Article Placement", price: "$1,000", desc: "One-page editorial in the bioEDGE voice, distributed to 2,000+ longevity clinics." },
-                  { name: "Half-Page Advertisement", price: "$750", desc: "Targeted visibility to the longevity clinic network. Ideal for launches and brand awareness." },
-                  { name: "Quarter-Page Advertisement", price: "$500", desc: "Efficient placement for directory listings or supporting a larger editorial presence." },
-                  { name: "Local Directory Listing", price: "$200", desc: "Curated listing with company name, category, location, and contact. 2,000+ clinic reach." },
-                ].map((item) => (
-                  <div key={item.name} className="prospectus-pricing-item">
-                    <div className="prospectus-pricing-item-info">
-                      <div className="prospectus-pricing-item-name">{item.name}</div>
-                      <div className="prospectus-pricing-item-desc">{item.desc}</div>
-                    </div>
-                    <div className="prospectus-pricing-item-price">{item.price}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Store NYC + Video Content stacked in right column */}
-            <div className="prospectus-pricing-category-stack">
-              <div className="prospectus-pricing-category">
-                <h3 className="prospectus-pricing-cat-title">On-Site Store</h3>
-                <div className="prospectus-pricing-items">
-                  {[
-                    { name: "Branded Face-Out Display", price: "$3,000", desc: "Fully branded face-out display. Maximum shelf visibility for high-intent attendees." },
-                    { name: "Single Shelf Display", price: "$500", desc: "Dedicated shelf in a curated retail environment. 750+ health optimizers over two days." },
-                    { name: "Literature Rack Placement", price: "$250", desc: "Brochures or sell sheets placed where attendees actively browse solutions." },
-                  ].map((item) => (
-                    <div key={item.name} className="prospectus-pricing-item">
-                      <div className="prospectus-pricing-item-info">
-                        <div className="prospectus-pricing-item-name">{item.name}</div>
-                        <div className="prospectus-pricing-item-desc">{item.desc}</div>
-                      </div>
-                      <div className="prospectus-pricing-item-price">{item.price}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="prospectus-pricing-category" style={{ marginTop: '24px' }}>
-                <h3 className="prospectus-pricing-cat-title">Video Content</h3>
-                <div className="prospectus-pricing-items">
-                  {[
-                    { name: "Professional Exhibitor Interview", price: "$1,000", desc: "On-site video interview capturing your brand story and product highlights for your channels." },
-                    { name: "Professional Testimonial Interview", price: "$500", desc: "Structured testimonial interviews filmed on-site and delivered as brand-ready content." },
-                  ].map((item) => (
-                    <div key={item.name} className="prospectus-pricing-item">
-                      <div className="prospectus-pricing-item-info">
-                        <div className="prospectus-pricing-item-name">{item.name}</div>
-                        <div className="prospectus-pricing-item-desc">{item.desc}</div>
-                      </div>
-                      <div className="prospectus-pricing-item-price">{item.price}</div>
-                    </div>
-                  ))}
-                </div>
               </div>
             </div>
 
