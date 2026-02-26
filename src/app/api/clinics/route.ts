@@ -49,6 +49,7 @@ function extractDomain(url: string | null | undefined): string | null {
  *   - active: Filter by active status (true/false)
  *   - featured: Filter by featured status (true/false)
  *   - has_email: Only return clinics with email (true)
+ *   - exclude_emailed_days: Exclude clinics emailed within N calendar days
  *   - distinct: Return distinct values (states, cities)
  *   - page: Page number (default: 1)
  *   - limit: Results per page (default: 50, max: 5000)
@@ -70,6 +71,7 @@ export async function GET(request: NextRequest) {
     const active = searchParams.get("active")
     const featured = searchParams.get("featured")
     const hasEmail = searchParams.get("has_email")
+    const excludeEmailedDays = searchParams.get("exclude_emailed_days")
     const distinct = searchParams.get("distinct")
     const page = parseInt(searchParams.get("page") || "1", 10)
     const pageLimit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 5000)
@@ -172,6 +174,35 @@ export async function GET(request: NextRequest) {
 
     if (hasEmail === "true") {
       query = query.not("email", "is", null)
+    }
+
+    // Exclude clinics that were emailed within the last N calendar days.
+    // Uses start-of-UTC-day so the window is always whole days, not rolling hours.
+    if (excludeEmailedDays) {
+      const days = parseInt(excludeEmailedDays, 10)
+      if (days > 0) {
+        const cutoff = new Date()
+        cutoff.setUTCDate(cutoff.getUTCDate() - days)
+        cutoff.setUTCHours(0, 0, 0, 0)
+
+        const { data: recentRecipients, error: recentError } = await supabase
+          .from("clinic_campaign_recipients")
+          .select("clinic_id")
+          .not("sent_at", "is", null)
+          .gte("sent_at", cutoff.toISOString())
+
+        if (recentError) {
+          console.error("[clinics] Error querying recently-emailed clinics:", recentError)
+        } else {
+          const recentIds = (recentRecipients || [])
+            .map((r) => r.clinic_id)
+            .filter(Boolean)
+
+          if (recentIds.length > 0) {
+            query = query.not("id", "in", `(${recentIds.join(",")})`)
+          }
+        }
+      }
     }
 
     // Pagination

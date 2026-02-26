@@ -339,6 +339,9 @@ export default function NewClinicEmailPage() {
       }
       params.set("has_email", "true")
       params.set("limit", "5000")
+      if (excludeRecentlyEmailed && excludeDays > 0) {
+        params.set("exclude_emailed_days", String(excludeDays))
+      }
 
       const res = await fetch(`/api/clinics?${params.toString()}`)
       if (res.ok) {
@@ -353,7 +356,7 @@ export default function NewClinicEmailPage() {
     } finally {
       setLoadingClinics(false)
     }
-  }, [selectedStates, selectedCities, selectedTags, allCitiesSelected])
+  }, [selectedStates, selectedCities, selectedTags, allCitiesSelected, excludeRecentlyEmailed, excludeDays])
 
   // Toggle helpers
   const toggleState = (state: string) => {

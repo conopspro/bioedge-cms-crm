@@ -198,15 +198,26 @@ export async function POST(request: NextRequest) {
         // Exclude clinics that were emailed recently (if requested)
         let recentlyEmailedIds = new Set<string>()
         if (excludeDays && excludeDays > 0) {
+          // Snap to start of the UTC calendar day `excludeDays` ago, so the
+          // window is always a whole number of calendar days (not a rolling
+          // 24×N-hour window). Without this, a 3 PM campaign creation would
+          // miss sends from earlier that same boundary day morning.
           const cutoff = new Date()
-          cutoff.setDate(cutoff.getDate() - excludeDays)
+          cutoff.setUTCDate(cutoff.getUTCDate() - excludeDays)
+          cutoff.setUTCHours(0, 0, 0, 0)
 
-          const { data: recentRecipients } = await supabase
+          const { data: recentRecipients, error: recentError } = await supabase
             .from("clinic_campaign_recipients")
             .select("clinic_id")
             .not("sent_at", "is", null)
             .gte("sent_at", cutoff.toISOString())
             .in("clinic_id", clinics.map((c) => c.id))
+
+          if (recentError) {
+            console.error("[clinic-campaigns] Error querying recently-emailed clinics:", recentError)
+          }
+
+          console.log(`[clinic-campaigns] exclude: cutoff=${cutoff.toISOString()}, found=${recentRecipients?.length ?? 0} recently-emailed of ${clinics.length} submitted`)
 
           recentlyEmailedIds = new Set(
             (recentRecipients || []).map((r) => r.clinic_id)

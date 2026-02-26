@@ -168,11 +168,14 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     )
 
     // Exclude clinics emailed recently (if requested)
+    // Snap to start of UTC calendar day so the window is always whole days,
+    // not a rolling 24×N-hour window that misses early-morning boundary sends.
     let recentlyEmailedIds = new Set<string>()
     let excludedCount = 0
     if (excludeDays && excludeDays > 0) {
       const cutoff = new Date()
-      cutoff.setDate(cutoff.getDate() - excludeDays)
+      cutoff.setUTCDate(cutoff.getUTCDate() - excludeDays)
+      cutoff.setUTCHours(0, 0, 0, 0)
 
       const { data: recentRecipients } = await supabase
         .from("clinic_campaign_recipients")

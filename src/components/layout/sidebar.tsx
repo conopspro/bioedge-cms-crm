@@ -23,6 +23,7 @@ import {
   MapPin,
   Send,
   FileDown,
+  BookUser,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -130,6 +131,11 @@ const toolsNavItems = [
     label: "Navigation",
     href: "/dashboard/settings/navigation",
     icon: Navigation,
+  },
+  {
+    label: "General Emails",
+    href: "/dashboard/outreach-emails",
+    icon: BookUser,
   },
   {
     label: "Settings",

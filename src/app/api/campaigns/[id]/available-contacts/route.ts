@@ -297,7 +297,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     if (contactCompanyIds.length > 0) {
       const cutoffDate = new Date()
-      cutoffDate.setDate(cutoffDate.getDate() - cooldownDays)
+      cutoffDate.setUTCDate(cutoffDate.getUTCDate() - cooldownDays)
+      cutoffDate.setUTCHours(0, 0, 0, 0)
 
       const { data: recentlySent } = await supabase
         .from("campaign_recipients")
