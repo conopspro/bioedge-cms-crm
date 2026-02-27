@@ -197,17 +197,17 @@ export function HomepageEvents({
                 className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(13,89,138,0.25)]"
               >
                 <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
-                <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
+                <div className="flex items-center gap-3 px-4 py-4 md:gap-8 md:px-8">
 
                   {/* Event image thumbnail */}
                   {displayImage ? (
                     <img
                       src={displayImage}
                       alt={displayTitle}
-                      className="h-28 w-44 flex-shrink-0 rounded object-cover shadow-xl transition-transform duration-300 group-hover:scale-105"
+                      className="h-20 w-24 flex-shrink-0 rounded object-cover shadow-xl transition-transform duration-300 group-hover:scale-105 md:h-28 md:w-44"
                     />
                   ) : (
-                    <div className="flex h-28 w-44 flex-shrink-0 items-center justify-center rounded bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105">
+                    <div className="flex h-20 w-24 flex-shrink-0 items-center justify-center rounded bg-white/5 shadow-xl transition-transform duration-300 group-hover:scale-105 md:h-28 md:w-44">
                       <Calendar className="h-10 w-10 text-electric-blue/50" />
                     </div>
                   )}

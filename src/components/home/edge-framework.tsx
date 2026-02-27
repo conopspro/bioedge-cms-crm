@@ -248,7 +248,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
                   </p>
                 </div>
               </div>
-              <span className="hidden flex-shrink-0 items-center gap-2 rounded-full bg-electric-blue px-5 py-2 text-sm font-semibold text-white transition-colors group-hover:bg-white group-hover:text-navy sm:inline-flex">
+              <span className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-full bg-electric-blue px-3 py-1.5 text-xs font-semibold text-white transition-colors group-hover:bg-white group-hover:text-navy sm:gap-2 sm:px-5 sm:py-2 sm:text-sm">
                 Get Clarity
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />

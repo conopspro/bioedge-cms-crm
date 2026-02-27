@@ -153,7 +153,7 @@ export default function OutreachCampaignDetailPage() {
         const res = await fetch(`/api/outreach-campaigns/${id}/generate`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ batchSize: 5 }),
+          body: JSON.stringify({ batchSize: 8 }),
         })
         if (!res.ok) {
           setGenerating(false)

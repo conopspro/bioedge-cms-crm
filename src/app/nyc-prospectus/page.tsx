@@ -201,7 +201,7 @@ export default function NYCProspectusPage() {
               <div className="prospectus-pricing-items">
                 {[
                   { name: "Front Cover Feature", price: "$6,500", desc: "Positions your brand alongside the leaders and chief scientists shaping longevity." },
-                  { name: "Back Cover Advertisement", price: "$4,000", desc: "Most-viewed exterior surface. Maximum exposure during distribution and display." },
+                  { name: "Back Cover Advertisement", price: "$4,000", desc: "Highly viewed exterior surface. Maximum exposure during distribution and display." },
                   { name: "Inside Front Cover Advertisement", price: "$2,000", desc: "Seen before any editorial content, capturing attention at peak reader engagement." },
                   { name: "Inside Back Cover Advertisement", price: "$2,000", desc: "High-visibility closing position for lasting recall as readers finish each issue." },
                   { name: "Envelope Logo Placement", price: "$2,000", desc: "Logo on the mailing envelope. Brand visibility before the magazine is even opened." },
@@ -347,7 +347,7 @@ export default function NYCProspectusPage() {
               <div className="prospectus-pricing-items">
                 {[
                   { name: "Front Cover Feature", price: "$5,000", desc: "Your brand defines the visual identity of the official event publication." },
-                  { name: "Back Cover", price: "$3,000", desc: "Most visible exterior surface of the program guide. Seen by all attendees." },
+                  { name: "Back Cover", price: "$3,000", desc: "Highly visible exterior surface of the program guide. Seen by all attendees." },
                   { name: "Inside Back Cover", price: "$2,000", desc: "High-visibility closing position as attendees reference schedules and exhibitors." },
                   { name: "Inside Front Cover", price: "$2,000", desc: "First advertising position seen when every attendee opens the program guide." },
                   { name: "Full-Page Ad", price: "$1,000", desc: "Full-page with premium editorial adjacency in the official event publication." },

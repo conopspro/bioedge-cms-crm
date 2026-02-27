@@ -30,7 +30,7 @@ export function ClinicPromoSection({ totalClinics }: ClinicPromoSectionProps) {
                   Longevity Clinic Directory
                 </h3>
                 {clinicCount && (
-                  <span className="rounded-full bg-electric-blue/20 px-3 py-0.5 text-xs font-semibold text-electric-blue">
+                  <span className="rounded-full bg-white/20 px-3 py-0.5 text-xs font-semibold text-white">
                     {clinicCount} clinics
                   </span>
                 )}
