@@ -226,12 +226,12 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
             className="group relative block overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-navy to-deep-blue transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_rgba(13,89,138,0.25)]"
           >
             <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-electric-blue transition-transform duration-400 group-hover:scale-x-100" />
-            <div className="flex items-center gap-6 px-6 py-4 md:gap-8 md:px-8">
-              <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-xl bg-white/15 shadow-xl transition-transform duration-300 group-hover:scale-105">
-                <ScanLine className="h-10 w-10 text-white" />
+            <div className="flex items-center gap-3 px-4 py-4 md:gap-8 md:px-8">
+              <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-xl bg-white/15 shadow-xl transition-transform duration-300 group-hover:scale-105 md:h-20 md:w-20">
+                <ScanLine className="h-8 w-8 text-white md:h-10 md:w-10" />
               </div>
               <div className="flex-1 min-w-0">
-                <h3 className="text-xl font-bold text-white md:text-2xl">
+                <h3 className="text-lg font-bold text-white md:text-2xl">
                   bioEDGE Decoder
                 </h3>
                 <div className="mt-3 hidden sm:block">
