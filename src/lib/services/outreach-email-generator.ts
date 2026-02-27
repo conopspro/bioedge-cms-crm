@@ -216,24 +216,22 @@ Include the link naturally in the body — do NOT just paste a raw URL at the en
     )
 
     // ── 15. Subject line rules ───────────────────────────────────────────────
-    const subjectRules = [
+    const subjectBaseRules = [
       `2–5 words ideal. Shorter outperforms longer every time.`,
       `Lowercase preferred. Capitalize proper nouns only (brand names, event names).`,
-      `Must feel like one human writing to another — cryptic in an intriguing way, not in a confusing way.`,
+      `Must feel like one human writing to another.`,
       `NEVER reference the recipient's location, city, company, practice name, or industry.`,
       `NEVER use: "Quick question", "Partnership opportunity", "Exciting news", "Touching base", "I had to reach out", or anything that signals mass email.`,
       `NEVER use clickbait, ALL CAPS words, exclamation marks, or emojis.`,
-      `Each recipient MUST get a unique subject line. No two should follow the same template pattern.`,
-      `Strong examples: "Nobody asks this question.", "The stack nobody takes.", "Wrong order.", "Addition is easy.", "Still optimizing?", "The missing framework.", "Your signals have answers.", "A system, not a stack.", "What the conference didn't cover.", "The supplement math doesn't work."`,
-      `Bad examples: "Exciting opportunity for you!", "Quick question from Sandy", "Unlock your longevity potential", "Longevity tools for chiropractors"`,
+      `Each recipient MUST get a unique subject line. Do not repeat the same subject line twice.`,
     ].join("\n- ")
 
     if (campaign.subject_prompt) {
       parts.push(
-        `## Subject Line Style\n\nCore rules (always apply):\n- ${subjectRules}\n\nAdditional guidance:\n${campaign.subject_prompt}`
+        `## Subject Line — YOUR PRIMARY DIRECTIVE\n\nThe following instruction overrides all defaults. Follow it precisely for every subject line:\n\n${campaign.subject_prompt}\n\n**Supporting rules (always apply in addition):**\n- ${subjectBaseRules}`
       )
     } else {
-      parts.push(`## Subject Line Style\n\n- ${subjectRules}`)
+      parts.push(`## Subject Line Style\n\n- ${subjectBaseRules}`)
     }
 
     // ── 16. Output format ────────────────────────────────────────────────────
