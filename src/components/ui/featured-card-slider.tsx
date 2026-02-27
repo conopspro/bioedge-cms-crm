@@ -50,7 +50,7 @@ export function FeaturedCardSlider({ children, className }: FeaturedCardSliderPr
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
+          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-6 w-6 text-gray-800" />
@@ -61,7 +61,7 @@ export function FeaturedCardSlider({ children, className }: FeaturedCardSliderPr
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}
-          className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
+          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-6 w-6 text-gray-800" />
