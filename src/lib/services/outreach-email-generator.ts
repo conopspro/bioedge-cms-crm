@@ -97,31 +97,43 @@ The goal is to be relevant and respectful, not to sell. The best outcome is a re
     // ── 2. Voice Principles ───────────────────────────────────────────────────
     parts.push(`## Voice Principles
 
-- Write like a peer in the health and longevity space. Not a brand. Not a vendor.
-- Direct and honest. State why you're reaching out clearly, without padding.
-- NO fake familiarity. You have not visited their practice, read their work, or followed them. Do not pretend otherwise.
-- NO hype words. This means: revolutionary, groundbreaking, game-changing, transform, supercharge, turbocharge, miracle, unlock, unleash, empower, paradigm shift, cutting-edge, synergy, leverage.
-- NO em dashes (—). NO emojis. NO exclamation marks.
+- Direct, grounded, and quietly confident. Short sentences.
+- No hype, no enthusiasm performance. Write like someone who has been in the room, seen the industry, and isn't impressed by their own cleverness.
+- Acknowledge the reader's sophistication without flattering them. Earn attention through specificity rather than energy.
+- Speak to insiders without being exclusive. The call to action feels like an invitation, not a push.
+- Write like a peer. Not a brand. Not a vendor.
+- NO hype words: revolutionary, groundbreaking, game-changing, transform, supercharge, turbocharge, miracle, unlock, unleash, empower, paradigm shift, cutting-edge, synergy, leverage.
+- NO em dashes (—). NO emojis. NO exclamation marks. Never oversells. Never assumes.
 - Short paragraphs: 2–3 sentences maximum.
-- This should feel like a quick personal note, not a marketing blast or a nurture sequence.
+- The credibility is in what's left out as much as what's included.
 - Treat the recipient as an intelligent adult who receives many emails and can immediately identify AI-generated slop.`)
 
     // ── 3. Personalization Rules (THE critical constraint) ───────────────────
     parts.push(`## Personalization Rules — READ CAREFULLY
 
-**NEVER address the recipient by name.** Do not open with "Hi [Name]" or any name-based greeting. This is a hard rule with no exceptions.
+**NEVER address the recipient by name.** No name in the greeting or anywhere in the email. Hard rule, no exceptions.
 
-Instead, personalize by demonstrating that you understand their world:
+**NEVER reference anything you know about the recipient.** Do not mention their location, city, state, employer, company name, practice name, industry, or specialty — even if that information is provided below. The recipient must never feel profiled, researched, or geo-targeted. This includes:
+- NO city or state references ("Another winter in Montana...", "You live in the Central Valley...")
+- NO industry call-outs ("As a chiropractor...", "In your line of work...")
+- NO practice/company name mentions ("At [Practice Name]...")
+- NO engagement history references ("Five emails and you're still reading...", "You clicked last time...")
+- NO assumptions about their situation, schedule, or life
 
-1. **Open with a line that proves you understand their daily reality or professional context.** This is the most important sentence in the email. Not a compliment, not a question — a statement that shows you actually get what their world is like.
+**The RIGHT approach: Open with a universal observation about the longevity space** — a truth, a tension, a gap, or an irony that any sophisticated reader will recognize from their own experience. The insight IS the personalization. It works because it is true, not because it references the reader.
 
-2. **Reference their practice name once if provided.** Weave it in naturally — not in the opening line, and never as "I see you run [practice name]" or "I noticed your clinic." Example: "If the team at [Practice Name] is already thinking about longevity..." not "Dear [Practice Name]."
+Strong opener examples (use these as inspiration, never copy verbatim):
+- "The longevity space has never had more answers. What it's missing is a way to know which questions to ask first."
+- "Everyone's optimizing. Few are doing it in the right order."
+- "Another supplement protocol, another $400 a month, another conversation about bioavailability. Who's asking what's blocking absorption in the first place?"
+- "You can stack the best supplements in the world on top of a system that isn't ready to use them. Most people do."
+- "Most people are fluent in symptoms and clueless about systems. That's not a discipline problem. That's a missing framework."
+- "The gap between knowing and doing has never been wider. The longevity space keeps widening it."
+- "Another year of optimizing sleep while the thing disrupting it goes unaddressed. Addition is easy. Subtraction is the work."
+- "Another biohacking conference, another stack of supplements nobody will actually take consistently."
+- "Your body has been sending signals the whole time. The problem was never the signal. It was not knowing how to read it."
 
-3. **Reference their city briefly if it adds warmth.** Only if known. Not forced. Skip it if it would feel awkward.
-
-4. **Do not fabricate details.** Only reference information actually provided in the contact context. If no practice name or location is given, write a strong generic opener for their persona type.
-
-5. **The best opening line is one they could not imagine receiving from anyone except someone who genuinely understands their practice.** That specificity is the personalization.`)
+These work because they respect the reader's intelligence. They are never cute. They are never impressed with themselves.`)
 
     // ── 4. Audience Context (persona briefing) ───────────────────────────────
     parts.push(`## Audience Context: ${persona.displayName}
@@ -205,15 +217,15 @@ Include the link naturally in the body — do NOT just paste a raw URL at the en
 
     // ── 15. Subject line rules ───────────────────────────────────────────────
     const subjectRules = [
-      `3–6 words ideal. Short subjects outperform long ones.`,
-      `Lowercase style is fine for common words. Always capitalize proper nouns: practice names, brand names, city names.`,
-      `Must feel like one human writing to another — not a campaign blast.`,
-      `Reference their practice type, specialty, or city when natural and known.`,
-      `NEVER use: "Quick question", "Partnership opportunity", "Exciting news", "Touching base", "I had to reach out", or anything that screams mass email.`,
+      `2–5 words ideal. Shorter outperforms longer every time.`,
+      `Lowercase preferred. Capitalize proper nouns only (brand names, event names).`,
+      `Must feel like one human writing to another — cryptic in an intriguing way, not in a confusing way.`,
+      `NEVER reference the recipient's location, city, company, practice name, or industry.`,
+      `NEVER use: "Quick question", "Partnership opportunity", "Exciting news", "Touching base", "I had to reach out", or anything that signals mass email.`,
       `NEVER use clickbait, ALL CAPS words, exclamation marks, or emojis.`,
       `Each recipient MUST get a unique subject line. No two should follow the same template pattern.`,
-      `Good examples: "longevity tools for chiropractors", "re: what I wrote for practitioners in FL", "your practice and the bioEDGE framework"`,
-      `Bad examples: "Exciting opportunity for you!", "Quick question from Sandy", "Unlock your longevity potential"`,
+      `Strong examples: "Nobody asks this question.", "The stack nobody takes.", "Wrong order.", "Addition is easy.", "Still optimizing?", "The missing framework.", "Your signals have answers.", "A system, not a stack.", "What the conference didn't cover.", "The supplement math doesn't work."`,
+      `Bad examples: "Exciting opportunity for you!", "Quick question from Sandy", "Unlock your longevity potential", "Longevity tools for chiropractors"`,
     ].join("\n- ")
 
     if (campaign.subject_prompt) {
@@ -235,41 +247,24 @@ Include the link naturally in the body — do NOT just paste a raw URL at the en
   private buildUserPrompt(recipient: OutreachRecipientContext): string {
     const parts: string[] = []
 
-    parts.push(`Write a personalized outreach email to this contact. Remember: no name greeting. Open with a line that reflects genuine understanding of their world.`)
+    parts.push(`Write an outreach email. No name greeting. Open with a universal observation — a truth about the longevity space that a sophisticated reader will recognize from their own experience. Do NOT reference anything about the recipient personally.`)
 
-    parts.push(`\n**Contact Details:**`)
-
+    // Only pass audience type to inform content angle — never to reference explicitly
     if (recipient.recipient_business_type && recipient.recipient_business_type !== 'Valid') {
-      parts.push(`- Business Type: ${recipient.recipient_business_type}`)
-    } else {
-      parts.push(`- Business Type: (unknown — general longevity/health interest)`)
+      parts.push(`\nAudience context (use to inform your angle — do NOT mention this in the email): ${recipient.recipient_business_type}`)
     }
 
-    if (recipient.recipient_practice_name) {
-      parts.push(`- Practice/Business Name: ${recipient.recipient_practice_name}`)
-    }
-
-    if (recipient.recipient_city && recipient.recipient_state) {
-      parts.push(`- Location: ${recipient.recipient_city}, ${recipient.recipient_state}`)
-    } else if (recipient.recipient_city || recipient.recipient_state) {
-      parts.push(`- Location: ${recipient.recipient_city || recipient.recipient_state}`)
-    }
-
-    // Engagement signal — only if meaningful
+    // Engagement signals — inform warmth/directness but never reference in the email
     if (recipient.recipient_total_clicks > 0) {
       parts.push(
-        `- Engagement History: Has clicked links in previous emails from Sandy — already showed active interest`
+        `\nEngagement note (do NOT reference this in the email): This person has clicked links before. You may write with slightly more directness and assume some existing familiarity with the space.`
       )
     } else if (recipient.recipient_total_opens >= 5) {
       parts.push(
-        `- Engagement History: Has opened ${recipient.recipient_total_opens} previous emails — familiar with Sandy, hasn't replied yet`
-      )
-    } else if (recipient.recipient_total_opens >= 1) {
-      parts.push(
-        `- Engagement History: Has opened previous emails from Sandy`
+        `\nEngagement note (do NOT reference this in the email): This person has opened several previous emails. Write with conviction — they are interested but have not yet acted.`
       )
     }
-    // If opens === 0, omit the engagement line entirely (cold contact)
+    // Cold contacts: no engagement note — write fresh
 
     return parts.join("\n")
   }

@@ -232,6 +232,16 @@ export default function OutreachCampaignDetailPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
+  const handleDeleteCampaign = async () => {
+    if (!confirm("Delete this entire campaign and all its emails? This cannot be undone.")) return
+    const res = await fetch(`/api/outreach-campaigns/${id}`, { method: "DELETE" })
+    if (res.ok) {
+      window.location.href = "/dashboard/outreach-emails"
+    } else {
+      alert("Failed to delete campaign.")
+    }
+  }
+
   const handlePauseSend = () => {
     if (sendTimerRef.current) {
       clearTimeout(sendTimerRef.current)
@@ -375,6 +385,16 @@ export default function OutreachCampaignDetailPage() {
               Resume Sending
             </Button>
           )}
+
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleDeleteCampaign}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            title="Delete campaign"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </div>
 

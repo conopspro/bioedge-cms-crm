@@ -133,7 +133,7 @@ export default function NewOutreachCampaignPage() {
   const [mustInclude, setMustInclude] = useState("")
   const [subjectPrompt, setSubjectPrompt] = useState("")
   const [referenceEmail, setReferenceEmail] = useState("")
-  const [maxWords, setMaxWords] = useState("100")
+  const [maxWords, setMaxWords] = useState("125")
   const [mustAvoid, setMustAvoid] = useState("")
   const [context, setContext] = useState("")
 
@@ -316,7 +316,7 @@ export default function NewOutreachCampaignPage() {
         must_avoid: mustAvoid.trim() || null,
         call_to_action: callToAction.trim() || null,
         reference_email: referenceEmail.trim() || null,
-        max_words: parseInt(maxWords, 10) || 100,
+        max_words: parseInt(maxWords, 10) || 125,
         subject_prompt: subjectPrompt.trim() || null,
         // Send pacing
         send_window_start: parseInt(sendWindowStart, 10) || 9,
