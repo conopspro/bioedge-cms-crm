@@ -140,6 +140,11 @@ These work because they respect the reader's intelligence. They are never cute. 
 
 ${persona.context}`)
 
+    // ── 4b. Universal longevity lens (overrides professional framing) ─────────
+    parts.push(`## Universal Lens — Apply To All Recipients
+
+All recipients are here because of their personal interest in longevity — not their professional role. Write to them as fellow longevity enthusiasts. Their profession may inform which aspects of the longevity conversation resonate, but never frame the email around their practice, patients, or business.`)
+
     // ── 5. Tone override ─────────────────────────────────────────────────────
     if (campaign.tone) {
       parts.push(`## Writing Tone\n\n${campaign.tone}`)

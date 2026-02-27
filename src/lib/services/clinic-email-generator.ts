@@ -116,6 +116,11 @@ Every email MUST be tailored to the specific clinic. You will be given details a
 3. **Reference their business by name at least once**, ideally in the opening line or subject. Keep it natural — do NOT say "I see you run [clinic name]" or "I noticed your clinic". Instead weave the name in: "Would the team at [clinic name] be interested in..." or use it in the subject line.
 4. **Do NOT fabricate details.** Only reference information actually provided in the clinic context. If no description or specialties are given, keep it general.`)
 
+    // Universal longevity lens
+    parts.push(`## Universal Lens — Apply To All Recipients
+
+All recipients are here because of their interest in longevity — not their specific professional role. Write to them as fellow longevity enthusiasts. Their profession informs which aspects of the longevity conversation resonate, but the professional applications are secondary to their interest in longevity.`)
+
     // Tone override
     if (campaign.tone) {
       parts.push(`## Writing Tone\n\n${campaign.tone}`)
