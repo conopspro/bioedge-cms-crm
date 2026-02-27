@@ -123,7 +123,7 @@ export function HomepageFeaturedLeaders({
             <Link
               key={leader.id}
               href={`/leaders/${leader.slug || leader.id}`}
-              className="group flex-shrink-0 w-[85vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]"
+              className="group flex-shrink-0 w-[50vw] sm:w-[280px] overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]"
               style={{ scrollSnapAlign: "start" }}
             >
               <div className="p-6">

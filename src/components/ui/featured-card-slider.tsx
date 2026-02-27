@@ -46,22 +46,22 @@ export function FeaturedCardSlider({ children, className }: FeaturedCardSliderPr
 
   return (
     <div className={cn("relative w-full", className)}>
-      {/* Left Arrow */}
+      {/* Left Arrow — desktop only */}
       {canScrollLeft && (
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
+          className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
           aria-label="Scroll left"
         >
           <ChevronLeft className="h-6 w-6 text-gray-800" />
         </button>
       )}
 
-      {/* Right Arrow */}
+      {/* Right Arrow — desktop only */}
       {canScrollRight && (
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
+          className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-white/90 hover:bg-white shadow-lg rounded-full p-3 transition-all hover:scale-110"
           aria-label="Scroll right"
         >
           <ChevronRight className="h-6 w-6 text-gray-800" />
@@ -71,7 +71,7 @@ export function FeaturedCardSlider({ children, className }: FeaturedCardSliderPr
       {/* Scrollable Container */}
       <div
         ref={scrollContainerRef}
-        className="flex gap-6 overflow-x-auto scroll-smooth px-12 py-4"
+        className="flex gap-6 overflow-x-auto scroll-smooth px-2 py-4 sm:px-12"
         style={{
           scrollSnapType: "x mandatory",
           scrollbarWidth: "none",
