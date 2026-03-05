@@ -204,13 +204,14 @@ export function ContactsTable({
               <TableHead>Email</TableHead>
               <TableHead>Visibility</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead>Engagement</TableHead>
               <TableHead className="w-[100px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {contacts.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   {loading ? (
                     <div className="text-muted-foreground">Loading...</div>
                   ) : total === 0 && !search && notWithinFilter === "all" && convertedFilter === "all" && visibilityFilter === "all" && outreachFilter === "all" ? (
@@ -337,6 +338,21 @@ export function ContactsTable({
                     <Badge variant={statusColors[contact.outreach_status || "not_contacted"]}>
                       {statusLabels[contact.outreach_status || "not_contacted"]}
                     </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {contact.bounced_at ? (
+                      <span className="text-xs text-destructive font-medium">Bounced</span>
+                    ) : contact.unsubscribed_at ? (
+                      <span className="text-xs text-orange-500 font-medium">Unsubscribed</span>
+                    ) : contact.total_clicks > 0 ? (
+                      <span className="text-xs text-green-600 font-medium">Clicked</span>
+                    ) : contact.total_opens >= 5 ? (
+                      <span className="text-xs text-blue-600">{contact.total_opens} opens</span>
+                    ) : contact.total_opens >= 1 ? (
+                      <span className="text-xs text-muted-foreground">{contact.total_opens} open{contact.total_opens > 1 ? "s" : ""}</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground/40">—</span>
+                    )}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">

@@ -49,6 +49,20 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient()
 
+    // Helper: atomically increment total_opens / total_clicks on source table
+    async function incrementEngagement(
+      sourceTable: "contacts" | "clinics" | "outreach_contacts",
+      email: string,
+      field: "opens" | "clicks"
+    ) {
+      await supabase.rpc("increment_email_engagement", {
+        p_table: sourceTable,
+        p_email: email,
+        p_opens: field === "opens" ? 1 : 0,
+        p_clicks: field === "clicks" ? 1 : 0,
+      })
+    }
+
     // ── email.received — inbound reply, no resend_id to look up ─────────────
     if (type === "email.received") {
       const senderEmail = data.from
@@ -121,6 +135,9 @@ export async function POST(request: NextRequest) {
     }
 
     // ── Update recipient record across all three tables ─────────────────────
+    // Track which source table to update for engagement increments
+    let sourceTable: "contacts" | "clinics" | "outreach_contacts" | null = null
+
     // Try campaign_recipients first
     const { data: campaignMatch, error: campaignError } = await supabase
       .from("campaign_recipients")
@@ -134,6 +151,7 @@ export async function POST(request: NextRequest) {
 
     if (campaignMatch && campaignMatch.length > 0) {
       recipientEmail = campaignMatch[0]?.recipient_email ?? null
+      sourceTable = "contacts"
       console.log(`Resend webhook: ${type} for ${resendId} (company campaign)`)
     } else {
       // Try clinic_campaign_recipients
@@ -149,6 +167,7 @@ export async function POST(request: NextRequest) {
 
       if (clinicMatch && clinicMatch.length > 0) {
         recipientEmail = clinicMatch[0]?.recipient_email ?? null
+        sourceTable = "clinics"
         console.log(`Resend webhook: ${type} for ${resendId} (clinic campaign)`)
       } else {
         // Try outreach_campaign_recipients
@@ -164,6 +183,7 @@ export async function POST(request: NextRequest) {
 
         if (outreachMatch && outreachMatch.length > 0) {
           recipientEmail = outreachMatch[0]?.recipient_email ?? null
+          sourceTable = "outreach_contacts"
           console.log(`Resend webhook: ${type} for ${resendId} (outreach campaign)`)
         } else {
           console.warn(`Resend webhook: no recipient found for resend_id ${resendId}`)
@@ -177,6 +197,15 @@ export async function POST(request: NextRequest) {
         await applyBounceToEmail(recipientEmail, supabase)
       } else if (type === "email.complained") {
         await applyUnsubscribeToEmail(recipientEmail, supabase)
+      }
+    }
+
+    // ── Increment engagement counters on source contact/clinic table ─────────
+    if (recipientEmail && sourceTable) {
+      if (type === "email.opened") {
+        await incrementEngagement(sourceTable, recipientEmail, "opens")
+      } else if (type === "email.clicked") {
+        await incrementEngagement(sourceTable, recipientEmail, "clicks")
       }
     }
 

@@ -327,6 +327,13 @@ export interface Contact {
   country: string | null
   // YouTube channel
   youtube_channel_url: string | null
+  // Suppression fields (added by migration 20260305144255)
+  bounced_at: string | null
+  unsubscribed_at: string | null
+  last_replied_at: string | null
+  // Email engagement counters (added by migration 20260305152249)
+  total_opens: number
+  total_clicks: number
 }
 
 /** Article/content piece linked to a company */

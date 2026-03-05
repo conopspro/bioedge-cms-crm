@@ -53,6 +53,11 @@ interface ClinicListItem {
   is_featured: boolean
   is_draft: boolean
   created_at: string
+  // Engagement + suppression (added by migrations 20260305*)
+  total_opens: number
+  total_clicks: number
+  bounced_at: string | null
+  unsubscribed_at: string | null
 }
 
 interface PaginationInfo {
@@ -273,6 +278,7 @@ export default function ClinicsPage() {
                   <TableHead className="text-center">Rating</TableHead>
                   <TableHead>Tags</TableHead>
                   <TableHead className="text-center">Status</TableHead>
+                  <TableHead>Engagement</TableHead>
                   <TableHead className="w-[100px]"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -336,6 +342,21 @@ export default function ClinicsPage() {
                         >
                           {clinic.is_active ? "Active" : "Inactive"}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {clinic.bounced_at ? (
+                          <span className="text-xs text-destructive font-medium">Bounced</span>
+                        ) : clinic.unsubscribed_at ? (
+                          <span className="text-xs text-orange-500 font-medium">Unsubscribed</span>
+                        ) : (clinic.total_clicks ?? 0) > 0 ? (
+                          <span className="text-xs text-green-600 font-medium">Clicked</span>
+                        ) : (clinic.total_opens ?? 0) >= 5 ? (
+                          <span className="text-xs text-blue-600">{clinic.total_opens} opens</span>
+                        ) : (clinic.total_opens ?? 0) >= 1 ? (
+                          <span className="text-xs text-muted-foreground">{clinic.total_opens} open{clinic.total_opens > 1 ? "s" : ""}</span>
+                        ) : (
+                          <span className="text-xs text-muted-foreground/40">—</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-1">
