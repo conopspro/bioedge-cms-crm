@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { resendService } from "@/lib/services/resend"
+import { buildUnsubscribeToken } from "@/lib/services/email-suppression"
 
 /**
  * POST /api/outreach-campaigns/[id]/send
@@ -171,6 +172,11 @@ export async function POST(
         .join("<br>")
       emailHtml += `<br><br><span style="color:#666;font-size:13px">${signatureHtml}</span>`
     }
+
+    // Unsubscribe footer
+    const unsubToken = buildUnsubscribeToken(recipient.id, "outreach_campaign_recipients")
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://bioedgelongevity.com"
+    emailHtml += `<br><br><hr style="border:none;border-top:1px solid #eee;margin:16px 0"><p style="color:#999;font-size:11px;text-align:center;margin:0">You're receiving this because you opted in at bioedgelongevity.com. <a href="${siteUrl}/unsubscribe?t=${unsubToken}" style="color:#999;">Unsubscribe</a></p>`
 
     // ── Send via Resend ──────────────────────────────────────────────────────
     const fromAddress = `${senderProfile.name} <${senderProfile.email}>`

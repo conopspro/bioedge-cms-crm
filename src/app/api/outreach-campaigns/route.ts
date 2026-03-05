@@ -225,6 +225,9 @@ export async function POST(request: Request) {
       contactQuery = contactQuery.gt("total_opens", 0)
     }
 
+    // Always exclude bounced and unsubscribed contacts
+    contactQuery = contactQuery.is("bounced_at", null).is("unsubscribed_at", null)
+
     if (recentlyEmailedContactIds.length > 0) {
       contactQuery = contactQuery.not(
         "id",

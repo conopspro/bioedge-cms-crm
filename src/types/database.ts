@@ -52,6 +52,7 @@ export type RecipientStatus =
   | "bounced"
   | "failed"
   | "suppressed"
+  | "delayed"
 
 /** Presentation status */
 export type PresentationStatus = "draft" | "published" | "archived"
