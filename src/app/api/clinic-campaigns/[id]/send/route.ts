@@ -118,6 +118,30 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       })
     }
 
+    // Skip if clinic email has been bounced or unsubscribed since being added
+    const { data: clinic } = await supabase
+      .from("clinics")
+      .select("bounced_at, unsubscribed_at")
+      .eq("id", recipient.clinic_id)
+      .single()
+
+    if (clinic?.bounced_at) {
+      await supabase
+        .from("clinic_campaign_recipients")
+        .update({ status: "suppressed", error: "Clinic email has bounced" })
+        .eq("id", recipient.id)
+
+      return NextResponse.json({ skipped: true, reason: "Bounced", recipient_id: recipient.id })
+    }
+    if (clinic?.unsubscribed_at) {
+      await supabase
+        .from("clinic_campaign_recipients")
+        .update({ status: "suppressed", error: "Clinic has unsubscribed" })
+        .eq("id", recipient.id)
+
+      return NextResponse.json({ skipped: true, reason: "Unsubscribed", recipient_id: recipient.id })
+    }
+
     // Build email HTML with signature
     let emailHtml = recipient.body_html || `<p>${(recipient.body || "").replace(/\n/g, "</p><p>")}</p>`
 

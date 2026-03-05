@@ -123,11 +123,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Fetch contacts to get their company_ids
+    // Fetch contacts to get their company_ids — exclude bounced/unsubscribed
     const { data: contacts, error: contactsError } = await supabase
       .from("contacts")
       .select("id, company_id, email")
       .in("id", contactIds)
+      .is("bounced_at", null)
+      .is("unsubscribed_at", null)
 
     if (contactsError) {
       console.error("Error fetching contacts:", contactsError)

@@ -151,11 +151,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       )
     }
 
-    // Fetch clinics
+    // Fetch clinics — exclude bounced/unsubscribed
     const { data: clinics, error: clinicsError } = await supabase
       .from("clinics")
       .select("id, name, email")
       .in("id", clinicIds)
+      .is("bounced_at", null)
+      .is("unsubscribed_at", null)
 
     if (clinicsError) {
       console.error("Error fetching clinics:", clinicsError)

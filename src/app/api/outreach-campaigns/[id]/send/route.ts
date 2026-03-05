@@ -158,6 +158,30 @@ export async function POST(
 
     const recipient = recipients[0]
 
+    // ── Skip if contact has been bounced or unsubscribed since being added ───
+    const { data: outreachContact } = await supabase
+      .from("outreach_contacts")
+      .select("bounced_at, unsubscribed_at")
+      .eq("email", recipient.recipient_email)
+      .single()
+
+    if (outreachContact?.bounced_at) {
+      await supabase
+        .from("outreach_campaign_recipients")
+        .update({ status: "suppressed", error: "Contact email has bounced" })
+        .eq("id", recipient.id)
+
+      return NextResponse.json({ skipped: true, reason: "Bounced", recipient_id: recipient.id })
+    }
+    if (outreachContact?.unsubscribed_at) {
+      await supabase
+        .from("outreach_campaign_recipients")
+        .update({ status: "suppressed", error: "Contact has unsubscribed" })
+        .eq("id", recipient.id)
+
+      return NextResponse.json({ skipped: true, reason: "Unsubscribed", recipient_id: recipient.id })
+    }
+
     // ── Build HTML email with signature ─────────────────────────────────────
     let emailHtml =
       recipient.body_html ||

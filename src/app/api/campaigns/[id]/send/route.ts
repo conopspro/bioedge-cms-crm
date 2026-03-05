@@ -110,7 +110,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     // Fetch contact for recipient
     const { data: contact } = await supabase
       .from("contacts")
-      .select("id, first_name, last_name, email, outreach_status")
+      .select("id, first_name, last_name, email, outreach_status, bounced_at, unsubscribed_at")
       .eq("id", recipient.contact_id)
       .single()
 
@@ -126,6 +126,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         reason: "No email address",
         recipient_id: recipient.id,
       })
+    }
+
+    // Skip bounced or unsubscribed contacts
+    if (contact.bounced_at) {
+      await supabase
+        .from("campaign_recipients")
+        .update({ status: "suppressed", error: "Contact email has bounced" })
+        .eq("id", recipient.id)
+
+      return NextResponse.json({ skipped: true, reason: "Bounced", recipient_id: recipient.id })
+    }
+    if (contact.unsubscribed_at) {
+      await supabase
+        .from("campaign_recipients")
+        .update({ status: "suppressed", error: "Contact has unsubscribed" })
+        .eq("id", recipient.id)
+
+      return NextResponse.json({ skipped: true, reason: "Unsubscribed", recipient_id: recipient.id })
     }
 
     // Build email HTML with signature

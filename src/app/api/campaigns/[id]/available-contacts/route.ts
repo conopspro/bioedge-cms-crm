@@ -209,6 +209,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       query = query.not("email", "is", null)
     }
 
+    // Always exclude bounced and unsubscribed contacts
+    query = query.is("bounced_at", null).is("unsubscribed_at", null)
+
     // Apply outreach recency filter — contact ID list
     if (outreachContactIds && outreachFilterMode === "include") {
       query = query.in("id", outreachContactIds)
