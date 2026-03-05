@@ -66,6 +66,15 @@ export async function GET(request: NextRequest) {
       const approvedCount = recipients.filter(
         (r: { status: string }) => r.status === "approved"
       ).length
+      const openedCount = recipients.filter(
+        (r: { status: string }) => ["opened", "clicked"].includes(r.status)
+      ).length
+      const clickedCount = recipients.filter(
+        (r: { status: string }) => r.status === "clicked"
+      ).length
+      const bouncedCount = recipients.filter(
+        (r: { status: string }) => ["bounced", "suppressed"].includes(r.status)
+      ).length
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { campaign_recipients, ...rest } = campaign
@@ -77,6 +86,9 @@ export async function GET(request: NextRequest) {
           sent: sentCount,
           generated: generatedCount,
           approved: approvedCount,
+          opened: openedCount,
+          clicked: clickedCount,
+          bounced: bouncedCount,
         },
       }
     })

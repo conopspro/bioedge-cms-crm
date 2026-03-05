@@ -33,6 +33,9 @@ interface CampaignListItem {
     sent: number
     generated: number
     approved: number
+    opened: number
+    clicked: number
+    bounced: number
   }
   created_at: string
   updated_at: string
@@ -170,6 +173,9 @@ export default function CampaignsPage() {
                 <TableHead>Sender</TableHead>
                 <TableHead className="text-center">Recipients</TableHead>
                 <TableHead className="text-center">Progress</TableHead>
+                <TableHead className="text-center">Opened</TableHead>
+                <TableHead className="text-center">Clicked</TableHead>
+                <TableHead className="text-center">Bounced</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="w-[80px]"></TableHead>
               </TableRow>
@@ -180,7 +186,7 @@ export default function CampaignsPage() {
                   label: campaign.status,
                   variant: "secondary" as const,
                 }
-                const { total, sent } = campaign.recipient_counts
+                const { total, sent, opened, clicked, bounced } = campaign.recipient_counts
                 const progress =
                   total > 0 ? Math.round((sent / total) * 100) : 0
 
@@ -224,6 +230,15 @@ export default function CampaignsPage() {
                       ) : (
                         <span className="text-xs text-muted-foreground">—</span>
                       )}
+                    </TableCell>
+                    <TableCell className="text-center text-sm">
+                      {opened > 0 ? <span className="text-blue-600">{opened}</span> : <span className="text-muted-foreground/40">—</span>}
+                    </TableCell>
+                    <TableCell className="text-center text-sm">
+                      {clicked > 0 ? <span className="text-green-600 font-medium">{clicked}</span> : <span className="text-muted-foreground/40">—</span>}
+                    </TableCell>
+                    <TableCell className="text-center text-sm">
+                      {bounced > 0 ? <span className="text-destructive">{bounced}</span> : <span className="text-muted-foreground/40">—</span>}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {formatDate(campaign.created_at)}

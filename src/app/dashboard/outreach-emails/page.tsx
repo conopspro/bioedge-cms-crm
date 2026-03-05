@@ -46,6 +46,9 @@ interface OutreachCampaignListItem {
   generated_count: number
   approved_count: number
   sent_count: number
+  opened_count: number
+  clicked_count: number
+  bounced_count: number
   sender_profiles: { name: string; email: string } | null
   created_at: string
 }
@@ -173,6 +176,9 @@ export default function OutreachEmailsPage() {
               <TableHead>Status</TableHead>
               <TableHead>Promoting</TableHead>
               <TableHead>Progress</TableHead>
+              <TableHead className="text-center">Opened</TableHead>
+              <TableHead className="text-center">Clicked</TableHead>
+              <TableHead className="text-center">Bounced</TableHead>
               <TableHead>Sender</TableHead>
               <TableHead>Created</TableHead>
               <TableHead className="w-[100px]" />
@@ -181,14 +187,14 @@ export default function OutreachEmailsPage() {
           <TableBody>
             {loading && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
                   Loading campaigns…
                 </TableCell>
               </TableRow>
             )}
             {!loading && filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
+                <TableCell colSpan={9} className="text-center py-10 text-muted-foreground">
                   No campaigns yet.{" "}
                   <Link
                     href="/dashboard/outreach-emails/new"
@@ -241,6 +247,15 @@ export default function OutreachEmailsPage() {
                       </div>
                       <Progress value={sentPercent} className="h-1.5" />
                     </div>
+                  </TableCell>
+                  <TableCell className="text-center text-sm">
+                    {(campaign.opened_count ?? 0) > 0 ? <span className="text-blue-600">{campaign.opened_count}</span> : <span className="text-muted-foreground/40">—</span>}
+                  </TableCell>
+                  <TableCell className="text-center text-sm">
+                    {(campaign.clicked_count ?? 0) > 0 ? <span className="text-green-600 font-medium">{campaign.clicked_count}</span> : <span className="text-muted-foreground/40">—</span>}
+                  </TableCell>
+                  <TableCell className="text-center text-sm">
+                    {(campaign.bounced_count ?? 0) > 0 ? <span className="text-destructive">{campaign.bounced_count}</span> : <span className="text-muted-foreground/40">—</span>}
                   </TableCell>
                   <TableCell>
                     <span className="text-sm text-muted-foreground">

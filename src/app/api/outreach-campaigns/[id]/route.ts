@@ -58,7 +58,9 @@ export async function GET(
         generated_count: statusMap.generated ?? 0,
         approved_count: statusMap.approved ?? 0,
         sent_count: sent,
-        bounced_count: statusMap.bounced ?? 0,
+        opened_count: (statusMap.opened ?? 0) + (statusMap.clicked ?? 0),
+        clicked_count: statusMap.clicked ?? 0,
+        bounced_count: (statusMap.bounced ?? 0) + (statusMap.suppressed ?? 0),
         failed_count: statusMap.failed ?? 0,
       },
     })

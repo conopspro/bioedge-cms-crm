@@ -598,6 +598,9 @@ export default function ClinicCampaignDetailPage() {
   const approvedCount = recipients.filter((r) => r.status === "approved").length
   const sentCount = recipients.filter((r) => ["sent", "delivered", "opened", "clicked"].includes(r.status)).length
   const errorCount = recipients.filter((r) => r.status === "error").length
+  const openedCount = recipients.filter((r) => ["opened", "clicked"].includes(r.status)).length
+  const clickedCount = recipients.filter((r) => r.status === "clicked").length
+  const bouncedCount = recipients.filter((r) => ["bounced", "suppressed"].includes(r.status)).length
 
   const statusBadge = STATUS_BADGES[campaign.status] || { label: campaign.status, variant: "secondary" as const }
 
@@ -718,6 +721,30 @@ export default function ClinicCampaignDetailPage() {
             <div className="text-xs text-muted-foreground">Sent</div>
           </CardContent>
         </Card>
+        {openedCount > 0 && (
+          <Card className="flex-1 min-w-[150px]">
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-2xl font-bold text-blue-600">{openedCount}</div>
+              <div className="text-xs text-muted-foreground">Opened</div>
+            </CardContent>
+          </Card>
+        )}
+        {clickedCount > 0 && (
+          <Card className="flex-1 min-w-[150px]">
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-2xl font-bold text-green-600">{clickedCount}</div>
+              <div className="text-xs text-muted-foreground">Clicked</div>
+            </CardContent>
+          </Card>
+        )}
+        {bouncedCount > 0 && (
+          <Card className="flex-1 min-w-[150px] border-destructive/40">
+            <CardContent className="pt-6 pb-4 text-center">
+              <div className="text-2xl font-bold text-destructive">{bouncedCount}</div>
+              <div className="text-xs text-muted-foreground">Bounced</div>
+            </CardContent>
+          </Card>
+        )}
         {errorCount > 0 && (
           <Card className="flex-1 min-w-[150px] border-destructive/40">
             <CardContent className="pt-6 pb-4 text-center">

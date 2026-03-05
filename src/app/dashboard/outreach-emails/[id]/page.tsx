@@ -57,6 +57,8 @@ interface CampaignDetail extends OutreachCampaign {
   generated_count: number
   approved_count: number
   sent_count: number
+  opened_count: number
+  clicked_count: number
   bounced_count: number
   failed_count: number
 }
@@ -434,6 +436,36 @@ export default function OutreachCampaignDetailPage() {
             <p className="text-xs text-muted-foreground mt-1">{sentPercent}% complete</p>
           </CardContent>
         </Card>
+        {campaign.opened_count > 0 && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Opened</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">{campaign.opened_count.toLocaleString()}</div>
+            </CardContent>
+          </Card>
+        )}
+        {campaign.clicked_count > 0 && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Clicked</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{campaign.clicked_count.toLocaleString()}</div>
+            </CardContent>
+          </Card>
+        )}
+        {campaign.bounced_count > 0 && (
+          <Card className="border-destructive/40">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">Bounced</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-destructive">{campaign.bounced_count.toLocaleString()}</div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Generation progress bar */}
