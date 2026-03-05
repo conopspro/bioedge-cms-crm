@@ -1,19 +1,7 @@
 "use client"
 
 import { useState, useRef } from "react"
-import { RefreshCw, Upload, CheckCircle, AlertCircle, Loader2 } from "lucide-react"
-
-interface SyncResult {
-  success: boolean
-  processed?: number
-  marked?: {
-    outreach_contacts: number
-    contacts: number
-    clinic_contacts: number
-    clinics: number
-  }
-  error?: string
-}
+import { Upload, CheckCircle, AlertCircle, Loader2, ExternalLink } from "lucide-react"
 
 interface CsvResult {
   success: boolean
@@ -27,7 +15,7 @@ interface CsvResult {
   error?: string
 }
 
-function ResultCard({ result }: { result: SyncResult | CsvResult }) {
+function ResultCard({ result }: { result: CsvResult }) {
   if (!result.success) {
     return (
       <div className="mt-4 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4">
@@ -48,9 +36,7 @@ function ResultCard({ result }: { result: SyncResult | CsvResult }) {
       <div className="mb-3 flex items-center gap-2">
         <CheckCircle className="h-5 w-5 text-green-600" />
         <p className="font-semibold text-green-800">
-          {"processed" in result
-            ? `${result.processed} suppressed emails checked · ${total} contacts marked`
-            : `${"emails_in_csv" in result ? result.emails_in_csv : 0} emails in CSV · ${total} contacts marked`}
+          {`${"emails_in_csv" in result ? result.emails_in_csv : 0} emails in CSV · ${total} contacts marked`}
         </p>
       </div>
       {m && (
@@ -73,27 +59,10 @@ function ResultCard({ result }: { result: SyncResult | CsvResult }) {
 }
 
 export default function BouncesPage() {
-  const [syncLoading, setSyncLoading] = useState(false)
-  const [syncResult, setSyncResult] = useState<SyncResult | null>(null)
-
   const [csvLoading, setCsvLoading] = useState(false)
   const [csvResult, setCsvResult] = useState<CsvResult | null>(null)
   const [csvFile, setCsvFile] = useState<File | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  async function handleSync() {
-    setSyncLoading(true)
-    setSyncResult(null)
-    try {
-      const res = await fetch("/api/admin/sync-bounces", { method: "POST" })
-      const data = await res.json()
-      setSyncResult(data)
-    } catch {
-      setSyncResult({ success: false, error: "Network error — could not reach server" })
-    } finally {
-      setSyncLoading(false)
-    }
-  }
 
   async function handleCsvUpload() {
     if (!csvFile) return
@@ -119,38 +88,37 @@ export default function BouncesPage() {
         Mark bounced and suppressed email addresses across all contact tables so they are excluded from future campaigns.
       </p>
 
-      {/* ── Method 1: Resend Sync ──────────────────────────────────────────────── */}
-      <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      {/* ── Step 1: Export from Resend ─────────────────────────────────────────── */}
+      <div className="mb-6 rounded-2xl border border-blue-100 bg-blue-50 p-6">
         <div className="mb-1 flex items-center gap-2">
-          <RefreshCw className="h-5 w-5 text-blue-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Sync from Resend</h2>
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white">1</span>
+          <h2 className="text-base font-semibold text-gray-900">Export suppression list from Resend</h2>
         </div>
-        <p className="mb-4 text-sm text-gray-500">
-          Fetches Resend&rsquo;s full suppression list (all-time hard bounces + spam complaints) and marks matching contacts.
-          This is the fastest and most complete option.
+        <p className="mb-3 text-sm text-gray-600">
+          Resend does not provide a public API to list suppressions — you need to export from their dashboard.
         </p>
-        <button
-          onClick={handleSync}
-          disabled={syncLoading}
-          className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-60"
+        <ol className="mb-4 list-decimal pl-5 text-sm text-gray-600 space-y-1">
+          <li>Log in to your Resend account</li>
+          <li>Go to <strong>Emails → Suppressions</strong></li>
+          <li>Click <strong>Export</strong> to download a CSV</li>
+        </ol>
+        <a
+          href="https://resend.com/suppression"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
         >
-          {syncLoading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" />
-              Syncing…
-            </>
-          ) : (
-            <>
-              <RefreshCw className="h-4 w-4" />
-              Sync Now
-            </>
-          )}
-        </button>
-        {syncResult && <ResultCard result={syncResult} />}
+          Open Resend Suppressions
+          <ExternalLink className="h-3.5 w-3.5" />
+        </a>
       </div>
 
-      {/* ── Method 2: CSV Upload ───────────────────────────────────────────────── */}
+      {/* ── Step 2: CSV Upload ─────────────────────────────────────────────────── */}
       <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mb-1 flex items-center gap-2">
+          <span className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-800 text-xs font-bold text-white">2</span>
+          <h2 className="text-base font-semibold text-gray-900">Upload the exported CSV</h2>
+        </div>
         <div className="mb-1 flex items-center gap-2">
           <Upload className="h-5 w-5 text-gray-600" />
           <h2 className="text-lg font-semibold text-gray-900">Upload Bounce CSV</h2>
