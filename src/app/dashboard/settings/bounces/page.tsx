@@ -103,7 +103,7 @@ export default function BouncesPage() {
           <li>Click <strong>Export</strong> to download a CSV</li>
         </ol>
         <a
-          href="https://resend.com/suppression"
+          href="https://resend.com/emails/suppressions"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 transition-colors"
