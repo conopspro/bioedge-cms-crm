@@ -163,6 +163,7 @@ export function HomepageEvents({
   return (
     <section className={`${className ?? "py-12"} px-8 ${bgClass}`} style={bgStyle}>
       <div className="mx-auto max-w-[1200px]">
+        {(label || title) && (
         <div className="mb-10 text-center">
           {label && (
             <span
@@ -181,6 +182,7 @@ export function HomepageEvents({
             </h2>
           )}
         </div>
+        )}
 
         <div className={`grid gap-8 ${getGridCols()}`}>
           {events.map((fe) => {
