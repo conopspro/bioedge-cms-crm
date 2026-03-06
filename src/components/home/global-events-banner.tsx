@@ -52,7 +52,7 @@ export async function GlobalEventsBanner() {
       events={upcoming as any}
       columns={columns}
       settings={{ bg_color: "#f8f9fa" }}
-      className="py-4"
+      className="pb-4"
     />
   )
 }
