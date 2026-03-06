@@ -109,7 +109,7 @@ export default function NewOutreachCampaignPage() {
   // ── Contact filters ─────────────────────────────────────────────────────────
   const [selectedBusinessTypes, setSelectedBusinessTypes] = useState<string[]>([])
   const [selectedStates, setSelectedStates] = useState<string[]>([])
-  const [engagement, setEngagement] = useState<"any" | "opened" | "clicked">("any")
+  const [engagement, setEngagement] = useState("any")
   const [excludeDays, setExcludeDays] = useState<string>("")
 
   // ── Contact count preview ───────────────────────────────────────────────────
@@ -470,7 +470,7 @@ export default function NewOutreachCampaignPage() {
             <Label>Engagement History</Label>
             <Select
               value={engagement}
-              onValueChange={(v) => setEngagement(v as "any" | "opened" | "clicked")}
+              onValueChange={setEngagement}
             >
               <SelectTrigger className="w-64">
                 <SelectValue />
@@ -479,6 +479,9 @@ export default function NewOutreachCampaignPage() {
                 <SelectItem value="any">Any (all contacts)</SelectItem>
                 <SelectItem value="opened">Has opened at least one email</SelectItem>
                 <SelectItem value="clicked">Has clicked a link</SelectItem>
+                <SelectItem value="bounced">Bounced</SelectItem>
+                <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+                <SelectItem value="none">No engagement</SelectItem>
               </SelectContent>
             </Select>
           </div>

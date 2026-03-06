@@ -12,7 +12,7 @@ import { getPersonaGroup, getPersonaBriefing } from "@/lib/outreach-personas"
  * Query params:
  *   businessTypes   comma-separated list of business_type values (empty = all)
  *   states          comma-separated list of states (empty = all)
- *   engagement      'any' | 'opened' | 'clicked' (default: 'any')
+ *   engagement      'any' | 'opened' | 'clicked' | 'bounced' | 'unsubscribed' | 'none' (default: 'any')
  *   excludeDays     number — exclude contacts emailed within N calendar days
  */
 export async function GET(request: Request) {
@@ -68,6 +68,16 @@ export async function GET(request: Request) {
       query = query.gt("total_clicks", 0)
     } else if (engagement === "opened") {
       query = query.gt("total_opens", 0)
+    } else if (engagement === "bounced") {
+      query = query.not("bounced_at", "is", null)
+    } else if (engagement === "unsubscribed") {
+      query = query.not("unsubscribed_at", "is", null)
+    } else if (engagement === "none") {
+      query = query
+        .eq("total_opens", 0)
+        .eq("total_clicks", 0)
+        .is("bounced_at", null)
+        .is("unsubscribed_at", null)
     }
 
     if (recentlyEmailedContactIds.length > 0) {

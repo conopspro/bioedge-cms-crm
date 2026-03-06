@@ -20,6 +20,7 @@ interface ContactSearchParams {
   converted?: string | null // only, exclude — filter by converted status
   catch_all?: string | null // only, exclude — filter by catch-all email type
   added_within?: string | null // 7d, 14d, 30d, 60d, 90d — only contacts created within this window
+  engagement?: string | null // bounced, unsubscribed, clicked, opened, none
 }
 
 /**
@@ -44,6 +45,7 @@ async function handleContactSearch(params: ContactSearchParams) {
     converted,
     catch_all: catchAll,
     added_within: addedWithin,
+    engagement,
   } = params
 
   // "Never outreached" filter — exclude contacts that appear anywhere in outreach_log.
@@ -287,6 +289,21 @@ async function handleContactSearch(params: ContactSearchParams) {
     if (titleSearch) {
       filtered = filtered.ilike("title", `%${titleSearch}%`)
     }
+    if (engagement === "bounced") {
+      filtered = filtered.not("bounced_at", "is", null)
+    } else if (engagement === "unsubscribed") {
+      filtered = filtered.not("unsubscribed_at", "is", null)
+    } else if (engagement === "clicked") {
+      filtered = filtered.gt("total_clicks", 0)
+    } else if (engagement === "opened") {
+      filtered = filtered.gt("total_opens", 0)
+    } else if (engagement === "none") {
+      filtered = filtered
+        .eq("total_opens", 0)
+        .eq("total_clicks", 0)
+        .is("bounced_at", null)
+        .is("unsubscribed_at", null)
+    }
     return filtered
   }
 
@@ -410,6 +427,7 @@ export async function GET(request: NextRequest) {
       not_within: searchParams.get("not_within"),
       converted: searchParams.get("converted"),
       catch_all: searchParams.get("catch_all"),
+      engagement: searchParams.get("engagement"),
     })
   } catch (error) {
     console.error("Unexpected error:", error)
@@ -461,6 +479,7 @@ export async function POST(request: NextRequest) {
       converted: body.converted || null,
       catch_all: body.catch_all || null,
       added_within: body.added_within || null,
+      engagement: body.engagement || null,
     })
   } catch (error) {
     console.error("Unexpected error:", error)

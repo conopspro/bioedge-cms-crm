@@ -166,6 +166,7 @@ export default function NewClinicEmailPage() {
 
   const [excludeRecentlyEmailed, setExcludeRecentlyEmailed] = useState(true)
   const [excludeDays, setExcludeDays] = useState(7)
+  const [clinicEngagement, setClinicEngagement] = useState("all")
 
   // ── Step 2: Tag filtering ──
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set())
@@ -342,6 +343,9 @@ export default function NewClinicEmailPage() {
       if (excludeRecentlyEmailed && excludeDays > 0) {
         params.set("exclude_emailed_days", String(excludeDays))
       }
+      if (clinicEngagement !== "all") {
+        params.set("engagement", clinicEngagement)
+      }
 
       const res = await fetch(`/api/clinics?${params.toString()}`)
       if (res.ok) {
@@ -356,7 +360,7 @@ export default function NewClinicEmailPage() {
     } finally {
       setLoadingClinics(false)
     }
-  }, [selectedStates, selectedCities, selectedTags, allCitiesSelected, excludeRecentlyEmailed, excludeDays])
+  }, [selectedStates, selectedCities, selectedTags, allCitiesSelected, excludeRecentlyEmailed, excludeDays, clinicEngagement])
 
   // Toggle helpers
   const toggleState = (state: string) => {
@@ -670,6 +674,24 @@ export default function NewClinicEmailPage() {
               disabled={!excludeRecentlyEmailed}
             />
             <span className="text-sm text-muted-foreground">days</span>
+          </div>
+
+          {/* Engagement filter */}
+          <div className="flex items-center gap-3 pt-2">
+            <Label className="text-sm whitespace-nowrap">Engagement</Label>
+            <Select value={clinicEngagement} onValueChange={setClinicEngagement}>
+              <SelectTrigger className="w-52">
+                <SelectValue placeholder="All" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="bounced">Bounced</SelectItem>
+                <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+                <SelectItem value="clicked">Clicked</SelectItem>
+                <SelectItem value="opened">Opened</SelectItem>
+                <SelectItem value="none">No Engagement</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>

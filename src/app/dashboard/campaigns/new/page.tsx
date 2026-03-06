@@ -139,6 +139,7 @@ export default function NewCampaignPage() {
   const [contactHasEmail, setContactHasEmail] = useState(true)
   const [contactOutreachTimeRange, setContactOutreachTimeRange] = useState("all")
   const [contactAddedWithin, setContactAddedWithin] = useState("all")
+  const [contactEngagement, setContactEngagement] = useState("all")
 
   const [searchResults, setSearchResults] = useState<ContactResult[]>([])
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(
@@ -326,6 +327,7 @@ export default function NewCampaignPage() {
       if (contactHasEmail) body.has_email = true
       if (contactOutreachTimeRange !== "all") body.outreach = contactOutreachTimeRange
       if (contactAddedWithin !== "all") body.added_within = contactAddedWithin
+      if (contactEngagement !== "all") body.engagement = contactEngagement
 
       const res = await fetch("/api/contacts/search", {
         method: "POST",
@@ -1406,6 +1408,26 @@ export default function NewCampaignPage() {
                             <SelectItem value="2d">Today &amp; Yesterday</SelectItem>
                             <SelectItem value="3d">Last 3 Days</SelectItem>
                             <SelectItem value="7d">Last 7 Days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
+                        <Label className="text-xs">Engagement</Label>
+                        <Select
+                          value={contactEngagement}
+                          onValueChange={setContactEngagement}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="bounced">Bounced</SelectItem>
+                            <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+                            <SelectItem value="clicked">Clicked</SelectItem>
+                            <SelectItem value="opened">Opened</SelectItem>
+                            <SelectItem value="none">No Engagement</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
