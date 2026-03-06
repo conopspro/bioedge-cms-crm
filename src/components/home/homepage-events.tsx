@@ -37,6 +37,7 @@ interface HomepageEventsProps {
     label_bg_color?: string | null
     text_color?: string | null
   }
+  className?: string
 }
 
 // Helper to determine if a color is dark (for text contrast)
@@ -81,6 +82,7 @@ export function HomepageEvents({
   columns = 1,
   events,
   settings,
+  className,
 }: HomepageEventsProps) {
   // Determine colors - use settings if provided, otherwise fallback to defaults
   const bgColor = settings?.bg_color || null
@@ -121,7 +123,7 @@ export function HomepageEvents({
   // If no events, show coming soon
   if (events.length === 0) {
     return (
-      <section className={`py-12 px-8 ${bgClass}`} style={bgStyle}>
+      <section className={`${className ?? "py-12"} px-8 ${bgClass}`} style={bgStyle}>
         <div className="mx-auto max-w-[1200px]">
           <div className="mb-8 text-center">
             {label && (
@@ -159,7 +161,7 @@ export function HomepageEvents({
   }
 
   return (
-    <section className={`py-12 px-8 ${bgClass}`} style={bgStyle}>
+    <section className={`${className ?? "py-12"} px-8 ${bgClass}`} style={bgStyle}>
       <div className="mx-auto max-w-[1200px]">
         <div className="mb-10 text-center">
           {label && (

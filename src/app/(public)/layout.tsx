@@ -1,5 +1,6 @@
 import { PublicHeader } from "@/components/brand/public-header"
 import { PublicFooter } from "@/components/brand/public-footer"
+import { GlobalEventsBanner } from "@/components/home/global-events-banner"
 import { createClient } from "@/lib/supabase/server"
 
 // Revalidate pages every 60 seconds to reflect database changes
@@ -58,6 +59,7 @@ export default async function PublicLayout({
   return (
     <div className="min-h-screen flex flex-col bg-off-white">
       <PublicHeader events={headerEvents} navItems={headerNavItems || undefined} />
+      <GlobalEventsBanner />
       <main className="flex-1">{children}</main>
       <PublicFooter navItems={footerNavItems || undefined} />
     </div>
