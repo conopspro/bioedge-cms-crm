@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Calendar, MapPin } from "lucide-react"
+import { Calendar, MapPin, Star } from "lucide-react"
 
 interface Event {
   id: string
@@ -221,7 +221,12 @@ export function HomepageEvents({
                     <h3 className="text-xl font-bold text-white md:text-2xl">
                       {displayTitle}
                     </h3>
-                    <div className="mt-3 hidden sm:block space-y-1.5">
+                    <div className="flex items-center gap-0.5 mt-1.5">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                    <div className="mt-2 hidden sm:block space-y-1.5">
                       {displayTagline && (
                         <p className="text-sm italic text-white/80">
                           &ldquo;{displayTagline}&rdquo;
