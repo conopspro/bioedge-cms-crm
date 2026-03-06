@@ -9,7 +9,7 @@ export function ClinicPromoSection({ totalClinics }: ClinicPromoSectionProps) {
   const clinicCount = totalClinics ? `${totalClinics.toLocaleString()}+` : null
 
   return (
-    <section className="py-6 px-8">
+    <section className="py-10 px-8 bg-white">
       <div className="mx-auto max-w-[1200px]">
         <Link
           href="/clinics"
