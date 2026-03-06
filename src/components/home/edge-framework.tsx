@@ -204,7 +204,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
                         <Icon className="h-5 w-5 text-white" />
                       </span>
                       <div>
-                        <p className="font-bold text-navy transition-colors group-hover:text-electric-blue">
+                        <p className="text-lg font-bold text-navy transition-colors group-hover:text-electric-blue">
                           {system.name}
                         </p>
                         <p className="mt-0.5 text-sm text-deep-blue">{system.description}</p>
