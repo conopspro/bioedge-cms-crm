@@ -47,7 +47,7 @@ export async function GlobalEventsBanner() {
 
   return (
     <HomepageEvents
-      label="UPCOMING EVENTS"
+      label={null}
       title={null}
       events={upcoming as any}
       columns={columns}
