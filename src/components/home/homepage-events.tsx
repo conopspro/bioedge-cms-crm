@@ -218,7 +218,7 @@ export function HomepageEvents({
 
                   {/* Text */}
                   <div className="flex-1 min-w-0">
-                    <h3 className="text-xl font-bold text-white md:text-2xl">
+                    <h3 className="text-lg font-bold text-white md:text-2xl">
                       {displayTitle}
                     </h3>
                     <div className="flex items-center gap-0.5 mt-1.5">
