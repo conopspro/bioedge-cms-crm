@@ -358,6 +358,7 @@ export default function NewCampaignPage() {
     contactHasEmail,
     contactOutreachTimeRange,
     contactAddedWithin,
+    contactEngagement,
   ])
 
   useEffect(() => {
@@ -1286,6 +1287,26 @@ export default function NewCampaignPage() {
                       </div>
 
                       <div className="space-y-1">
+                        <Label className="text-xs">Engagement</Label>
+                        <Select
+                          value={contactEngagement}
+                          onValueChange={setContactEngagement}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="All" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            <SelectItem value="bounced">Bounced</SelectItem>
+                            <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+                            <SelectItem value="clicked">Clicked</SelectItem>
+                            <SelectItem value="opened">Opened</SelectItem>
+                            <SelectItem value="none">No Engagement</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-1">
                         <Label className="text-xs">Not Contacted Within</Label>
                         <Select
                           value={contactNotWithin}
@@ -1408,26 +1429,6 @@ export default function NewCampaignPage() {
                             <SelectItem value="2d">Today &amp; Yesterday</SelectItem>
                             <SelectItem value="3d">Last 3 Days</SelectItem>
                             <SelectItem value="7d">Last 7 Days</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-1">
-                        <Label className="text-xs">Engagement</Label>
-                        <Select
-                          value={contactEngagement}
-                          onValueChange={setContactEngagement}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="All" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            <SelectItem value="bounced">Bounced</SelectItem>
-                            <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
-                            <SelectItem value="clicked">Clicked</SelectItem>
-                            <SelectItem value="opened">Opened</SelectItem>
-                            <SelectItem value="none">No Engagement</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
