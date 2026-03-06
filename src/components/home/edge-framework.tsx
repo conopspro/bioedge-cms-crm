@@ -105,7 +105,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
             </span>
           )}
           <h2
-            className="mb-4 text-[30px] font-bold tracking-wide"
+            className="mb-4 text-2xl md:text-[30px] font-bold tracking-wide"
             style={{ color: titleColor || undefined }}
           >
             <Link href="/framework" className="hover:text-electric-blue transition-colors">
@@ -184,7 +184,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
 
         {/* 15 Biological Systems */}
         <div>
-          <h3 className="mb-6 text-center text-[30px] font-bold tracking-wide" style={{ color: titleColor || undefined }}>
+          <h3 className="mb-6 text-center text-2xl md:text-[30px] font-bold tracking-wide" style={{ color: titleColor || undefined }}>
             <Link href="/systems" className="hover:text-electric-blue transition-colors">
               15 Biological Systems
             </Link>

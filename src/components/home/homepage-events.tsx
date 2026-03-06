@@ -136,7 +136,7 @@ export function HomepageEvents({
             )}
             {title && (
               <h2
-                className="text-[30px] font-bold tracking-wide"
+                className="text-2xl md:text-[30px] font-bold tracking-wide"
                 style={{ color: titleColor || (isDarkBg ? "#ffffff" : "#0a2540") }}
               >
                 {title}
@@ -175,7 +175,7 @@ export function HomepageEvents({
           )}
           {title && (
             <h2
-              className="text-[30px] font-bold tracking-wide"
+              className="text-2xl md:text-[30px] font-bold tracking-wide"
               style={{ color: titleColor || (isDarkBg ? "#ffffff" : "#0a2540") }}
             >
               {title}
