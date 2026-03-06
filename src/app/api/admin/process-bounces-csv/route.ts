@@ -29,23 +29,34 @@ export async function POST(request: NextRequest) {
     // Detect email column index from header row
     const headers = lines[0].split(",").map((h) => h.trim().toLowerCase().replace(/['"]/g, ""))
     let emailColIndex = headers.findIndex(
-      (h) => h === "email" || h === "email address" || h === "email_address"
+      (h) => h === "email" || h === "email address" || h === "email_address" || h === "to"
     )
 
-    // Fallback: scan first data row for a column containing "@"
+    // Fallback: scan first data row for a bare email (skip display-name format like "Name <email@x.com>")
     if (emailColIndex === -1) {
       const firstDataCols = lines[1].split(",").map((c) => c.trim().replace(/['"]/g, ""))
-      emailColIndex = firstDataCols.findIndex((c) => c.includes("@"))
+      emailColIndex = firstDataCols.findIndex((c) => c.includes("@") && !c.includes("<"))
     }
 
     if (emailColIndex === -1) {
       return NextResponse.json({ error: "Could not detect email column in CSV" }, { status: 400 })
     }
 
+    // Detect last_event column — used to filter to bounced rows only (Resend emails-sent export)
+    const lastEventColIndex = headers.findIndex((h) => h === "last_event")
+    const BOUNCE_EVENTS = new Set(["bounced", "suppressed", "spam_complaint"])
+
     // Extract emails from data rows
     const emails: string[] = []
     for (let i = 1; i < lines.length; i++) {
       const cols = lines[i].split(",").map((c) => c.trim().replace(/['"]/g, ""))
+
+      // If the CSV has a last_event column, skip non-bounce rows
+      if (lastEventColIndex !== -1) {
+        const lastEvent = cols[lastEventColIndex]?.toLowerCase().trim()
+        if (!BOUNCE_EVENTS.has(lastEvent)) continue
+      }
+
       const email = cols[emailColIndex]?.toLowerCase()
       if (email && email.includes("@")) {
         emails.push(email)
