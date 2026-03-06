@@ -181,7 +181,7 @@ export default function SystemsIndexPage() {
             <p className="body-text mb-6">
               Each system report follows the same structure, guiding you through a process of discovery:
             </p>
-            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div className="flex gap-3">
                 <span className="flex items-center justify-center w-8 h-8 rounded-full text-white font-heading font-bold text-sm flex-shrink-0" style={{ backgroundColor: "#0d2840" }}>E</span>
                 <div>
