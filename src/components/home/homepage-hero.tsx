@@ -65,7 +65,7 @@ export function HomepageHero({ settings }: HomepageHeroProps) {
           <div className="flex flex-wrap justify-center gap-4 lg:justify-start">
             <Link
               href={ctaUrl}
-              className="inline-flex items-center gap-2 rounded-lg bg-gold px-8 py-4 text-base font-semibold text-navy transition-all hover:-translate-y-0.5 hover:bg-[#e87a3a] hover:shadow-[0_10px_30px_rgba(255,145,77,0.3)]"
+              className="inline-flex items-center gap-2 rounded-lg bg-gold px-8 py-4 text-base font-semibold text-navy transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               {ctaText} →
             </Link>
