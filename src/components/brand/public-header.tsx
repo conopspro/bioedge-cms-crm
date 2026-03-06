@@ -96,53 +96,73 @@ export function PublicHeader({ className, events = [], navItems }: PublicHeaderP
           )}
         </div>
 
-        {/* Navigation - centered under logo */}
-        <nav className="flex flex-wrap justify-center items-center gap-x-3 gap-y-2 lg:gap-4">
-          {navItems && navItems.length > 0 ? (
-            // Database-driven navigation
-            navItems.map((item) =>
-              item.is_external ? (
-                <a
-                  key={item.id}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold"
-                >
-                  {item.label}
-                </a>
-              ) : (
-                <Link
-                  key={item.id}
-                  href={item.href}
-                  className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold"
-                >
-                  {item.label}
-                </Link>
-              )
+        {/* Navigation - two rows with hierarchy */}
+        {(() => {
+          const primaryLabels = new Set(["Clinics", "Solutions", "Leaders", "Companies", "Presentations", "Articles"])
+          const row1Items = navItems?.filter(item => primaryLabels.has(item.label)) ?? []
+          const row2Items = navItems?.filter(item => !primaryLabels.has(item.label)) ?? []
+
+          const renderLink = (item: NavItem, sizeClass: string) =>
+            item.is_external ? (
+              <a
+                key={item.id}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`font-heading ${sizeClass} font-bold tracking-wide text-white transition-colors hover:text-gold`}
+              >
+                {item.label}
+              </a>
+            ) : (
+              <Link
+                key={item.id}
+                href={item.href}
+                className={`font-heading ${sizeClass} font-bold tracking-wide text-white transition-colors hover:text-gold`}
+              >
+                {item.label}
+              </Link>
             )
-          ) : (
-            // Fallback hardcoded navigation
-            <>
-              <Link href="/articles" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Articles</Link>
-              <Link href="/companies" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Companies</Link>
-              <Link href="/leaders" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Leaders</Link>
-              <Link href="/presentations" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Presentations</Link>
-              <Link href="/clinics" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Clinics</Link>
-              <a href="https://bioedge.circle.so/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Coach</a>
-              <a href="https://www.bioedgedecoder.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Decoder</a>
-              <Link href="/systems" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">Systems</Link>
-              <a href="https://longevitynewswire.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-xs font-bold tracking-wide text-white transition-colors hover:text-gold">News</a>
-            </>
-          )}
-          <Link
-            href="/search"
-            className="flex items-center justify-center text-white transition-colors hover:text-gold"
-            aria-label="Search"
-          >
-            <Search className="h-4 w-4 lg:h-5 lg:w-5" />
-          </Link>
-        </nav>
+
+          return (
+            <nav className="flex flex-col items-center gap-y-2">
+              {/* Row 1: Primary — Clinics, Solutions, Leaders, Companies, Presentations, Articles */}
+              <div className="flex flex-wrap justify-center items-center gap-x-5 gap-y-1">
+                {navItems && navItems.length > 0 ? (
+                  row1Items.map(item => renderLink(item, "text-[18px]"))
+                ) : (
+                  <>
+                    <Link href="/clinics" className="font-heading text-[18px] font-bold tracking-wide text-white transition-colors hover:text-gold">Clinics</Link>
+                    <Link href="/leaders" className="font-heading text-[18px] font-bold tracking-wide text-white transition-colors hover:text-gold">Leaders</Link>
+                    <Link href="/companies" className="font-heading text-[18px] font-bold tracking-wide text-white transition-colors hover:text-gold">Companies</Link>
+                    <Link href="/presentations" className="font-heading text-[18px] font-bold tracking-wide text-white transition-colors hover:text-gold">Presentations</Link>
+                    <Link href="/articles" className="font-heading text-[18px] font-bold tracking-wide text-white transition-colors hover:text-gold">Articles</Link>
+                  </>
+                )}
+              </div>
+
+              {/* Row 2: Secondary — EDGE Framework, Systems, Decoder, Courses, News + Search */}
+              <div className="flex flex-wrap justify-center items-center gap-x-5 gap-y-1">
+                {navItems && navItems.length > 0 ? (
+                  row2Items.map(item => renderLink(item, "text-base"))
+                ) : (
+                  <>
+                    <Link href="/framework" className="font-heading text-base font-bold tracking-wide text-white transition-colors hover:text-gold">EDGE Framework</Link>
+                    <Link href="/systems" className="font-heading text-base font-bold tracking-wide text-white transition-colors hover:text-gold">Systems</Link>
+                    <a href="https://www.bioedgedecoder.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-base font-bold tracking-wide text-white transition-colors hover:text-gold">Decoder</a>
+                    <a href="https://longevitynewswire.com/" target="_blank" rel="noopener noreferrer" className="font-heading text-base font-bold tracking-wide text-white transition-colors hover:text-gold">News</a>
+                  </>
+                )}
+                <Link
+                  href="/search"
+                  className="flex items-center justify-center text-white transition-colors hover:text-gold"
+                  aria-label="Search"
+                >
+                  <Search className="h-4 w-4 lg:h-5 lg:w-5" />
+                </Link>
+              </div>
+            </nav>
+          )
+        })()}
       </div>
     </header>
   )
