@@ -232,23 +232,25 @@ export function HomepageEvents({
                           &ldquo;{displayTagline}&rdquo;
                         </p>
                       )}
-                      {event.start_date && (
-                        <div className="flex items-center gap-1.5 text-xs text-white/50">
-                          <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span>
-                            {formatDate(event.start_date)}
-                            {event.end_date && formatDate(event.end_date) !== formatDate(event.start_date) && (
-                              <> &ndash; {formatDate(event.end_date)}</>
-                            )}
-                          </span>
-                        </div>
-                      )}
-                      {(event.city || event.venue_name) && (
-                        <div className="flex items-center gap-1.5 text-xs text-white/50">
-                          <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span>{event.venue_name || `${event.city}${event.state ? `, ${event.state}` : ""}`}</span>
-                        </div>
-                      )}
+                      <div className="flex items-center gap-3 text-xs text-white/50 flex-wrap">
+                        {event.start_date && (
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span>
+                              {formatDate(event.start_date)}
+                              {event.end_date && formatDate(event.end_date) !== formatDate(event.start_date) && (
+                                <> &ndash; {formatDate(event.end_date)}</>
+                              )}
+                            </span>
+                          </div>
+                        )}
+                        {(event.city || event.venue_name) && (
+                          <div className="flex items-center gap-1.5">
+                            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span>{event.venue_name || `${event.city}${event.state ? `, ${event.state}` : ""}`}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
