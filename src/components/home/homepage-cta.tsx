@@ -84,7 +84,7 @@ export function HomepageCta({
         )}
         {title && (
           <h2
-            className="text-[30px] font-bold tracking-wide mb-4"
+            className="text-2xl md:text-[30px] font-bold tracking-wide mb-4"
             style={{ color: titleColor || (isDarkBg ? "#ffffff" : "#0a2540") }}
           >
             {title}
