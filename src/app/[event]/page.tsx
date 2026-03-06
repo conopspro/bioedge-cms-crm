@@ -755,14 +755,13 @@ export default async function EventLandingPage({ params }: PageProps) {
           )}
         </div>
 
-        {/* Portrait YouTube video — only shown when video_url is set (desktop only) */}
+        {/* Portrait YouTube video — shown on all screen sizes when video_url is set */}
         {heroVideoUrl && (
-          <div className="hidden lg:flex flex-shrink-0 items-center justify-center">
+          <div className="flex flex-shrink-0 items-center justify-center">
             <div
-              className="relative overflow-hidden rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)]"
+              className="relative overflow-hidden rounded-2xl w-[200px] sm:w-[240px] lg:w-[315px]"
               style={{
-                width: 315,
-                height: 560,
+                aspectRatio: "9/16",
                 border: "3px solid rgba(255, 145, 77, 0.6)",
                 boxShadow: "0 0 30px rgba(255, 145, 77, 0.2), 0 25px 50px -12px rgba(0,0,0,0.4)",
               }}
