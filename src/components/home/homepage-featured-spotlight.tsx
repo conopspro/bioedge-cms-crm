@@ -79,7 +79,7 @@ export function HomepageFeaturedSpotlight({
             )}
             {title && (
               <h2
-                className="text-[30px] font-bold tracking-wide"
+                className="text-2xl md:text-[30px] font-bold tracking-wide"
                 style={{ color: titleColor || (isDarkBg ? "#ffffff" : "#0a2540") }}
               >
                 <Link href="/spotlight" className="hover:text-electric-blue transition-colors">

@@ -96,7 +96,7 @@ export async function EventCards({
             <span className="mb-4 inline-block rounded bg-deep-blue px-5 py-1.5 text-xs font-semibold uppercase tracking-widest text-white">
               UPCOMING EVENTS
             </span>
-            <h2 className={`text-[30px] font-bold tracking-wide ${isDarkBg ? "text-white" : "text-navy"}`}>
+            <h2 className={`text-2xl md:text-[30px] font-bold tracking-wide ${isDarkBg ? "text-white" : "text-navy"}`}>
               {sectionTitle}
             </h2>
           </div>
@@ -126,7 +126,7 @@ export async function EventCards({
             UPCOMING EVENTS
           </span>
           {sectionTitle && (
-            <h2 className={`text-[30px] font-bold tracking-wide ${isDarkBg ? "text-white" : "text-navy"}`}>
+            <h2 className={`text-2xl md:text-[30px] font-bold tracking-wide ${isDarkBg ? "text-white" : "text-navy"}`}>
               {sectionTitle}
             </h2>
           )}
