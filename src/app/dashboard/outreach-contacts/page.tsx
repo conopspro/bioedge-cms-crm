@@ -333,7 +333,9 @@ export default function OutreachContactsPage() {
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
-  const getEngagementLabel = (opens: number, clicks: number) => {
+  const getEngagementLabel = (opens: number, clicks: number, bouncedAt?: string | null, unsubscribedAt?: string | null) => {
+    if (bouncedAt) return { label: "Bounced", color: "text-destructive font-medium" }
+    if (unsubscribedAt) return { label: "Unsubscribed", color: "text-orange-500 font-medium" }
     if (clicks > 0) return { label: "Clicked", color: "text-green-600" }
     if (opens >= 5) return { label: `${opens} opens`, color: "text-blue-600" }
     if (opens >= 1) return { label: `${opens} open${opens > 1 ? "s" : ""}`, color: "text-muted-foreground" }
@@ -667,7 +669,7 @@ export default function OutreachContactsPage() {
               </TableRow>
             )}
             {!loading && contacts.map((contact) => {
-              const eng = getEngagementLabel(contact.total_opens, contact.total_clicks)
+              const eng = getEngagementLabel(contact.total_opens, contact.total_clicks, contact.bounced_at, contact.unsubscribed_at)
               const isSelected = selectedIds.has(contact.id)
               return (
                 <TableRow

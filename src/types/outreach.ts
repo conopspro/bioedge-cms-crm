@@ -22,6 +22,8 @@ export interface OutreachContact {
   notes: string | null
   total_opens: number
   total_clicks: number
+  bounced_at: string | null
+  unsubscribed_at: string | null
   source_file: string | null
   imported_at: string | null
   created_at: string
