@@ -27,7 +27,7 @@ export function ClinicPromoSection({ totalClinics, sectionClassName }: ClinicPro
             {/* Text */}
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 flex-wrap">
-                <h3 className="text-2xl font-bold text-white">
+                <h3 className="text-lg font-bold text-white md:text-2xl">
                   Longevity Clinic Directory
                 </h3>
                 {clinicCount && (

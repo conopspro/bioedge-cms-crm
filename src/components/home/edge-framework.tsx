@@ -156,7 +156,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
                 className="h-32 w-auto flex-shrink-0 rounded shadow-xl transition-transform duration-300 group-hover:scale-105"
               />
               <div className="flex-1 min-w-0">
-                <h3 className="text-xl font-bold text-white md:text-2xl">
+                <h3 className="text-lg font-bold text-white md:text-2xl">
                   Biological EDGE:<span className="font-normal text-white"> A Practical Guide to Longevity</span>
                 </h3>
                 <div className="mt-3 hidden sm:block">
