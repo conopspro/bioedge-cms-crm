@@ -134,7 +134,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
 
               <div className="mb-2 text-5xl font-bold leading-none text-electric-blue">{item.letter}</div>
               <h3 className="mb-4 text-xl font-bold text-navy">{item.title}</h3>
-              <p className="text-[0.95rem] leading-relaxed text-deep-blue">{item.description}</p>
+              <p className="hidden lg:block text-[0.95rem] leading-relaxed text-deep-blue">{item.description}</p>
             </div>
           ))}
         </div>
