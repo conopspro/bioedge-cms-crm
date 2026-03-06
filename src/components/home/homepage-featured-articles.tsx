@@ -166,7 +166,7 @@ export function HomepageFeaturedArticles({
                   </h3>
 
                   {article.excerpt && (
-                    <p className="text-sm text-gray-600 line-clamp-3">
+                    <p className="text-base text-gray-600 line-clamp-3">
                       {article.excerpt}
                     </p>
                   )}

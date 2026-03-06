@@ -182,7 +182,7 @@ export function HomepageFeaturedSpotlight({
                   </h3>
 
                   {spotlight.short_description && (
-                    <p className="text-sm text-gray-600 line-clamp-2">
+                    <p className="text-base text-gray-600 line-clamp-2">
                       {spotlight.short_description}
                     </p>
                   )}

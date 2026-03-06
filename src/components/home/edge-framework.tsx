@@ -207,7 +207,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
                         <p className="text-lg font-bold text-navy transition-colors group-hover:text-electric-blue">
                           {system.name}
                         </p>
-                        <p className="mt-0.5 text-sm text-deep-blue">{system.description}</p>
+                        <p className="mt-0.5 text-base text-deep-blue">{system.description}</p>
                       </div>
                     </div>
                   </div>

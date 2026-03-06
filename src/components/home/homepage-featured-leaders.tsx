@@ -149,7 +149,7 @@ export function HomepageFeaturedLeaders({
                   </h3>
 
                   {leader.title && (
-                    <p className="text-sm text-gray-600 mt-1 line-clamp-1">
+                    <p className="text-base text-gray-600 mt-1 line-clamp-1">
                       {leader.title}
                     </p>
                   )}

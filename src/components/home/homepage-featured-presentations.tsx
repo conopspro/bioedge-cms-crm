@@ -182,7 +182,7 @@ export function HomepageFeaturedPresentations({
                   </h3>
 
                   {presentation.short_description && (
-                    <p className="text-sm text-gray-600 line-clamp-2">
+                    <p className="text-base text-gray-600 line-clamp-2">
                       {presentation.short_description}
                     </p>
                   )}

@@ -1078,7 +1078,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                           <p className="font-heading font-semibold text-navy">{name}</p>
                         )}
                         {(testShowTitle || testShowCompany) && (title || company) && (
-                          <p className="text-sm text-text-light">
+                          <p className="text-base text-text-light">
                             {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
                           </p>
                         )}
@@ -1312,7 +1312,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                   </p>
                 )}
                 {contact.company && (
-                  <p className="text-sm font-medium mt-1" style={{ color: '#017ab2' }}>
+                  <p className="text-base font-medium mt-1" style={{ color: '#017ab2' }}>
                     {contact.company.name}
                   </p>
                 )}
