@@ -61,7 +61,7 @@ interface EdgeFrameworkProps {
 }
 
 export function EdgeFramework({ label, title, description, settings }: EdgeFrameworkProps) {
-  const cardsRef = useRef<(HTMLDivElement | null)[]>([])
+  const cardsRef = useRef<(HTMLElement | null)[]>([])
 
   const bgColor = settings?.bg_color || "#ffffff"
   const titleColor = settings?.title_color || undefined
@@ -122,12 +122,13 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
 
         <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
           {edgeItems.map((item, index) => (
-            <div
+            <Link
               key={index}
+              href="/framework"
+              className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-8 text-center opacity-0 translate-y-5 transition-all duration-600 ease-out hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)] block"
               ref={(el) => {
                 cardsRef.current[index] = el
               }}
-              className="group relative overflow-hidden rounded-2xl border border-deep-blue/10 bg-gradient-to-br from-off-white to-white p-8 text-center opacity-0 translate-y-5 transition-all duration-600 ease-out hover:-translate-y-2 hover:shadow-[0_10px_20px_rgba(13,89,138,0.15)]"
             >
               {/* Top border animation */}
               <div className="absolute left-0 right-0 top-0 h-1 origin-left scale-x-0 bg-navy transition-transform duration-400 group-hover:scale-x-100" />
@@ -135,7 +136,7 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
               <div className="mb-2 text-5xl font-bold leading-none text-electric-blue">{item.letter}</div>
               <h3 className="mb-4 text-xl font-bold text-navy">{item.title}</h3>
               <p className="hidden lg:block text-[0.95rem] leading-relaxed text-deep-blue">{item.description}</p>
-            </div>
+            </Link>
           ))}
         </div>
 
