@@ -104,6 +104,7 @@ export default function OutreachCampaignDetailPage() {
   const [generateProgress, setGenerateProgress] = useState<{ generated: number; remaining: number } | null>(null)
   const [sending, setSending] = useState(false)
   const [sendDelay, setSendDelay] = useState(0)
+  const [recipientEngagementFilter, setRecipientEngagementFilter] = useState("all")
   const [previewRecipient, setPreviewRecipient] = useState<OutreachCampaignRecipient | null>(null)
   const [editSubject, setEditSubject] = useState("")
   const [editBody, setEditBody] = useState("")
@@ -125,7 +126,9 @@ export default function OutreachCampaignDetailPage() {
 
   const fetchRecipients = useCallback(async () => {
     try {
-      const res = await fetch(`/api/outreach-campaigns/${id}/recipients?pageSize=100`)
+      const params = new URLSearchParams({ pageSize: "100" })
+      if (recipientEngagementFilter !== "all") params.set("engagement", recipientEngagementFilter)
+      const res = await fetch(`/api/outreach-campaigns/${id}/recipients?${params.toString()}`)
       if (res.ok) {
         const data = await res.json()
         setRecipients(data.recipients ?? [])
@@ -134,7 +137,7 @@ export default function OutreachCampaignDetailPage() {
     } catch (err) {
       console.error("Failed to fetch recipients:", err)
     }
-  }, [id])
+  }, [id, recipientEngagementFilter])
 
   useEffect(() => {
     const load = async () => {
@@ -489,17 +492,31 @@ export default function OutreachCampaignDetailPage() {
 
       {/* Recipients table */}
       <div className="space-y-3">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-semibold">
             Recipients{" "}
             <span className="text-muted-foreground text-base font-normal">
               ({recipientsTotal.toLocaleString()})
             </span>
           </h2>
-          <Button variant="ghost" size="sm" onClick={() => { fetchCampaign(); fetchRecipients() }}>
-            <RefreshCw className="h-3.5 w-3.5 mr-1" />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <select
+              value={recipientEngagementFilter}
+              onChange={(e) => setRecipientEngagementFilter(e.target.value)}
+              className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="all">All Engagement</option>
+              <option value="opened">Opened</option>
+              <option value="clicked">Clicked</option>
+              <option value="bounced">Bounced</option>
+              <option value="failed">Failed / Suppressed</option>
+              <option value="not_opened">Not Opened</option>
+            </select>
+            <Button variant="ghost" size="sm" onClick={() => { fetchCampaign(); fetchRecipients() }}>
+              <RefreshCw className="h-3.5 w-3.5 mr-1" />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         <div className="rounded-lg border">

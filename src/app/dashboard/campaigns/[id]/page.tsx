@@ -148,6 +148,7 @@ export default function CampaignDetailPage() {
     useState<EnrichedRecipient | null>(null)
   const [showPreview, setShowPreview] = useState(false)
   const [actionLoading, setActionLoading] = useState<string | null>(null) // recipientId being acted on
+  const [recipientEngagementFilter, setRecipientEngagementFilter] = useState("all")
   const [testEmail, setTestEmail] = useState("")
   const [testSending, setTestSending] = useState(false)
   const [testResult, setTestResult] = useState<{ success: boolean; message: string } | null>(null)
@@ -576,6 +577,15 @@ export default function CampaignDetailPage() {
 
   const recipients = campaign.campaign_recipients || []
   const totalRecipients = recipients.length
+  const filteredRecipients = (() => {
+    if (recipientEngagementFilter === "all") return recipients
+    if (recipientEngagementFilter === "opened") return recipients.filter((r) => r.opened_at != null)
+    if (recipientEngagementFilter === "clicked") return recipients.filter((r) => r.clicked_at != null)
+    if (recipientEngagementFilter === "bounced") return recipients.filter((r) => r.status === "bounced")
+    if (recipientEngagementFilter === "failed") return recipients.filter((r) => r.status === "failed" || r.status === "suppressed")
+    if (recipientEngagementFilter === "not_opened") return recipients.filter((r) => r.status === "sent" || r.status === "delivered")
+    return recipients
+  })()
   const pendingCount = recipients.filter((r) => r.status === "pending").length
   const generatedCount = recipients.filter(
     (r) => r.status === "generated"
@@ -976,10 +986,30 @@ export default function CampaignDetailPage() {
       {/* Recipients Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Recipients</CardTitle>
-          <CardDescription>
-            {totalRecipients} recipients in this campaign.
-          </CardDescription>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <CardTitle>Recipients</CardTitle>
+              <CardDescription>
+                {recipientEngagementFilter !== "all"
+                  ? `${filteredRecipients.length} of ${totalRecipients} recipients`
+                  : `${totalRecipients} recipients in this campaign.`}
+              </CardDescription>
+            </div>
+            {recipients.length > 0 && (
+              <select
+                value={recipientEngagementFilter}
+                onChange={(e) => setRecipientEngagementFilter(e.target.value)}
+                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                <option value="all">All Engagement</option>
+                <option value="opened">Opened</option>
+                <option value="clicked">Clicked</option>
+                <option value="bounced">Bounced</option>
+                <option value="failed">Failed / Suppressed</option>
+                <option value="not_opened">Not Opened</option>
+              </select>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {recipients.length === 0 ? (
@@ -1012,7 +1042,7 @@ export default function CampaignDetailPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {recipients.map((recipient) => {
+                  {filteredRecipients.map((recipient) => {
                     const rStatus =
                       RECIPIENT_STATUS_BADGES[recipient.status] || {
                         label: recipient.status,

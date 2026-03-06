@@ -16,6 +16,7 @@ export async function GET(
     const pageSize = Math.min(100, Math.max(1, parseInt(searchParams.get("pageSize") ?? "50", 10)))
     const status = searchParams.get("status")
     const search = searchParams.get("search")?.trim() ?? ""
+    const engagement = searchParams.get("engagement") // opened, clicked, bounced, failed, not_opened
 
     let query = supabase
       .from("outreach_campaign_recipients")
@@ -30,6 +31,18 @@ export async function GET(
       query = query.or(
         `recipient_email.ilike.%${search}%,recipient_practice_name.ilike.%${search}%`
       )
+    }
+
+    if (engagement === "opened") {
+      query = query.not("opened_at", "is", null)
+    } else if (engagement === "clicked") {
+      query = query.not("clicked_at", "is", null)
+    } else if (engagement === "bounced") {
+      query = query.eq("status", "bounced")
+    } else if (engagement === "failed") {
+      query = query.in("status", ["failed", "suppressed"])
+    } else if (engagement === "not_opened") {
+      query = query.in("status", ["sent", "delivered"])
     }
 
     const from = (page - 1) * pageSize
