@@ -568,7 +568,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             )}
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 justify-center md:justify-start">
               {heroCtaUrl ? (
                 <a
                   href={heroCtaUrl}

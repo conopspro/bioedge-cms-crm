@@ -39,7 +39,7 @@ export function HomepageHero({ settings }: HomepageHeroProps) {
   return (
     <section className="relative flex items-center overflow-hidden bg-gradient-to-br from-navy via-deep-blue to-electric-blue">
       <div className="relative z-10 mx-auto flex w-full max-w-[1200px] flex-col items-center justify-center gap-8 px-8 py-12 lg:flex-row lg:gap-16">
-        <div className="animate-fade-in-up text-center lg:flex-1 lg:text-left">
+        <div className="animate-fade-in-up text-left lg:flex-1">
           <span className="mb-6 inline-block rounded-full border border-gold/30 bg-white/15 px-6 py-2 text-sm font-semibold uppercase tracking-widest text-gold backdrop-blur-sm">
             {label}
           </span>
@@ -53,12 +53,12 @@ export function HomepageHero({ settings }: HomepageHeroProps) {
             </span>
           </h1>
 
-          <p className="mx-auto mb-8 text-lg font-bold text-white lg:mx-0 lg:max-w-[600px]">
+          <p className="mb-8 text-lg font-bold text-white max-w-[600px]">
             {subtitle}
           </p>
 
           <div
-            className="mx-auto mb-10 max-w-[550px] text-lg leading-relaxed text-white lg:mx-0"
+            className="mb-10 max-w-[550px] text-lg leading-relaxed text-white"
             dangerouslySetInnerHTML={{ __html: description }}
           />
 
