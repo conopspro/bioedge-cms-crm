@@ -164,10 +164,10 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
                       <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-sm italic text-white/80">
+                  <p className="text-sm italic text-[#f8f9fa]">
                     &ldquo;Meticulous research. Penetrating analysis. Data-driven conclusions. A solid framework for change.&rdquo;
                   </p>
-                  <p className="mt-1 text-xs text-white/50">
+                  <p className="mt-1 text-xs text-[#f8f9fa]">
                     &mdash; Dr. Michael J. Krentz
                   </p>
                 </div>
@@ -240,10 +240,10 @@ export function EdgeFramework({ label, title, description, settings }: EdgeFrame
                       <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                     ))}
                   </div>
-                  <p className="text-sm italic text-white/80">
+                  <p className="text-sm italic text-[#f8f9fa]">
                     &ldquo;When Something Feels Off, This Helps You Understand Why&rdquo;
                   </p>
-                  <p className="mt-1 text-xs text-white/50">
+                  <p className="mt-1 text-xs text-[#f8f9fa]">
                     A simple way to interpret your signals so you can make clearer health decisions.
                   </p>
                 </div>

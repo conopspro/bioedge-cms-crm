@@ -228,7 +228,7 @@ export function HomepageEvents({
                     </div>
                     <div className="mt-2 hidden sm:block space-y-1.5">
                       {displayTagline && (
-                        <p className="text-sm italic text-white/80">
+                        <p className="text-sm italic text-[#f8f9fa]">
                           &ldquo;{displayTagline}&rdquo;
                         </p>
                       )}

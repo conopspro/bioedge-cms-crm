@@ -42,10 +42,10 @@ export function ClinicPromoSection({ totalClinics, sectionClassName }: ClinicPro
                     <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <p className="text-sm italic text-white/80">
+                <p className="text-sm italic text-[#f8f9fa]">
                   &ldquo;The Largest Directory of Longevity Clinics in the USA&rdquo;
                 </p>
-                <p className="mt-1 text-xs text-white/50">
+                <p className="mt-1 text-xs text-[#f8f9fa]">
                   Find integrative medicine, IV therapy, hormone optimization, and longevity-focused clinics near you.
                 </p>
               </div>
