@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/server"
+import { GlobalEventsBanner } from "@/components/home/global-events-banner"
 
 // Revalidate pages every 60 seconds to reflect database changes
 export const revalidate = 60
@@ -214,6 +215,8 @@ export default async function EventLayout({ children, params }: LayoutProps) {
           </nav>
         </div>
       </header>
+
+      <GlobalEventsBanner />
 
       {/* Page Content - Full width container, sections handle their own backgrounds */}
       <main className="flex-1">
