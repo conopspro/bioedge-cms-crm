@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation"
 import {
   Eye,
   EyeOff,
-  GripVertical,
   ChevronDown,
   ChevronUp,
   Image as ImageIcon,
@@ -191,6 +190,9 @@ interface LandingPageSettings {
   photo_slider_2: SliderSectionSettings
   video_playlist: VideoPlaylistSettings
   custom_html: CustomHtmlSettings
+  presentations_slider?: { visible: boolean; title?: string; subtitle?: string }
+  edge_framework?: { visible: boolean; title?: string; subtitle?: string }
+  clinic_promo?: { visible: boolean; title?: string; subtitle?: string }
   section_order?: string[] // Array of section keys in display order
 }
 
@@ -334,8 +336,11 @@ const defaultSettings: LandingPageSettings = {
     expand_first: false,
   },
   custom_html: { visible: false, title: "Custom Section", subtitle: "", order: 11, html_content: "", background: "#ffffff" },
+  presentations_slider: { visible: false, title: "Presentations from Prior Events", subtitle: "Video Library" },
+  edge_framework: { visible: false },
+  clinic_promo: { visible: false },
   final_cta: { visible: true, title: "Ready to Join Us?", subtitle: "", description: "", button_text: "Get Your Tickets Now", order: 12 },
-  section_order: ["hero", "value_props", "testimonials", "leaders", "photo_slider_1", "tickets", "venue", "companies", "video_playlist", "photo_slider_2", "faq", "custom_html", "final_cta"],
+  section_order: ["hero", "value_props", "testimonials", "leaders", "photo_slider_1", "tickets", "venue", "companies", "video_playlist", "photo_slider_2", "faq", "custom_html", "presentations_slider", "clinic_promo", "edge_framework", "final_cta"],
 }
 
 const sectionLabels: Record<string, string> = {
@@ -351,6 +356,9 @@ const sectionLabels: Record<string, string> = {
   photo_slider_2: "Photo Slider 2",
   faq: "FAQ Section",
   custom_html: "Custom HTML Section",
+  presentations_slider: "Presentations Slider",
+  edge_framework: "EDGE Framework (Book + Systems + Decoder)",
+  clinic_promo: "Clinic Directory Promo",
   final_cta: "Final Call-to-Action",
 }
 
@@ -367,6 +375,9 @@ const sectionDescriptions: Record<string, string> = {
   photo_slider_2: "Second image carousel for more photos",
   faq: "Frequently asked questions",
   custom_html: "Add your own HTML content",
+  presentations_slider: "Featured video presentations from prior bioEDGE events",
+  edge_framework: "Book promo, 15 Biological Systems grid, and bioEDGE Decoder",
+  clinic_promo: "Link to the longevity clinic directory",
   final_cta: "Bottom registration call-to-action",
 }
 
@@ -496,8 +507,17 @@ function mergeWithDefaults(initial: Partial<LandingPageSettings> | null): Landin
   const merged = { ...defaultSettings }
   for (const key of Object.keys(defaultSettings) as (keyof LandingPageSettings)[]) {
     if (key === 'section_order') {
-      // Use initial section_order if provided, otherwise use default
-      merged.section_order = initial.section_order || defaultSettings.section_order
+      // Use initial section_order but append any new default keys not yet present
+      const base = initial.section_order || defaultSettings.section_order || []
+      const newKeys = (defaultSettings.section_order || []).filter((k) => !base.includes(k))
+      if (newKeys.length > 0) {
+        const finalCtaIdx = base.indexOf('final_cta')
+        merged.section_order = finalCtaIdx >= 0
+          ? [...base.slice(0, finalCtaIdx), ...newKeys, ...base.slice(finalCtaIdx)]
+          : [...base, ...newKeys]
+      } else {
+        merged.section_order = base
+      }
     } else if (initial[key]) {
       merged[key] = { ...defaultSettings[key], ...initial[key] } as any
     }
@@ -978,18 +998,16 @@ export function LandingPageEditor({
     (key): key is keyof Omit<LandingPageSettings, 'section_order'> => key !== 'section_order' && key in settings
   )
 
-  // Handle drag and drop reordering
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return
-
-    const items = Array.from(sectionKeys)
-    const [reorderedItem] = items.splice(result.source.index, 1)
-    items.splice(result.destination.index, 0, reorderedItem)
-
-    setSettings((prev) => ({
-      ...prev,
-      section_order: items,
-    }))
+  // Move a section up or down in section_order
+  const moveSection = (key: string, direction: 'up' | 'down') => {
+    const keys = [...(settings.section_order ?? defaultSettings.section_order ?? [])]
+    const idx = keys.indexOf(key)
+    if (direction === 'up' && idx > 0) {
+      ;[keys[idx - 1], keys[idx]] = [keys[idx], keys[idx - 1]]
+    } else if (direction === 'down' && idx < keys.length - 1) {
+      ;[keys[idx], keys[idx + 1]] = [keys[idx + 1], keys[idx]]
+    }
+    setSettings((prev) => ({ ...prev, section_order: keys }))
   }
 
   return (
@@ -1001,7 +1019,7 @@ export function LandingPageEditor({
             <div>
               <CardTitle>Landing Page Sections</CardTitle>
               <CardDescription>
-                Toggle visibility and customize titles for each section. Drag to reorder.
+                Toggle visibility and customize titles for each section. Use arrows to reorder.
               </CardDescription>
             </div>
             <Button onClick={saveSettings} disabled={saving}>
@@ -1012,6 +1030,7 @@ export function LandingPageEditor({
         <CardContent className="space-y-2">
           {sectionKeys.map((section, index) => {
             const sectionSettings = settings[section]
+            if (!sectionSettings) return null
             const isExpanded = expandedSections.has(section)
 
             return (
@@ -1023,7 +1042,26 @@ export function LandingPageEditor({
                   )}
                 >
                   <div className="flex items-center gap-3 p-3">
-                    <GripVertical className="h-4 w-4 text-muted-foreground cursor-move" />
+                    <div className="flex flex-col">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5"
+                        disabled={index === 0}
+                        onClick={(e) => { e.stopPropagation(); moveSection(section, 'up') }}
+                      >
+                        <ChevronUp className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-5 w-5"
+                        disabled={index === sectionKeys.length - 1}
+                        onClick={(e) => { e.stopPropagation(); moveSection(section, 'down') }}
+                      >
+                        <ChevronDown className="h-3 w-3" />
+                      </Button>
+                    </div>
 
                     <Switch
                       checked={sectionSettings.visible}
@@ -1055,7 +1093,7 @@ export function LandingPageEditor({
 
                   <CollapsibleContent>
                     <div className="px-3 pb-3 pt-0 border-t space-y-3">
-                      {section !== "hero" && (
+                      {section !== "hero" && section !== "edge_framework" && section !== "clinic_promo" && (
                         <>
                           <div className="grid gap-3 sm:grid-cols-2 pt-3">
                             <div>

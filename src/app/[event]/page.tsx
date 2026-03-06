@@ -11,6 +11,10 @@ import { FinalCtaSection } from "@/components/events/final-cta-section"
 import { CompaniesGrid } from "@/components/events/public/companies-grid"
 import { RichText } from "@/components/ui/rich-text"
 import { EventJsonLd } from "@/components/seo/json-ld"
+import React from "react"
+import { HomepageFeaturedPresentations } from "@/components/home/homepage-featured-presentations"
+import { ClinicPromoSection } from "@/components/home/clinic-promo-section"
+import { EdgeFramework } from "@/components/home/edge-framework"
 
 // TODO: Re-enable caching for production
 export const revalidate = 60
@@ -231,6 +235,30 @@ export default async function EventLandingPage({ params }: PageProps) {
       .order("display_order", { ascending: true }),
   ])
 
+  // Fetch data for optional sections
+  const showPresentations = (event.landing_page_settings as any)?.presentations_slider?.visible === true
+  const showClinicPromo = (event.landing_page_settings as any)?.clinic_promo?.visible === true
+
+  const [featuredPresentations, totalClinics] = await Promise.all([
+    showPresentations
+      ? supabase
+          .from("presentations")
+          .select("id, title, slug, short_description, youtube_url, contact:contacts(id, first_name, last_name, avatar_url), company:companies(name)")
+          .eq("is_featured", true)
+          .eq("status", "published")
+          .order("title")
+          .limit(12)
+          .then((r) => r.data ?? [])
+      : Promise.resolve([]),
+    showClinicPromo
+      ? supabase
+          .from("clinics")
+          .select("id", { count: "exact", head: true })
+          .or("is_draft.is.null,is_draft.eq.false")
+          .then((r) => r.count ?? null)
+      : Promise.resolve(null),
+  ])
+
   // Parse JSON fields safely
   const valueProps = Array.isArray(event.value_props) ? event.value_props : []
   const sectionColors = event.section_colors as Partial<SectionColorsSettings> | null
@@ -314,6 +342,9 @@ export default async function EventLandingPage({ params }: PageProps) {
     companies?: { visible?: boolean; title?: string; subtitle?: string }
     venue?: { visible?: boolean; title?: string; subtitle?: string; description?: string | null; button_text?: string | null; button_url?: string | null }
     section_order?: string[]
+    presentations_slider?: { visible?: boolean; title?: string; subtitle?: string }
+    edge_framework?: { visible?: boolean }
+    clinic_promo?: { visible?: boolean }
   } | null
 
   // Get colors for each section
@@ -446,665 +477,608 @@ export default async function EventLandingPage({ params }: PageProps) {
   const heroEarlyBirdText = heroSettings?.early_bird_text || event.early_bird_text
   const heroOverlayOpacity = heroSettings?.overlay_opacity ?? event.hero_overlay_opacity ?? 70
 
-  return (
+  // ============================================
+  // SECTION VARIABLES (for section_order support)
+  // ============================================
+
+  const heroSection = (
     <>
-      <EventJsonLd
-        name={event.name}
-        slug={event.slug}
-        description={event.description}
-        startDate={event.start_date}
-        endDate={event.end_date}
-        venueName={event.venue_name}
-        city={event.city}
-        state={event.state}
-        imageUrl={event.og_image_url}
-        ticketUrl={event.ticket_url}
-        status={event.status}
-      />
-
       {/* ============================================ */}
-      {/* HERO SECTION - WHAT, WHEN, WHERE */}
-      {/* ============================================ */}
-      {heroLayout === 'split_image' && heroSplitImageUrl ? (
-        // Split Layout Hero
-        <section
-          className="relative overflow-hidden"
-          style={{
-            ...(heroColors.background
-              ? getBackgroundStyle(heroColors.background)
-              : { background: 'linear-gradient(to bottom right, #0a2540, #1e3a5f, #3b82f6)' }
-            ),
-          }}
-        >
-          {/* Decorative elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gold/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-accent/10 rounded-full blur-3xl" />
-          </div>
+  {/* HERO SECTION - WHAT, WHEN, WHERE */}
+  {/* ============================================ */}
+  {heroLayout === 'split_image' && heroSplitImageUrl ? (
+    // Split Layout Hero
+    <section
+      className="relative overflow-hidden"
+      style={{
+        ...(heroColors.background
+          ? getBackgroundStyle(heroColors.background)
+          : { background: 'linear-gradient(to bottom right, #0a2540, #1e3a5f, #3b82f6)' }
+        ),
+      }}
+    >
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gold/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-accent/10 rounded-full blur-3xl" />
+      </div>
 
-          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
-            <div className={`flex flex-col ${heroSplitImagePosition === 'left' ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12 py-10 md:py-16`}>
-              {/* Text Content - 50% */}
-              <div className="flex-1 w-full md:w-1/2">
-                {/* Event Logo */}
-                {heroLogoUrl && (
-                  <img
-                    src={heroLogoUrl}
-                    alt={event.name}
-                    className="h-10 md:h-12 mb-4"
-                  />
-                )}
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6">
+        <div className={`flex flex-col ${heroSplitImagePosition === 'left' ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-12 py-10 md:py-16`}>
+          {/* Text Content - 50% */}
+          <div className="flex-1 w-full md:w-1/2">
+            {/* Event Logo */}
+            {heroLogoUrl && (
+              <img
+                src={heroLogoUrl}
+                alt={event.name}
+                className="h-10 md:h-12 mb-4"
+              />
+            )}
 
-                {/* Event Name */}
-                <h1
-                  className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3"
-                  style={{ color: heroColors.title }}
-                >
-                  {event.name}
-                </h1>
+            {/* Event Name */}
+            <h1
+              className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3"
+              style={{ color: heroColors.title }}
+            >
+              {event.name}
+            </h1>
 
-                {/* Tagline */}
-                {heroTagline && (
-                  <p
-                    className="text-lg md:text-xl font-semibold mb-6"
-                    style={{ color: heroColors.subtitle }}
-                  >
-                    {heroTagline}
-                  </p>
-                )}
-
-                {/* Date & Location */}
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6" style={{ color: heroColors.text }}>
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
-                    <span className="font-medium">{formatDateRange(event.start_date, event.end_date)}</span>
-                  </div>
-                  {(event.venue_name || event.city) && (
-                    <>
-                      <span className="hidden sm:block text-white/40">|</span>
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
-                        <span>{event.city}{event.state && `, ${event.state}`}</span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                {/* Countdown Timer */}
-                {heroShowCountdown && event.start_date && (
-                  <div className="mb-6">
-                    <CountdownTimer
-                      targetDate={new Date(event.start_date)}
-                      cardBg={heroColors.card_bg}
-                      textColor={heroColors.title}
-                      labelColor={heroColors.text}
-                    />
-                  </div>
-                )}
-
-                {/* CTA Buttons */}
-                <div className="flex flex-wrap gap-3">
-                  {heroCtaUrl ? (
-                    <a
-                      href={heroCtaUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md transition-colors"
-                      style={{
-                        backgroundColor: heroColors.button_bg || '#c9a227',
-                        color: heroColors.button_text || '#ffffff',
-                      }}
-                    >
-                      {heroCtaText}
-                    </a>
-                  ) : (
-                    <p className="font-heading font-semibold uppercase tracking-wider text-sm" style={{ color: heroColors.button_bg || '#c9a227' }}>
-                      Tickets Go On Sale Soon
-                    </p>
-                  )}
-                  {heroSecondaryCtaUrl && heroSecondaryCtaText && (
-                    <a
-                      href={heroSecondaryCtaUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md border-2 transition-colors"
-                      style={{
-                        borderColor: heroColors.button_bg || '#c9a227',
-                        color: heroColors.button_bg || '#c9a227',
-                      }}
-                    >
-                      {heroSecondaryCtaText}
-                    </a>
-                  )}
-                </div>
-
-                {/* Early Bird Notice */}
-                {heroShowEarlyBird && heroEarlyBirdText && (
-                  <p className="mt-4 font-medium text-sm" style={{ color: heroColors.accent || '#c9a227' }}>
-                    {heroEarlyBirdText}
-                  </p>
-                )}
-              </div>
-
-              {/* Image - 50% with padding */}
-              <div className="flex-1 w-full md:w-1/2">
-                <div className="rounded-2xl overflow-hidden shadow-2xl">
-                  <img
-                    src={heroSplitImageUrl}
-                    alt={event.name}
-                    className="w-full h-auto object-cover"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      ) : (
-        // Full Background Hero (default)
-        <section
-          className="relative overflow-hidden"
-          style={{
-            backgroundImage: event.hero_image_url ? `url(${event.hero_image_url})` : undefined,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-            ...(!event.hero_image_url && heroColors.background ? getBackgroundStyle(heroColors.background) : {}),
-          }}
-        >
-          {/* Overlay - use custom background color/gradient or default gradient */}
-          <div
-            className="absolute inset-0"
-            style={{
-              ...(heroColors.background
-                ? getBackgroundStyle(heroColors.background)
-                : { background: 'linear-gradient(to bottom right, #0a2540, #1e3a5f, #3b82f6)' }
-              ),
-              opacity: event.hero_image_url ? heroOverlayOpacity / 100 : 1,
-            }}
-          />
-
-          {/* Decorative elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gold/10 rounded-full blur-3xl" />
-            <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-accent/10 rounded-full blur-3xl" />
-          </div>
-
-          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-16">
-            <div className="max-w-3xl">
-              {/* Event Logo */}
-              {heroLogoUrl && (
-                <img
-                  src={heroLogoUrl}
-                  alt={event.name}
-                  className="h-10 md:h-12 mb-4"
-                />
-              )}
-
-              {/* Event Name */}
-              <h1
-                className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3"
-                style={{ color: heroColors.title }}
+            {/* Tagline */}
+            {heroTagline && (
+              <p
+                className="text-lg md:text-xl font-semibold mb-6"
+                style={{ color: heroColors.subtitle }}
               >
-                {event.name}
-              </h1>
+                {heroTagline}
+              </p>
+            )}
 
-              {/* Tagline */}
-              {heroTagline && (
-                <p
-                  className="text-lg md:text-xl font-semibold mb-6 max-w-2xl"
-                  style={{ color: heroColors.subtitle }}
-                >
-                  {heroTagline}
-                </p>
-              )}
-
-              {/* Date & Location */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6" style={{ color: heroColors.text }}>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
-                  <span className="font-medium">{formatDateRange(event.start_date, event.end_date)}</span>
-                </div>
-                {(event.venue_name || event.city) && (
-                  <>
-                    <span className="hidden sm:block text-white/40">|</span>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
-                      <span>{event.city}{event.state && `, ${event.state}`}</span>
-                    </div>
-                  </>
-                )}
+            {/* Date & Location */}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6" style={{ color: heroColors.text }}>
+              <div className="flex items-center gap-2">
+                <Calendar className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
+                <span className="font-medium">{formatDateRange(event.start_date, event.end_date)}</span>
               </div>
-
-              {/* Countdown Timer */}
-              {heroShowCountdown && event.start_date && (
-                <div className="mb-6">
-                  <CountdownTimer
-                    targetDate={new Date(event.start_date)}
-                    cardBg={heroColors.card_bg}
-                    textColor={heroColors.title}
-                    labelColor={heroColors.text}
-                  />
-                </div>
-              )}
-
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap gap-3">
-                {heroCtaUrl ? (
-                  <a
-                    href={heroCtaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md transition-colors"
-                    style={{
-                      backgroundColor: heroColors.button_bg || '#c9a227',
-                      color: heroColors.button_text || '#ffffff',
-                    }}
-                  >
-                    {heroCtaText}
-                  </a>
-                ) : (
-                  <p className="font-heading font-semibold uppercase tracking-wider text-sm" style={{ color: heroColors.button_bg || '#c9a227' }}>
-                    Tickets Go On Sale Soon
-                  </p>
-                )}
-                {heroSecondaryCtaUrl && heroSecondaryCtaText && (
-                  <a
-                    href={heroSecondaryCtaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md border-2 transition-colors"
-                    style={{
-                      borderColor: heroColors.button_bg || '#c9a227',
-                      color: heroColors.button_bg || '#c9a227',
-                    }}
-                  >
-                    {heroSecondaryCtaText}
-                  </a>
-                )}
-              </div>
-
-              {/* Early Bird Notice */}
-              {heroShowEarlyBird && heroEarlyBirdText && (
-                <p className="mt-4 font-medium text-sm" style={{ color: heroColors.accent || '#c9a227' }}>
-                  {heroEarlyBirdText}
-                </p>
+              {(event.venue_name || event.city) && (
+                <>
+                  <span className="hidden sm:block text-white/40">|</span>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
+                    <span>{event.city}{event.state && `, ${event.state}`}</span>
+                  </div>
+                </>
               )}
             </div>
-          </div>
-        </section>
-      )}
 
-      {/* ============================================ */}
-      {/* PHOTO SLIDERS - AFTER HERO */}
-      {/* ============================================ */}
-      {slidersByPosition['after_hero']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
-                  </p>
-                )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
-                )}
+            {/* Countdown Timer */}
+            {heroShowCountdown && event.start_date && (
+              <div className="mb-6">
+                <CountdownTimer
+                  targetDate={new Date(event.start_date)}
+                  cardBg={heroColors.card_bg}
+                  textColor={heroColors.title}
+                  labelColor={heroColors.text}
+                />
               </div>
             )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
-          </div>
-        </section>
-      ))}
 
-      {/* ============================================ */}
-      {/* VALUE PROPOSITION - WHY */}
-      {/* ============================================ */}
-      {(() => {
-        const vpSettings = landingPageSettings?.value_props
-        const vpVisible = vpSettings?.visible !== false
-        const vpTitle = vpSettings?.title || "What You'll Get"
-        const vpSubtitle = vpSettings?.subtitle || "Why Attend"
-        const vpDescription = vpSettings?.description
-        const vpLayout = vpSettings?.layout || 'grid'
-        const vpColumns = vpSettings?.columns || 3
-        const vpShowIcons = vpSettings?.show_icons !== false
-        const vpIconStyle = vpSettings?.icon_style || 'check'
-        const vpUseCustom = vpSettings?.use_custom_props === true
-        const vpCustomProps = vpSettings?.custom_value_props
-        const vpFallback = vpSettings?.fallback_description || event.description
-
-        // Determine which value props to use
-        const displayProps = vpUseCustom && vpCustomProps?.length
-          ? vpCustomProps
-          : valueProps
-
-        const hasDisplayProps = displayProps.length > 0
-
-        // Grid column classes based on settings
-        const gridColsClass = vpLayout === 'list'
-          ? 'max-w-2xl mx-auto space-y-2'
-          : vpColumns === 2
-            ? 'grid gap-3 md:grid-cols-2'
-            : vpColumns === 4
-              ? 'grid gap-3 md:grid-cols-2 lg:grid-cols-4'
-              : 'grid gap-3 md:grid-cols-2 lg:grid-cols-3'
-
-        // Render icon based on style
-        const renderIcon = (index: number, highlight: boolean) => {
-          if (!vpShowIcons) return null
-
-          const iconBgClass = highlight ? "bg-gold text-white" : "bg-navy text-white"
-
-          if (vpIconStyle === 'number') {
-            return (
-              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${iconBgClass}`}>
-                <span className="text-xs font-bold">{index + 1}</span>
-              </div>
-            )
-          }
-
-          if (vpIconStyle === 'bullet') {
-            return (
-              <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${iconBgClass}`}>
-                <span className="text-lg leading-none">•</span>
-              </div>
-            )
-          }
-
-          // Default: check
-          return (
-            <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${iconBgClass}`}>
-              <Check className="h-4 w-4" />
+            {/* CTA Buttons */}
+            <div className="flex flex-wrap gap-3">
+              {heroCtaUrl ? (
+                <a
+                  href={heroCtaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md transition-colors"
+                  style={{
+                    backgroundColor: heroColors.button_bg || '#c9a227',
+                    color: heroColors.button_text || '#ffffff',
+                  }}
+                >
+                  {heroCtaText}
+                </a>
+              ) : (
+                <p className="font-heading font-semibold uppercase tracking-wider text-sm" style={{ color: heroColors.button_bg || '#c9a227' }}>
+                  Tickets Go On Sale Soon
+                </p>
+              )}
+              {heroSecondaryCtaUrl && heroSecondaryCtaText && (
+                <a
+                  href={heroSecondaryCtaUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md border-2 transition-colors"
+                  style={{
+                    borderColor: heroColors.button_bg || '#c9a227',
+                    color: heroColors.button_bg || '#c9a227',
+                  }}
+                >
+                  {heroSecondaryCtaText}
+                </a>
+              )}
             </div>
-          )
-        }
 
-        if (!vpVisible) return null
-        if (!hasDisplayProps && !vpFallback) return null
+            {/* Early Bird Notice */}
+            {heroShowEarlyBird && heroEarlyBirdText && (
+              <p className="mt-4 font-medium text-sm" style={{ color: heroColors.accent || '#c9a227' }}>
+                {heroEarlyBirdText}
+              </p>
+            )}
+          </div>
 
+          {/* Image - 50% with padding */}
+          <div className="flex-1 w-full md:w-1/2">
+            <div className="rounded-2xl overflow-hidden shadow-2xl">
+              <img
+                src={heroSplitImageUrl}
+                alt={event.name}
+                className="w-full h-auto object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  ) : (
+    // Full Background Hero (default)
+    <section
+      className="relative overflow-hidden"
+      style={{
+        backgroundImage: event.hero_image_url ? `url(${event.hero_image_url})` : undefined,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        ...(!event.hero_image_url && heroColors.background ? getBackgroundStyle(heroColors.background) : {}),
+      }}
+    >
+      {/* Overlay - use custom background color/gradient or default gradient */}
+      <div
+        className="absolute inset-0"
+        style={{
+          ...(heroColors.background
+            ? getBackgroundStyle(heroColors.background)
+            : { background: 'linear-gradient(to bottom right, #0a2540, #1e3a5f, #3b82f6)' }
+          ),
+          opacity: event.hero_image_url ? heroOverlayOpacity / 100 : 1,
+        }}
+      />
+
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-gold/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-accent/10 rounded-full blur-3xl" />
+      </div>
+
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-16">
+        <div className="max-w-3xl">
+          {/* Event Logo */}
+          {heroLogoUrl && (
+            <img
+              src={heroLogoUrl}
+              alt={event.name}
+              className="h-10 md:h-12 mb-4"
+            />
+          )}
+
+          {/* Event Name */}
+          <h1
+            className="font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-3"
+            style={{ color: heroColors.title }}
+          >
+            {event.name}
+          </h1>
+
+          {/* Tagline */}
+          {heroTagline && (
+            <p
+              className="text-lg md:text-xl font-semibold mb-6 max-w-2xl"
+              style={{ color: heroColors.subtitle }}
+            >
+              {heroTagline}
+            </p>
+          )}
+
+          {/* Date & Location */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6" style={{ color: heroColors.text }}>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
+              <span className="font-medium">{formatDateRange(event.start_date, event.end_date)}</span>
+            </div>
+            {(event.venue_name || event.city) && (
+              <>
+                <span className="hidden sm:block text-white/40">|</span>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 flex-shrink-0" style={{ color: heroColors.accent || '#c9a227' }} />
+                  <span>{event.city}{event.state && `, ${event.state}`}</span>
+                </div>
+              </>
+            )}
+          </div>
+
+          {/* Countdown Timer */}
+          {heroShowCountdown && event.start_date && (
+            <div className="mb-6">
+              <CountdownTimer
+                targetDate={new Date(event.start_date)}
+                cardBg={heroColors.card_bg}
+                textColor={heroColors.title}
+                labelColor={heroColors.text}
+              />
+            </div>
+          )}
+
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap gap-3">
+            {heroCtaUrl ? (
+              <a
+                href={heroCtaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md transition-colors"
+                style={{
+                  backgroundColor: heroColors.button_bg || '#c9a227',
+                  color: heroColors.button_text || '#ffffff',
+                }}
+              >
+                {heroCtaText}
+              </a>
+            ) : (
+              <p className="font-heading font-semibold uppercase tracking-wider text-sm" style={{ color: heroColors.button_bg || '#c9a227' }}>
+                Tickets Go On Sale Soon
+              </p>
+            )}
+            {heroSecondaryCtaUrl && heroSecondaryCtaText && (
+              <a
+                href={heroSecondaryCtaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center font-heading font-bold uppercase tracking-wider text-sm px-6 py-3 rounded-md border-2 transition-colors"
+                style={{
+                  borderColor: heroColors.button_bg || '#c9a227',
+                  color: heroColors.button_bg || '#c9a227',
+                }}
+              >
+                {heroSecondaryCtaText}
+              </a>
+            )}
+          </div>
+
+          {/* Early Bird Notice */}
+          {heroShowEarlyBird && heroEarlyBirdText && (
+            <p className="mt-4 font-medium text-sm" style={{ color: heroColors.accent || '#c9a227' }}>
+              {heroEarlyBirdText}
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ============================================ */}
+  {/* PHOTO SLIDERS - AFTER HERO */}
+  {/* ============================================ */}
+  {slidersByPosition['after_hero']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
+            )}
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
+
+  const valuePropsSection = (
+    <>
+      {/* ============================================ */}
+  {/* VALUE PROPOSITION - WHY */}
+  {/* ============================================ */}
+  {(() => {
+    const vpSettings = landingPageSettings?.value_props
+    const vpVisible = vpSettings?.visible !== false
+    const vpTitle = vpSettings?.title || "What You'll Get"
+    const vpSubtitle = vpSettings?.subtitle || "Why Attend"
+    const vpDescription = vpSettings?.description
+    const vpLayout = vpSettings?.layout || 'grid'
+    const vpColumns = vpSettings?.columns || 3
+    const vpShowIcons = vpSettings?.show_icons !== false
+    const vpIconStyle = vpSettings?.icon_style || 'check'
+    const vpUseCustom = vpSettings?.use_custom_props === true
+    const vpCustomProps = vpSettings?.custom_value_props
+    const vpFallback = vpSettings?.fallback_description || event.description
+
+    // Determine which value props to use
+    const displayProps = vpUseCustom && vpCustomProps?.length
+      ? vpCustomProps
+      : valueProps
+
+    const hasDisplayProps = displayProps.length > 0
+
+    // Grid column classes based on settings
+    const gridColsClass = vpLayout === 'list'
+      ? 'max-w-2xl mx-auto space-y-2'
+      : vpColumns === 2
+        ? 'grid gap-3 md:grid-cols-2'
+        : vpColumns === 4
+          ? 'grid gap-3 md:grid-cols-2 lg:grid-cols-4'
+          : 'grid gap-3 md:grid-cols-2 lg:grid-cols-3'
+
+    // Render icon based on style
+    const renderIcon = (index: number, highlight: boolean) => {
+      if (!vpShowIcons) return null
+
+      const iconBgClass = highlight ? "bg-gold text-white" : "bg-navy text-white"
+
+      if (vpIconStyle === 'number') {
         return (
-          <section className="py-5" style={getBackgroundStyle(valuePropsColors.background)}>
-            <div className="max-w-5xl mx-auto px-4 sm:px-6">
-              <div className="max-w-3xl mx-auto text-center mb-5">
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: valuePropsColors.subtitle }}>{vpSubtitle}</p>
-                <h2 className="font-heading text-2xl font-bold" style={{ color: valuePropsColors.title }}>{vpTitle}</h2>
-                {vpDescription && (
-                  <p className="mt-3 text-lg whitespace-pre-line text-left" style={{ color: valuePropsColors.text }}><RichText>{vpDescription}</RichText></p>
-                )}
-              </div>
+          <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${iconBgClass}`}>
+            <span className="text-xs font-bold">{index + 1}</span>
+          </div>
+        )
+      }
 
-              {hasDisplayProps ? (
-                <div className={gridColsClass}>
-                  {displayProps.map((prop: { text: string; icon?: string; highlight?: boolean }, index: number) => {
-                    const isHighlight = prop.highlight || false
+      if (vpIconStyle === 'bullet') {
+        return (
+          <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${iconBgClass}`}>
+            <span className="text-lg leading-none">•</span>
+          </div>
+        )
+      }
 
-                    if (vpLayout === 'cards') {
-                      return (
-                        <div
-                          key={index}
-                          className={`p-4 rounded-lg border-2 transition-shadow hover:shadow-md ${
-                            isHighlight ? "border-gold bg-gold/5" : "border-gray-200 bg-white"
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            {renderIcon(index, isHighlight)}
-                            <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
-                          </div>
-                        </div>
-                      )
-                    }
+      // Default: check
+      return (
+        <div className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${iconBgClass}`}>
+          <Check className="h-4 w-4" />
+        </div>
+      )
+    }
 
-                    if (vpLayout === 'list') {
-                      return (
-                        <div
-                          key={index}
-                          className={`flex items-start gap-3 p-3 rounded-lg ${
-                            isHighlight ? "bg-gold/10 border border-gold" : "bg-muted"
-                          }`}
-                        >
-                          {renderIcon(index, isHighlight)}
-                          <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
-                        </div>
-                      )
-                    }
+    if (!vpVisible) return null
+    if (!hasDisplayProps && !vpFallback) return null
 
-                    // Default: grid
-                    return (
-                      <div
-                        key={index}
-                        className={`flex items-start gap-3 p-4 rounded-lg ${
-                          isHighlight ? "bg-gold/10 border border-gold" : "bg-muted"
-                        }`}
-                      >
+    return (
+      <section className="py-5" style={getBackgroundStyle(valuePropsColors.background)}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="max-w-3xl mx-auto text-center mb-5">
+            <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: valuePropsColors.subtitle }}>{vpSubtitle}</p>
+            <h2 className="font-heading text-2xl font-bold" style={{ color: valuePropsColors.title }}>{vpTitle}</h2>
+            {vpDescription && (
+              <p className="mt-3 text-lg whitespace-pre-line text-left" style={{ color: valuePropsColors.text }}><RichText>{vpDescription}</RichText></p>
+            )}
+          </div>
+
+          {hasDisplayProps ? (
+            <div className={gridColsClass}>
+              {displayProps.map((prop: { text: string; icon?: string; highlight?: boolean }, index: number) => {
+                const isHighlight = prop.highlight || false
+
+                if (vpLayout === 'cards') {
+                  return (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-lg border-2 transition-shadow hover:shadow-md ${
+                        isHighlight ? "border-gold bg-gold/5" : "border-gray-200 bg-white"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
                         {renderIcon(index, isHighlight)}
                         <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
                       </div>
-                    )
-                  })}
-                </div>
-              ) : vpFallback && (
-                <div className="max-w-3xl mx-auto">
-                  <p className="body-text text-center whitespace-pre-wrap" style={{ color: valuePropsColors.text }}>
-                    {vpFallback}
-                  </p>
-                </div>
-              )}
+                    </div>
+                  )
+                }
+
+                if (vpLayout === 'list') {
+                  return (
+                    <div
+                      key={index}
+                      className={`flex items-start gap-3 p-3 rounded-lg ${
+                        isHighlight ? "bg-gold/10 border border-gold" : "bg-muted"
+                      }`}
+                    >
+                      {renderIcon(index, isHighlight)}
+                      <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
+                    </div>
+                  )
+                }
+
+                // Default: grid
+                return (
+                  <div
+                    key={index}
+                    className={`flex items-start gap-3 p-4 rounded-lg ${
+                      isHighlight ? "bg-gold/10 border border-gold" : "bg-muted"
+                    }`}
+                  >
+                    {renderIcon(index, isHighlight)}
+                    <p className="text-lg font-medium" style={{ color: valuePropsColors.text }}>{prop.text}</p>
+                  </div>
+                )
+              })}
             </div>
-          </section>
-        )
-      })()}
+          ) : vpFallback && (
+            <div className="max-w-3xl mx-auto">
+              <p className="body-text text-center whitespace-pre-wrap" style={{ color: valuePropsColors.text }}>
+                {vpFallback}
+              </p>
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  })()}
 
-      {/* Sliders: After Value Props */}
-      {slidersByPosition['after_value_props']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
-                  </p>
-                )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
-                )}
-              </div>
+  {/* Sliders: After Value Props */}
+  {slidersByPosition['after_value_props']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
             )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
+            )}
           </div>
-        </section>
-      ))}
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
 
+  const testimonialsSection = (
+    <>
       {/* ============================================ */}
-      {/* SOCIAL PROOF - TESTIMONIALS */}
-      {/* ============================================ */}
-      {(() => {
-        const testSettings = landingPageSettings?.testimonials
-        const testVisible = testSettings?.visible !== false
-        const testTitle = testSettings?.title || "Don't Take Our Word For It"
-        const testSubtitle = testSettings?.subtitle || "What Attendees Say"
-        const testDescription = testSettings?.description
-        const testLayout = testSettings?.layout || 'grid'
-        const testColumns = testSettings?.columns || 2
-        const testMaxItems = testSettings?.max_testimonials || 6
-        const testShowPhotos = testSettings?.show_photos !== false
-        const testShowQuoteIcon = testSettings?.show_quote_icon === true
-        const testShowTitle = testSettings?.show_title !== false
-        const testShowCompany = testSettings?.show_company !== false
-        const testShowVideoLink = testSettings?.show_video_link !== false
-        const testCardStyle = testSettings?.card_style || 'default'
+  {/* SOCIAL PROOF - TESTIMONIALS */}
+  {/* ============================================ */}
+  {(() => {
+    const testSettings = landingPageSettings?.testimonials
+    const testVisible = testSettings?.visible !== false
+    const testTitle = testSettings?.title || "Don't Take Our Word For It"
+    const testSubtitle = testSettings?.subtitle || "What Attendees Say"
+    const testDescription = testSettings?.description
+    const testLayout = testSettings?.layout || 'grid'
+    const testColumns = testSettings?.columns || 2
+    const testMaxItems = testSettings?.max_testimonials || 6
+    const testShowPhotos = testSettings?.show_photos !== false
+    const testShowQuoteIcon = testSettings?.show_quote_icon === true
+    const testShowTitle = testSettings?.show_title !== false
+    const testShowCompany = testSettings?.show_company !== false
+    const testShowVideoLink = testSettings?.show_video_link !== false
+    const testCardStyle = testSettings?.card_style || 'default'
 
-        if (!testVisible || !hasTestimonials) return null
+    if (!testVisible || !hasTestimonials) return null
 
-        // Limit testimonials displayed
-        const displayTestimonials = testimonials?.slice(0, testMaxItems) || []
+    // Limit testimonials displayed
+    const displayTestimonials = testimonials?.slice(0, testMaxItems) || []
 
-        // Grid column classes based on settings (default to 2 columns)
-        // Single testimonial: center it with max width
-        const gridColsClass = testLayout === 'featured'
-          ? 'space-y-4'
-          : displayTestimonials.length === 1
-            ? 'flex justify-center'
-            : testColumns === 3
-              ? 'grid gap-4 md:grid-cols-2 lg:grid-cols-3'
-              : 'grid gap-4 md:grid-cols-2'
+    // Grid column classes based on settings (default to 2 columns)
+    // Single testimonial: center it with max width
+    const gridColsClass = testLayout === 'featured'
+      ? 'space-y-4'
+      : displayTestimonials.length === 1
+        ? 'flex justify-center'
+        : testColumns === 3
+          ? 'grid gap-4 md:grid-cols-2 lg:grid-cols-3'
+          : 'grid gap-4 md:grid-cols-2'
 
-        // Card style classes
-        const getCardClass = (isFeatured = false) => {
-          const baseClass = isFeatured ? 'p-6' : 'p-4'
-          switch (testCardStyle) {
-            case 'minimal':
-              return `${baseClass} bg-transparent`
-            case 'bordered':
-              return `${baseClass} border-2 border-gray-200 rounded-lg bg-white`
-            default:
-              return `be-card relative ${baseClass}`
-          }
-        }
+    // Card style classes
+    const getCardClass = (isFeatured = false) => {
+      const baseClass = isFeatured ? 'p-6' : 'p-4'
+      switch (testCardStyle) {
+        case 'minimal':
+          return `${baseClass} bg-transparent`
+        case 'bordered':
+          return `${baseClass} border-2 border-gray-200 rounded-lg bg-white`
+        default:
+          return `be-card relative ${baseClass}`
+      }
+    }
 
-        return (
-          <section className="py-5" style={getBackgroundStyle(testimonialsColors.background)}>
-            <div className="max-w-5xl mx-auto px-4 sm:px-6">
-              <div className="max-w-3xl mx-auto text-center mb-5">
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: testimonialsColors.subtitle }}>{testSubtitle}</p>
-                <h2 className="font-heading text-2xl font-bold" style={{ color: testimonialsColors.title }}>{testTitle}</h2>
-                {testDescription && (
-                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: testimonialsColors.text }}><RichText>{testDescription}</RichText></p>
-                )}
-              </div>
+    return (
+      <section className="py-5" style={getBackgroundStyle(testimonialsColors.background)}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="max-w-3xl mx-auto text-center mb-5">
+            <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: testimonialsColors.subtitle }}>{testSubtitle}</p>
+            <h2 className="font-heading text-2xl font-bold" style={{ color: testimonialsColors.title }}>{testTitle}</h2>
+            {testDescription && (
+              <p className="mt-3 text-lg whitespace-pre-line" style={{ color: testimonialsColors.text }}><RichText>{testDescription}</RichText></p>
+            )}
+          </div>
 
-              {testLayout === 'featured' && displayTestimonials.length > 0 ? (
-                // Featured layout: first testimonial is large
-                <div className="space-y-4">
-                  {/* Featured testimonial */}
-                  {(() => {
-                    const featured = displayTestimonials[0]
-                    const name = featured.contact
-                      ? `${featured.contact.first_name} ${featured.contact.last_name}`
-                      : featured.author_name
-                    const title = featured.contact?.title || featured.author_title
-                    const company = featured.contact?.company?.name || featured.author_company
-                    const image = featured.contact?.avatar_url || featured.author_image_url
-                    const leaderSlug = featured.contact?.slug
+          {testLayout === 'featured' && displayTestimonials.length > 0 ? (
+            // Featured layout: first testimonial is large
+            <div className="space-y-4">
+              {/* Featured testimonial */}
+              {(() => {
+                const featured = displayTestimonials[0]
+                const name = featured.contact
+                  ? `${featured.contact.first_name} ${featured.contact.last_name}`
+                  : featured.author_name
+                const title = featured.contact?.title || featured.author_title
+                const company = featured.contact?.company?.name || featured.author_company
+                const image = featured.contact?.avatar_url || featured.author_image_url
+                const leaderSlug = featured.contact?.slug
 
-                    return (
-                      <div className={`${getCardClass(true)} relative`}>
-                        <p className="mb-6 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{featured.quote}</RichText></p>
-                        <div className="flex items-center gap-3">
-                          {testShowPhotos && (
-                            image ? (
-                              <img src={image} alt={name || ""} className="w-14 h-14 rounded-full object-cover" loading="lazy" />
-                            ) : (
-                              <div className="w-14 h-14 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-lg">
-                                {name?.charAt(0) || "?"}
-                              </div>
-                            )
-                          )}
-                          <div>
-                            {leaderSlug ? (
-                              <a href={`/leaders/${leaderSlug}`} className="font-heading font-semibold text-navy hover:text-gold transition-colors">{name}</a>
-                            ) : (
-                              <p className="font-heading font-semibold text-navy">{name}</p>
-                            )}
-                            {(testShowTitle || testShowCompany) && (title || company) && (
-                              <p className="text-sm text-text-light">
-                                {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        {testShowVideoLink && featured.video_url && (
-                          <a
-                            href={featured.video_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="mt-4 inline-flex items-center gap-1 text-sm text-gold hover:text-gold/80"
-                          >
-                            <Play className="h-4 w-4" />
-                            Watch Video
-                          </a>
-                        )}
-                      </div>
-                    )
-                  })()}
-
-                  {/* Rest of testimonials in grid */}
-                  {displayTestimonials.length > 1 && (
-                    <div className="grid gap-4 md:grid-cols-2">
-                      {displayTestimonials.slice(1).map((testimonial) => {
-                        const name = testimonial.contact
-                          ? `${testimonial.contact.first_name} ${testimonial.contact.last_name}`
-                          : testimonial.author_name
-                        const title = testimonial.contact?.title || testimonial.author_title
-                        const company = testimonial.contact?.company?.name || testimonial.author_company
-                        const image = testimonial.contact?.avatar_url || testimonial.author_image_url
-                        const leaderSlug = testimonial.contact?.slug
-
-                        return (
-                          <div key={testimonial.id} className={`${getCardClass()} relative`}>
-                            <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{testimonial.quote}</RichText></p>
-                            <div className="flex items-center gap-2">
-                              {testShowPhotos && (
-                                image ? (
-                                  <img src={image} alt={name || ""} className="w-10 h-10 rounded-full object-cover" loading="lazy" />
-                                ) : (
-                                  <div className="w-10 h-10 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-sm">
-                                    {name?.charAt(0) || "?"}
-                                  </div>
-                                )
-                              )}
-                              <div>
-                                {leaderSlug ? (
-                                  <a href={`/leaders/${leaderSlug}`} className="font-heading font-semibold text-navy text-sm hover:text-gold transition-colors">{name}</a>
-                                ) : (
-                                  <p className="font-heading font-semibold text-navy text-sm">{name}</p>
-                                )}
-                                {(testShowTitle || testShowCompany) && (title || company) && (
-                                  <p className="text-xs text-text-light">
-                                    {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            {testShowVideoLink && testimonial.video_url && (
-                              <a
-                                href={testimonial.video_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="mt-3 inline-flex items-center gap-1 text-xs text-gold hover:text-gold/80"
-                              >
-                                <Play className="h-3 w-3" />
-                                Watch Video
-                              </a>
-                            )}
+                return (
+                  <div className={`${getCardClass(true)} relative`}>
+                    <p className="mb-6 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{featured.quote}</RichText></p>
+                    <div className="flex items-center gap-3">
+                      {testShowPhotos && (
+                        image ? (
+                          <img src={image} alt={name || ""} className="w-14 h-14 rounded-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-lg">
+                            {name?.charAt(0) || "?"}
                           </div>
                         )
-                      })}
+                      )}
+                      <div>
+                        {leaderSlug ? (
+                          <a href={`/leaders/${leaderSlug}`} className="font-heading font-semibold text-navy hover:text-gold transition-colors">{name}</a>
+                        ) : (
+                          <p className="font-heading font-semibold text-navy">{name}</p>
+                        )}
+                        {(testShowTitle || testShowCompany) && (title || company) && (
+                          <p className="text-sm text-text-light">
+                            {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </div>
-              ) : (
-                // Standard grid layout
-                <div className={gridColsClass}>
-                  {displayTestimonials.map((testimonial) => {
+                    {testShowVideoLink && featured.video_url && (
+                      <a
+                        href={featured.video_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-4 inline-flex items-center gap-1 text-sm text-gold hover:text-gold/80"
+                      >
+                        <Play className="h-4 w-4" />
+                        Watch Video
+                      </a>
+                    )}
+                  </div>
+                )
+              })()}
+
+              {/* Rest of testimonials in grid */}
+              {displayTestimonials.length > 1 && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {displayTestimonials.slice(1).map((testimonial) => {
                     const name = testimonial.contact
                       ? `${testimonial.contact.first_name} ${testimonial.contact.last_name}`
                       : testimonial.author_name
@@ -1112,10 +1086,9 @@ export default async function EventLandingPage({ params }: PageProps) {
                     const company = testimonial.contact?.company?.name || testimonial.author_company
                     const image = testimonial.contact?.avatar_url || testimonial.author_image_url
                     const leaderSlug = testimonial.contact?.slug
-                    const singleItemClass = displayTestimonials.length === 1 ? 'max-w-lg w-full' : ''
 
                     return (
-                      <div key={testimonial.id} className={`${getCardClass()} relative ${singleItemClass}`}>
+                      <div key={testimonial.id} className={`${getCardClass()} relative`}>
                         <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{testimonial.quote}</RichText></p>
                         <div className="flex items-center gap-2">
                           {testShowPhotos && (
@@ -1157,671 +1130,840 @@ export default async function EventLandingPage({ params }: PageProps) {
                 </div>
               )}
             </div>
-          </section>
-        )
-      })()}
-
-      {/* Sliders: After Testimonials */}
-      {slidersByPosition['after_testimonials']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
-                  </p>
-                )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
-                )}
-              </div>
-            )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
-          </div>
-        </section>
-      ))}
-
-      {/* ============================================ */}
-      {/* LEADERS - WHO */}
-      {/* ============================================ */}
-      {hasLeaders && (
-        <section className="py-5" style={getBackgroundStyle(leadersColors.background)}>
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="flex items-end justify-between mb-5">
-              <div>
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: leadersColors.subtitle }}>{landingPageSettings?.leaders?.subtitle || "Who You'll Learn From"}</p>
-                <h2 className="font-heading text-2xl font-bold" style={{ color: leadersColors.title }}>{landingPageSettings?.leaders?.title || "Featured Leaders"}</h2>
-              </div>
-              <Link
-                href={`/${event.slug}/leaders`}
-                className="hidden sm:flex items-center gap-1 font-medium text-sm hover:opacity-80"
-                style={{ color: '#017ab2' }}
-              >
-                View All <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {leaders?.map((leader) => {
-                const contact = leader.contact
-                if (!contact) return null
-
-                const name = `${contact.first_name} ${contact.last_name}`
-                const title = leader.title_override || contact.title
-                const image = leader.headshot_url || contact.avatar_url
+          ) : (
+            // Standard grid layout
+            <div className={gridColsClass}>
+              {displayTestimonials.map((testimonial) => {
+                const name = testimonial.contact
+                  ? `${testimonial.contact.first_name} ${testimonial.contact.last_name}`
+                  : testimonial.author_name
+                const title = testimonial.contact?.title || testimonial.author_title
+                const company = testimonial.contact?.company?.name || testimonial.author_company
+                const image = testimonial.contact?.avatar_url || testimonial.author_image_url
+                const leaderSlug = testimonial.contact?.slug
+                const singleItemClass = displayTestimonials.length === 1 ? 'max-w-lg w-full' : ''
 
                 return (
-                  <Link
-                    key={leader.id}
-                    href={contact.slug ? `/leaders/${contact.slug}` : `/${event.slug}/leaders`}
-                    className="be-card hover:shadow-lg transition-shadow text-center group"
-                    style={{ boxShadow: '0 0 0 2px rgba(1, 122, 178, 0.3)' }}
-                  >
-                    {image ? (
-                      <img
-                        src={image}
-                        alt={name}
-                        className="w-20 h-20 rounded-full object-cover mx-auto mb-3"
-                        loading="lazy"
-                        style={{ boxShadow: '0 0 0 4px rgba(1, 122, 178, 0.2)' }}
-                      />
-                    ) : (
-                      <div
-                        className="w-20 h-20 rounded-full mx-auto mb-3 be-avatar-gradient flex items-center justify-center text-white text-xl font-heading font-bold"
-                        style={{ boxShadow: '0 0 0 4px rgba(1, 122, 178, 0.2)' }}
-                      >
-                        {contact.first_name.charAt(0)}{contact.last_name.charAt(0)}
+                  <div key={testimonial.id} className={`${getCardClass()} relative ${singleItemClass}`}>
+                    <p className="mb-4 italic text-lg" style={{ color: testimonialsColors.text }}><RichText>{testimonial.quote}</RichText></p>
+                    <div className="flex items-center gap-2">
+                      {testShowPhotos && (
+                        image ? (
+                          <img src={image} alt={name || ""} className="w-10 h-10 rounded-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-navy text-white flex items-center justify-center font-heading font-bold text-sm">
+                            {name?.charAt(0) || "?"}
+                          </div>
+                        )
+                      )}
+                      <div>
+                        {leaderSlug ? (
+                          <a href={`/leaders/${leaderSlug}`} className="font-heading font-semibold text-navy text-sm hover:text-gold transition-colors">{name}</a>
+                        ) : (
+                          <p className="font-heading font-semibold text-navy text-sm">{name}</p>
+                        )}
+                        {(testShowTitle || testShowCompany) && (title || company) && (
+                          <p className="text-xs text-text-light">
+                            {testShowTitle && title}{testShowTitle && testShowCompany && title && company && ", "}{testShowCompany && company}
+                          </p>
+                        )}
                       </div>
-                    )}
-                    <h3
-                      className="font-heading font-semibold transition-colors"
-                      style={{ color: '#0d2840' }}
-                    >
-                      {name}
-                    </h3>
-                    {title && (
-                      <p className="text-lg mt-1" style={{ color: '#0d2840' }}>
-                        {title}
-                      </p>
-                    )}
-                    {contact.company && (
-                      <p className="text-sm font-medium mt-1" style={{ color: '#017ab2' }}>
-                        {contact.company.name}
-                      </p>
-                    )}
-                  </Link>
-                )
-              })}
-            </div>
-
-            <div className="mt-5 text-center sm:hidden">
-              <Link
-                href={`/${event.slug}/leaders`}
-                className="inline-flex items-center justify-center px-4 py-2 rounded-full font-medium text-sm border hover:opacity-80"
-                style={{ color: '#017ab2', borderColor: '#017ab2' }}
-              >
-                View All Leaders
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Sliders: After Leaders (legacy position-based) */}
-      {slidersByPosition['after_leaders']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
-                  </p>
-                )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
-                )}
-              </div>
-            )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
-          </div>
-        </section>
-      ))}
-
-      {/* ============================================ */}
-      {/* PHOTO SLIDER 1 - Draggable Section */}
-      {/* ============================================ */}
-      {photoSlider1Settings?.visible && photoSlider1 && photoSlider1.images?.length > 0 && (
-        <section
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(photoSlider1Settings.background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(photoSlider1Settings.title || photoSlider1Settings.subtitle) && (
-              <div className="text-center mb-6">
-                {photoSlider1Settings.subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {photoSlider1Settings.subtitle}
-                  </p>
-                )}
-                {photoSlider1Settings.title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {photoSlider1Settings.title}
-                  </h2>
-                )}
-              </div>
-            )}
-            <PhotoSlider
-              images={photoSlider1.images || []}
-              showCaption={photoSlider1.show_captions}
-            />
-          </div>
-        </section>
-      )}
-
-      {/* ============================================ */}
-      {/* TICKETS - HOW */}
-      {/* ============================================ */}
-      {hasTickets && (
-        <section id="tickets" className="py-5" style={getBackgroundStyle(ticketsColors.background)}>
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="max-w-3xl mx-auto text-center mb-5">
-              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: ticketsColors.subtitle }}>
-                {landingPageSettings?.tickets?.subtitle || "Reserve Your Spot"}
-              </p>
-              <h2 className="font-heading text-2xl md:text-3xl font-bold" style={{ color: ticketsColors.title }}>
-                {landingPageSettings?.tickets?.title || "Choose Your Experience"}
-              </h2>
-            </div>
-
-            <div className={`grid gap-4 ${
-              ticketTiers!.length === 1 ? "max-w-md mx-auto" :
-              ticketTiers!.length === 2 ? "md:grid-cols-2 max-w-2xl mx-auto" :
-              "md:grid-cols-2 lg:grid-cols-3"
-            }`}>
-              {ticketTiers?.map((tier, index) => (
-                <TicketTierCard
-                  key={tier.id}
-                  name={tier.name}
-                  description={tier.description}
-                  price={Number(tier.price)}
-                  originalPrice={tier.original_price ? Number(tier.original_price) : null}
-                  currency={tier.currency || "USD"}
-                  features={tier.features || []}
-                  registrationUrl={tier.registration_url}
-                  isSoldOut={tier.is_sold_out || false}
-                  waitlistUrl={tier.waitlist_url}
-                  isHighlighted={tier.is_highlighted || false}
-                  highlightText={tier.highlight_text}
-                  cardBg={ticketsColors.card_bg}
-                  titleColor={ticketsColors.card_title || ticketsColors.title}
-                  textColor={ticketsColors.card_text || ticketsColors.text}
-                  buttonBg={ticketsColors.button_bg}
-                  buttonText={ticketsColors.button_text}
-                  accentColor={ticketsColors.accent}
-                  animateOnScroll={true}
-                  animationDelay={index * 150}
-                />
-              ))}
-            </div>
-
-            {/* Single CTA button below all tiers */}
-            <div className="mt-8 text-center">
-              <a
-                href={ticketTiers![0].registration_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center rounded-md font-bold h-12 px-10 transition-colors hover:opacity-90 text-lg"
-                style={{
-                  backgroundColor: ticketsColors.button_bg || '#0a2540',
-                  color: ticketsColors.button_text || '#ffffff',
-                }}
-              >
-                Join Us in {event.city || 'Person'}
-              </a>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Sliders: After Tickets */}
-      {slidersByPosition['after_tickets']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
-                  </p>
-                )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
-                )}
-              </div>
-            )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
-          </div>
-        </section>
-      ))}
-
-      {/* ============================================ */}
-      {/* VENUE - WHERE (detailed) */}
-      {/* ============================================ */}
-      {(event.venue_name || event.venue_description) && landingPageSettings?.venue?.visible !== false && (
-        <section id="venue" className="py-5" style={getBackgroundStyle(venueColors.background)}>
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="grid md:grid-cols-2 gap-6 items-center">
-              <div>
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: venueColors.subtitle }}>{landingPageSettings?.venue?.subtitle || "The Venue"}</p>
-                <h2 className="font-heading text-2xl font-bold mb-4" style={{ color: venueColors.title }}>{landingPageSettings?.venue?.title || event.venue_name || "Event Location"}</h2>
-
-                {landingPageSettings?.venue?.description && (
-                  <p className="mb-4 text-lg" style={{ color: venueColors.text }}>
-                    <RichText>{landingPageSettings.venue.description}</RichText>
-                  </p>
-                )}
-
-                {event.venue_address && (
-                  <p className="mb-3 text-lg" style={{ color: venueColors.text }}>
-                    {event.venue_address}<br />
-                    {event.city}{event.state && `, ${event.state}`} {event.country}
-                  </p>
-                )}
-
-                {event.venue_description && (
-                  <p className="mb-4 whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}>
-                    <RichText>{event.venue_description}</RichText>
-                  </p>
-                )}
-
-                {event.transportation_info && (
-                  <div className="mb-4">
-                    <h3 className="font-heading font-semibold mb-1 text-lg" style={{ color: venueColors.title }}>Getting There</h3>
-                    <p className="whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}><RichText>{event.transportation_info}</RichText></p>
-                  </div>
-                )}
-
-                {(event.hotel_booking_url || event.hotel_group_rate) && (
-                  <div className="p-3 bg-gold/10 rounded-lg border border-gold/20">
-                    <h3 className="font-heading font-semibold text-navy mb-1 text-lg">Accommodations</h3>
-                    {event.hotel_group_rate && (
-                      <p className="text-text-dark mb-2 text-lg"><RichText>{event.hotel_group_rate}</RichText></p>
-                    )}
-                    {event.hotel_booking_url && (
+                    </div>
+                    {testShowVideoLink && testimonial.video_url && (
                       <a
-                        href={event.hotel_booking_url}
+                        href={testimonial.video_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gold hover:text-gold/80 font-medium inline-flex items-center gap-1 text-sm"
+                        className="mt-3 inline-flex items-center gap-1 text-xs text-gold hover:text-gold/80"
                       >
-                        Book Hotel <ChevronRight className="h-4 w-4" />
+                        <Play className="h-3 w-3" />
+                        Watch Video
                       </a>
                     )}
                   </div>
-                )}
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+    )
+  })()}
 
-                {landingPageSettings?.venue?.button_text && landingPageSettings?.venue?.button_url && (
-                  <div className="mt-4">
-                    <a
-                      href={landingPageSettings.venue.button_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center rounded-md font-bold px-6 py-2.5 transition-colors hover:opacity-90"
-                      style={{ backgroundColor: venueColors.button_bg || '#c9a227', color: venueColors.button_text || '#ffffff' }}
-                    >
-                      {landingPageSettings.venue.button_text}
-                    </a>
-                  </div>
-                )}
-              </div>
+  {/* Sliders: After Testimonials */}
+  {slidersByPosition['after_testimonials']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
+            )}
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
 
-              <div className="bg-muted rounded-lg overflow-hidden aspect-video">
-                {venuePhoto?.image_url ? (
+  const leadersSection = (
+    <>
+      {/* ============================================ */}
+  {/* LEADERS - WHO */}
+  {/* ============================================ */}
+  {hasLeaders && (
+    <section className="py-5" style={getBackgroundStyle(leadersColors.background)}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="flex items-end justify-between mb-5">
+          <div>
+            <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: leadersColors.subtitle }}>{landingPageSettings?.leaders?.subtitle || "Who You'll Learn From"}</p>
+            <h2 className="font-heading text-2xl font-bold" style={{ color: leadersColors.title }}>{landingPageSettings?.leaders?.title || "Featured Leaders"}</h2>
+          </div>
+          <Link
+            href={`/${event.slug}/leaders`}
+            className="hidden sm:flex items-center gap-1 font-medium text-sm hover:opacity-80"
+            style={{ color: '#017ab2' }}
+          >
+            View All <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {leaders?.map((leader) => {
+            const contact = leader.contact
+            if (!contact) return null
+
+            const name = `${contact.first_name} ${contact.last_name}`
+            const title = leader.title_override || contact.title
+            const image = leader.headshot_url || contact.avatar_url
+
+            return (
+              <Link
+                key={leader.id}
+                href={contact.slug ? `/leaders/${contact.slug}` : `/${event.slug}/leaders`}
+                className="be-card hover:shadow-lg transition-shadow text-center group"
+                style={{ boxShadow: '0 0 0 2px rgba(1, 122, 178, 0.3)' }}
+              >
+                {image ? (
                   <img
-                    src={venuePhoto.image_url}
-                    alt={venuePhoto.alt_text || event.venue_name || "Venue"}
-                    className="w-full h-full object-cover"
+                    src={image}
+                    alt={name}
+                    className="w-20 h-20 rounded-full object-cover mx-auto mb-3"
                     loading="lazy"
-                  />
-                ) : event.hero_image_url ? (
-                  <img
-                    src={event.hero_image_url}
-                    alt={event.venue_name || "Venue"}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
+                    style={{ boxShadow: '0 0 0 4px rgba(1, 122, 178, 0.2)' }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-text-light">
-                    <MapPin className="h-12 w-12" />
+                  <div
+                    className="w-20 h-20 rounded-full mx-auto mb-3 be-avatar-gradient flex items-center justify-center text-white text-xl font-heading font-bold"
+                    style={{ boxShadow: '0 0 0 4px rgba(1, 122, 178, 0.2)' }}
+                  >
+                    {contact.first_name.charAt(0)}{contact.last_name.charAt(0)}
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Sliders: After Venue */}
-      {slidersByPosition['after_venue']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
+                <h3
+                  className="font-heading font-semibold transition-colors"
+                  style={{ color: '#0d2840' }}
+                >
+                  {name}
+                </h3>
+                {title && (
+                  <p className="text-lg mt-1" style={{ color: '#0d2840' }}>
+                    {title}
                   </p>
                 )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
+                {contact.company && (
+                  <p className="text-sm font-medium mt-1" style={{ color: '#017ab2' }}>
+                    {contact.company.name}
+                  </p>
+                )}
+              </Link>
+            )
+          })}
+        </div>
+
+        <div className="mt-5 text-center sm:hidden">
+          <Link
+            href={`/${event.slug}/leaders`}
+            className="inline-flex items-center justify-center px-4 py-2 rounded-full font-medium text-sm border hover:opacity-80"
+            style={{ color: '#017ab2', borderColor: '#017ab2' }}
+          >
+            View All Leaders
+          </Link>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Sliders: After Leaders (legacy position-based) */}
+  {slidersByPosition['after_leaders']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
+            )}
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
+
+  const photoSlider1Section = (
+    <>
+      {/* ============================================ */}
+  {/* PHOTO SLIDER 1 - Draggable Section */}
+  {/* ============================================ */}
+  {photoSlider1Settings?.visible && photoSlider1 && photoSlider1.images?.length > 0 && (
+    <section
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(photoSlider1Settings.background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(photoSlider1Settings.title || photoSlider1Settings.subtitle) && (
+          <div className="text-center mb-6">
+            {photoSlider1Settings.subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {photoSlider1Settings.subtitle}
+              </p>
+            )}
+            {photoSlider1Settings.title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {photoSlider1Settings.title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={photoSlider1.images || []}
+          showCaption={photoSlider1.show_captions}
+        />
+      </div>
+    </section>
+  )}
+    </>
+  )
+
+  const ticketsSection = (
+    <>
+      {/* ============================================ */}
+  {/* TICKETS - HOW */}
+  {/* ============================================ */}
+  {hasTickets && (
+    <section id="tickets" className="py-5" style={getBackgroundStyle(ticketsColors.background)}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="max-w-3xl mx-auto text-center mb-5">
+          <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: ticketsColors.subtitle }}>
+            {landingPageSettings?.tickets?.subtitle || "Reserve Your Spot"}
+          </p>
+          <h2 className="font-heading text-2xl md:text-3xl font-bold" style={{ color: ticketsColors.title }}>
+            {landingPageSettings?.tickets?.title || "Choose Your Experience"}
+          </h2>
+        </div>
+
+        <div className={`grid gap-4 ${
+          ticketTiers!.length === 1 ? "max-w-md mx-auto" :
+          ticketTiers!.length === 2 ? "md:grid-cols-2 max-w-2xl mx-auto" :
+          "md:grid-cols-2 lg:grid-cols-3"
+        }`}>
+          {ticketTiers?.map((tier, index) => (
+            <TicketTierCard
+              key={tier.id}
+              name={tier.name}
+              description={tier.description}
+              price={Number(tier.price)}
+              originalPrice={tier.original_price ? Number(tier.original_price) : null}
+              currency={tier.currency || "USD"}
+              features={tier.features || []}
+              registrationUrl={tier.registration_url}
+              isSoldOut={tier.is_sold_out || false}
+              waitlistUrl={tier.waitlist_url}
+              isHighlighted={tier.is_highlighted || false}
+              highlightText={tier.highlight_text}
+              cardBg={ticketsColors.card_bg}
+              titleColor={ticketsColors.card_title || ticketsColors.title}
+              textColor={ticketsColors.card_text || ticketsColors.text}
+              buttonBg={ticketsColors.button_bg}
+              buttonText={ticketsColors.button_text}
+              accentColor={ticketsColors.accent}
+              animateOnScroll={true}
+              animationDelay={index * 150}
+            />
+          ))}
+        </div>
+
+        {/* Single CTA button below all tiers */}
+        <div className="mt-8 text-center">
+          <a
+            href={ticketTiers![0].registration_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center rounded-md font-bold h-12 px-10 transition-colors hover:opacity-90 text-lg"
+            style={{
+              backgroundColor: ticketsColors.button_bg || '#0a2540',
+              color: ticketsColors.button_text || '#ffffff',
+            }}
+          >
+            Join Us in {event.city || 'Person'}
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Sliders: After Tickets */}
+  {slidersByPosition['after_tickets']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
+            )}
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
+
+  const venueSection = (
+    <>
+      {/* ============================================ */}
+  {/* VENUE - WHERE (detailed) */}
+  {/* ============================================ */}
+  {(event.venue_name || event.venue_description) && landingPageSettings?.venue?.visible !== false && (
+    <section id="venue" className="py-5" style={getBackgroundStyle(venueColors.background)}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="grid md:grid-cols-2 gap-6 items-center">
+          <div>
+            <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: venueColors.subtitle }}>{landingPageSettings?.venue?.subtitle || "The Venue"}</p>
+            <h2 className="font-heading text-2xl font-bold mb-4" style={{ color: venueColors.title }}>{landingPageSettings?.venue?.title || event.venue_name || "Event Location"}</h2>
+
+            {landingPageSettings?.venue?.description && (
+              <p className="mb-4 text-lg" style={{ color: venueColors.text }}>
+                <RichText>{landingPageSettings.venue.description}</RichText>
+              </p>
+            )}
+
+            {event.venue_address && (
+              <p className="mb-3 text-lg" style={{ color: venueColors.text }}>
+                {event.venue_address}<br />
+                {event.city}{event.state && `, ${event.state}`} {event.country}
+              </p>
+            )}
+
+            {event.venue_description && (
+              <p className="mb-4 whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}>
+                <RichText>{event.venue_description}</RichText>
+              </p>
+            )}
+
+            {event.transportation_info && (
+              <div className="mb-4">
+                <h3 className="font-heading font-semibold mb-1 text-lg" style={{ color: venueColors.title }}>Getting There</h3>
+                <p className="whitespace-pre-wrap text-lg" style={{ color: venueColors.text }}><RichText>{event.transportation_info}</RichText></p>
+              </div>
+            )}
+
+            {(event.hotel_booking_url || event.hotel_group_rate) && (
+              <div className="p-3 bg-gold/10 rounded-lg border border-gold/20">
+                <h3 className="font-heading font-semibold text-navy mb-1 text-lg">Accommodations</h3>
+                {event.hotel_group_rate && (
+                  <p className="text-text-dark mb-2 text-lg"><RichText>{event.hotel_group_rate}</RichText></p>
+                )}
+                {event.hotel_booking_url && (
+                  <a
+                    href={event.hotel_booking_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gold hover:text-gold/80 font-medium inline-flex items-center gap-1 text-sm"
+                  >
+                    Book Hotel <ChevronRight className="h-4 w-4" />
+                  </a>
                 )}
               </div>
             )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
+
+            {landingPageSettings?.venue?.button_text && landingPageSettings?.venue?.button_url && (
+              <div className="mt-4">
+                <a
+                  href={landingPageSettings.venue.button_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-md font-bold px-6 py-2.5 transition-colors hover:opacity-90"
+                  style={{ backgroundColor: venueColors.button_bg || '#c9a227', color: venueColors.button_text || '#ffffff' }}
+                >
+                  {landingPageSettings.venue.button_text}
+                </a>
+              </div>
+            )}
           </div>
-        </section>
-      ))}
 
+          <div className="bg-muted rounded-lg overflow-hidden aspect-video">
+            {venuePhoto?.image_url ? (
+              <img
+                src={venuePhoto.image_url}
+                alt={venuePhoto.alt_text || event.venue_name || "Venue"}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            ) : event.hero_image_url ? (
+              <img
+                src={event.hero_image_url}
+                alt={event.venue_name || "Venue"}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-text-light">
+                <MapPin className="h-12 w-12" />
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Sliders: After Venue */}
+  {slidersByPosition['after_venue']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
+            )}
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
+
+  const companiesSection = (
+    <>
       {/* ============================================ */}
-      {/* COMPANIES - WHO (sponsors/exhibitors) */}
+  {/* COMPANIES - WHO (sponsors/exhibitors) */}
+  {/* ============================================ */}
+  {hasCompanies && (
+    <section className="py-5" style={getBackgroundStyle(companiesColors.background)}>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="text-center mb-5">
+          <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: companiesColors.subtitle }}>{landingPageSettings?.companies?.subtitle || "Our Partners"}</p>
+          <h2 className="font-heading text-2xl font-bold" style={{ color: companiesColors.title }}>{landingPageSettings?.companies?.title || "Companies & Sponsors"}</h2>
+          <Link
+            href={`/${event.slug}/companies`}
+            className="inline-flex items-center gap-1 font-medium text-sm hover:opacity-80 mt-2"
+            style={{ color: '#017ab2' }}
+          >
+            View All <ChevronRight className="h-4 w-4" />
+          </Link>
+        </div>
+
+        <CompaniesGrid
+          companyGroups={companyGroups}
+          activeTiers={activeTiers}
+          tierLabels={tierLabels}
+        />
+
+        <div className="mt-5 text-center">
+          <a
+            href="mailto:peter@bioedgelongevity.com"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-full font-medium text-sm border hover:opacity-80"
+            style={{ color: '#017ab2', borderColor: '#017ab2' }}
+          >
+            Become a Partner
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* Sliders: After Companies */}
+  {slidersByPosition['after_companies']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
+            )}
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
+
+  const videoPlaylistSection = (
+    <>
       {/* ============================================ */}
-      {hasCompanies && (
-        <section className="py-5" style={getBackgroundStyle(companiesColors.background)}>
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            <div className="text-center mb-5">
-              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: companiesColors.subtitle }}>{landingPageSettings?.companies?.subtitle || "Our Partners"}</p>
-              <h2 className="font-heading text-2xl font-bold" style={{ color: companiesColors.title }}>{landingPageSettings?.companies?.title || "Companies & Sponsors"}</h2>
-              <Link
-                href={`/${event.slug}/companies`}
-                className="inline-flex items-center gap-1 font-medium text-sm hover:opacity-80 mt-2"
-                style={{ color: '#017ab2' }}
-              >
-                View All <ChevronRight className="h-4 w-4" />
-              </Link>
+  {/* VIDEO PLAYLIST - Draggable Section */}
+  {/* ============================================ */}
+  {videoPlaylistSettings?.visible && videoPlaylistSettings.videos && videoPlaylistSettings.videos.length > 0 && (
+    <section
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(videoPlaylistSettings.background || '#f8f9fa')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(videoPlaylistSettings.title || videoPlaylistSettings.subtitle) && (
+          <div className="text-center mb-6">
+            {videoPlaylistSettings.subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                {videoPlaylistSettings.subtitle}
+              </p>
+            )}
+            {videoPlaylistSettings.title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {videoPlaylistSettings.title}
+              </h2>
+            )}
+          </div>
+        )}
+        <VideoPlaylist videos={videoPlaylistSettings.videos} />
+      </div>
+    </section>
+  )}
+    </>
+  )
+
+  const photoSlider2Section = (
+    <>
+      {/* ============================================ */}
+  {/* PHOTO SLIDER 2 - Draggable Section */}
+  {/* ============================================ */}
+  {photoSlider2Settings?.visible && photoSlider2 && photoSlider2.images?.length > 0 && (
+    <section
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(photoSlider2Settings.background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(photoSlider2Settings.title || photoSlider2Settings.subtitle) && (
+          <div className="text-center mb-6">
+            {photoSlider2Settings.subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {photoSlider2Settings.subtitle}
+              </p>
+            )}
+            {photoSlider2Settings.title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {photoSlider2Settings.title}
+              </h2>
+            )}
+          </div>
+        )}
+        <PhotoSlider
+          images={photoSlider2.images || []}
+          showCaption={photoSlider2.show_captions}
+        />
+      </div>
+    </section>
+  )}
+    </>
+  )
+
+  const faqSection = (
+    <>
+      {/* ============================================ */}
+  {/* FAQ */}
+  {/* ============================================ */}
+  {(() => {
+    const faqSettings = landingPageSettings?.faq
+    const faqVisible = faqSettings?.visible !== false
+    const faqTitle = faqSettings?.title || "Frequently Asked Questions"
+    const faqSubtitle = faqSettings?.subtitle || "Questions?"
+    const faqDescription = faqSettings?.description
+    const faqLayout = faqSettings?.layout || 'accordion'
+    const faqShowContact = faqSettings?.show_contact_section !== false
+    const faqContactText = faqSettings?.contact_text || "Still have questions?"
+    const faqContactEmail = faqSettings?.contact_email || event.contact_email || null
+    const faqContactButtonText = faqSettings?.contact_button_text || "Contact Us"
+    const faqExpandFirst = faqSettings?.expand_first === true
+
+    if (!faqVisible || !hasFAQs) return null
+
+    return (
+      <section id="faq" className="py-5" style={getBackgroundStyle(faqColors.background)}>
+        <div className="max-w-5xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-5">
+            <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: faqColors.subtitle }}>
+              {faqSubtitle}
+            </p>
+            <h2 className="font-heading text-2xl font-bold" style={{ color: faqColors.title }}>
+              {faqTitle}
+            </h2>
+            {faqDescription && (
+              <p className="mt-3 text-lg max-w-2xl mx-auto whitespace-pre-line" style={{ color: faqColors.text }}>
+                <RichText>{faqDescription}</RichText>
+              </p>
+            )}
+          </div>
+
+          {faqLayout === 'two_column' ? (
+            <div className="grid gap-4 md:grid-cols-2 max-w-4xl mx-auto">
+              {allFaqs.map((faq, index) => (
+                <div key={faq.id} className="p-4 rounded-lg bg-muted">
+                  <h3 className="font-heading font-semibold mb-2" style={{ color: faqColors.title }}>
+                    {faq.question}
+                  </h3>
+                  <p className="text-lg whitespace-pre-wrap" style={{ color: faqColors.text }}>
+                    <RichText>{faq.answer}</RichText>
+                  </p>
+                </div>
+              ))}
             </div>
+          ) : (
+            <div className="max-w-2xl mx-auto">
+              <FAQAccordion items={allFaqs} defaultOpen={faqExpandFirst ? 0 : undefined} />
+            </div>
+          )}
 
-            <CompaniesGrid
-              companyGroups={companyGroups}
-              activeTiers={activeTiers}
-              tierLabels={tierLabels}
-            />
-
+          {faqShowContact && faqContactEmail && (
             <div className="mt-5 text-center">
+              <p className="mb-2 text-lg" style={{ color: faqColors.text }}>{faqContactText}</p>
               <a
-                href="mailto:peter@bioedgelongevity.com"
-                className="inline-flex items-center justify-center px-4 py-2 rounded-full font-medium text-sm border hover:opacity-80"
-                style={{ color: '#017ab2', borderColor: '#017ab2' }}
+                href={`mailto:${faqContactEmail}`}
+                className="text-gold hover:text-gold/80 font-medium text-sm"
               >
-                Become a Partner
+                {faqContactButtonText}
               </a>
             </div>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
+    )
+  })()}
+    </>
+  )
 
-      {/* Sliders: After Companies */}
-      {slidersByPosition['after_companies']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
-                  </p>
-                )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
-                )}
-              </div>
+  const customHtmlSection = (
+    <>
+      {/* ============================================ */}
+  {/* CUSTOM HTML - Draggable Section */}
+  {/* ============================================ */}
+  {customHtmlSettings?.visible && customHtmlSettings.html_content && (
+    <section
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(customHtmlSettings.background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(customHtmlSettings.title || customHtmlSettings.subtitle) && (
+          <div className="text-center mb-6">
+            {customHtmlSettings.subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
+                {customHtmlSettings.subtitle}
+              </p>
             )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
-          </div>
-        </section>
-      ))}
-
-      {/* ============================================ */}
-      {/* VIDEO PLAYLIST - Draggable Section */}
-      {/* ============================================ */}
-      {videoPlaylistSettings?.visible && videoPlaylistSettings.videos && videoPlaylistSettings.videos.length > 0 && (
-        <section
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(videoPlaylistSettings.background || '#f8f9fa')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(videoPlaylistSettings.title || videoPlaylistSettings.subtitle) && (
-              <div className="text-center mb-6">
-                {videoPlaylistSettings.subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
-                    {videoPlaylistSettings.subtitle}
-                  </p>
-                )}
-                {videoPlaylistSettings.title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {videoPlaylistSettings.title}
-                  </h2>
-                )}
-              </div>
+            {customHtmlSettings.title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {customHtmlSettings.title}
+              </h2>
             )}
-            <VideoPlaylist videos={videoPlaylistSettings.videos} />
           </div>
-        </section>
-      )}
+        )}
+        <div dangerouslySetInnerHTML={{ __html: customHtmlSettings.html_content }} />
+      </div>
+    </section>
+  )}
 
-      {/* ============================================ */}
-      {/* PHOTO SLIDER 2 - Draggable Section */}
-      {/* ============================================ */}
-      {photoSlider2Settings?.visible && photoSlider2 && photoSlider2.images?.length > 0 && (
-        <section
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(photoSlider2Settings.background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(photoSlider2Settings.title || photoSlider2Settings.subtitle) && (
-              <div className="text-center mb-6">
-                {photoSlider2Settings.subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {photoSlider2Settings.subtitle}
-                  </p>
-                )}
-                {photoSlider2Settings.title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {photoSlider2Settings.title}
-                  </h2>
-                )}
-              </div>
+  {/* Sliders: After FAQ */}
+  {slidersByPosition['after_faq']?.map((slider: any) => (
+    <section
+      key={slider.id}
+      className="py-8 md:py-12"
+      style={getBackgroundStyle(slider.section_background || '#ffffff')}
+    >
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        {(slider.section_title || slider.section_subtitle) && (
+          <div className="text-center mb-6">
+            {slider.section_subtitle && (
+              <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
+                {slider.section_subtitle}
+              </p>
             )}
-            <PhotoSlider
-              images={photoSlider2.images || []}
-              showCaption={photoSlider2.show_captions}
-            />
-          </div>
-        </section>
-      )}
-
-      {/* ============================================ */}
-      {/* FAQ */}
-      {/* ============================================ */}
-      {(() => {
-        const faqSettings = landingPageSettings?.faq
-        const faqVisible = faqSettings?.visible !== false
-        const faqTitle = faqSettings?.title || "Frequently Asked Questions"
-        const faqSubtitle = faqSettings?.subtitle || "Questions?"
-        const faqDescription = faqSettings?.description
-        const faqLayout = faqSettings?.layout || 'accordion'
-        const faqShowContact = faqSettings?.show_contact_section !== false
-        const faqContactText = faqSettings?.contact_text || "Still have questions?"
-        const faqContactEmail = faqSettings?.contact_email || event.contact_email || null
-        const faqContactButtonText = faqSettings?.contact_button_text || "Contact Us"
-        const faqExpandFirst = faqSettings?.expand_first === true
-
-        if (!faqVisible || !hasFAQs) return null
-
-        return (
-          <section id="faq" className="py-5" style={getBackgroundStyle(faqColors.background)}>
-            <div className="max-w-5xl mx-auto px-4 sm:px-6">
-              <div className="text-center mb-5">
-                <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: faqColors.subtitle }}>
-                  {faqSubtitle}
-                </p>
-                <h2 className="font-heading text-2xl font-bold" style={{ color: faqColors.title }}>
-                  {faqTitle}
-                </h2>
-                {faqDescription && (
-                  <p className="mt-3 text-lg max-w-2xl mx-auto whitespace-pre-line" style={{ color: faqColors.text }}>
-                    <RichText>{faqDescription}</RichText>
-                  </p>
-                )}
-              </div>
-
-              {faqLayout === 'two_column' ? (
-                <div className="grid gap-4 md:grid-cols-2 max-w-4xl mx-auto">
-                  {allFaqs.map((faq, index) => (
-                    <div key={faq.id} className="p-4 rounded-lg bg-muted">
-                      <h3 className="font-heading font-semibold mb-2" style={{ color: faqColors.title }}>
-                        {faq.question}
-                      </h3>
-                      <p className="text-lg whitespace-pre-wrap" style={{ color: faqColors.text }}>
-                        <RichText>{faq.answer}</RichText>
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="max-w-2xl mx-auto">
-                  <FAQAccordion items={allFaqs} defaultOpen={faqExpandFirst ? 0 : undefined} />
-                </div>
-              )}
-
-              {faqShowContact && faqContactEmail && (
-                <div className="mt-5 text-center">
-                  <p className="mb-2 text-lg" style={{ color: faqColors.text }}>{faqContactText}</p>
-                  <a
-                    href={`mailto:${faqContactEmail}`}
-                    className="text-gold hover:text-gold/80 font-medium text-sm"
-                  >
-                    {faqContactButtonText}
-                  </a>
-                </div>
-              )}
-            </div>
-          </section>
-        )
-      })()}
-
-      {/* ============================================ */}
-      {/* CUSTOM HTML - Draggable Section */}
-      {/* ============================================ */}
-      {customHtmlSettings?.visible && customHtmlSettings.html_content && (
-        <section
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(customHtmlSettings.background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(customHtmlSettings.title || customHtmlSettings.subtitle) && (
-              <div className="text-center mb-6">
-                {customHtmlSettings.subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1 text-gold">
-                    {customHtmlSettings.subtitle}
-                  </p>
-                )}
-                {customHtmlSettings.title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {customHtmlSettings.title}
-                  </h2>
-                )}
-              </div>
+            {slider.section_title && (
+              <h2 className="font-heading text-2xl font-bold text-navy">
+                {slider.section_title}
+              </h2>
             )}
-            <div dangerouslySetInnerHTML={{ __html: customHtmlSettings.html_content }} />
           </div>
-        </section>
-      )}
+        )}
+        <PhotoSlider
+          images={slider.images || []}
+          showCaption={slider.show_captions}
+        />
+      </div>
+    </section>
+  ))}
+    </>
+  )
 
-      {/* Sliders: After FAQ */}
-      {slidersByPosition['after_faq']?.map((slider: any) => (
-        <section
-          key={slider.id}
-          className="py-8 md:py-12"
-          style={getBackgroundStyle(slider.section_background || '#ffffff')}
-        >
-          <div className="max-w-5xl mx-auto px-4 sm:px-6">
-            {(slider.section_title || slider.section_subtitle) && (
-              <div className="text-center mb-6">
-                {slider.section_subtitle && (
-                  <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: '#017ab2' }}>
-                    {slider.section_subtitle}
-                  </p>
-                )}
-                {slider.section_title && (
-                  <h2 className="font-heading text-2xl font-bold text-navy">
-                    {slider.section_title}
-                  </h2>
-                )}
-              </div>
-            )}
-            <PhotoSlider
-              images={slider.images || []}
-              showCaption={slider.show_captions}
-            />
-          </div>
-        </section>
-      ))}
+  const finalCtaSection = (
+    <>
+      {/* ============================================ */}
+  {/* FINAL CTA */}
+  {/* ============================================ */}
+  <FinalCtaSection
+    event={event}
+    sectionColors={sectionColors}
+    landingPageSettings={landingPageSettings}
+  />
+    </>
+  )
 
-      {/* ============================================ */}
-      {/* FINAL CTA */}
-      {/* ============================================ */}
-      <FinalCtaSection
-        event={event}
-        sectionColors={sectionColors}
-        landingPageSettings={landingPageSettings}
+  // New optional sections
+  const presentationsSliderSection = (() => {
+    const s = landingPageSettings?.presentations_slider
+    if (!s?.visible) return null
+    return (
+      <HomepageFeaturedPresentations
+        presentations={featuredPresentations as any}
+        title={s.title ?? "Presentations from Prior Events"}
+        label={s.subtitle ?? "VIDEO LIBRARY"}
       />
+    )
+  })()
+
+  const edgeFrameworkSection = (() => {
+    if (!landingPageSettings?.edge_framework?.visible) return null
+    return <EdgeFramework />
+  })()
+
+  const clinicPromoSectionEl = (() => {
+    if (!landingPageSettings?.clinic_promo?.visible) return null
+    return <ClinicPromoSection totalClinics={totalClinics} />
+  })()
+
+  const sectionRenderMap: Record<string, React.ReactNode> = {
+    hero: heroSection,
+    value_props: valuePropsSection,
+    testimonials: testimonialsSection,
+    leaders: leadersSection,
+    photo_slider_1: photoSlider1Section,
+    photo_slider_2: photoSlider2Section,
+    tickets: ticketsSection,
+    venue: venueSection,
+    companies: companiesSection,
+    video_playlist: videoPlaylistSection,
+    faq: faqSection,
+    custom_html: customHtmlSection,
+    final_cta: finalCtaSection,
+    presentations_slider: presentationsSliderSection,
+    edge_framework: edgeFrameworkSection,
+    clinic_promo: clinicPromoSectionEl,
+  }
+
+  const DEFAULT_SECTION_ORDER = [
+    "hero", "value_props", "testimonials", "leaders", "photo_slider_1",
+    "tickets", "venue", "companies", "video_playlist", "photo_slider_2",
+    "faq", "custom_html", "presentations_slider", "clinic_promo",
+    "edge_framework", "final_cta",
+  ]
+
+  const sectionOrder = landingPageSettings?.section_order ?? DEFAULT_SECTION_ORDER
+
+  return (
+    <>
+        <EventJsonLd
+    name={event.name}
+    slug={event.slug}
+    description={event.description}
+    startDate={event.start_date}
+    endDate={event.end_date}
+    venueName={event.venue_name}
+    city={event.city}
+    state={event.state}
+    imageUrl={event.og_image_url}
+    ticketUrl={event.ticket_url}
+    status={event.status}
+  />
+
+      {sectionOrder.map((key) => (
+        <React.Fragment key={key}>{sectionRenderMap[key]}</React.Fragment>
+      ))}
 
       {/* Bottom padding for mobile sticky CTA */}
       <div className="h-16 sm:hidden" />
