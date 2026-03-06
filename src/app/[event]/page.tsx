@@ -1559,7 +1559,7 @@ export default async function EventLandingPage({ params }: PageProps) {
             )}
 
             {landingPageSettings?.venue?.button_text && landingPageSettings?.venue?.button_url && (
-              <div className="mt-4">
+              <div className="mt-4 flex justify-center md:justify-start">
                 <a
                   href={landingPageSettings.venue.button_url}
                   target="_blank"
