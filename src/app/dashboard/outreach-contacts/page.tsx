@@ -102,6 +102,7 @@ export default function OutreachContactsPage() {
   const [searchInput, setSearchInput] = useState("")
   const [businessTypeFilter, setBusinessTypeFilter] = useState("")
   const [businessTypes, setBusinessTypes] = useState<BusinessTypeCount[]>([])
+  const [engagementFilter, setEngagementFilter] = useState("all")
 
   // Multi-select state
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
@@ -128,6 +129,7 @@ export default function OutreachContactsPage() {
       })
       if (search) params.set("search", search)
       if (businessTypeFilter) params.set("businessType", businessTypeFilter)
+      if (engagementFilter !== "all") params.set("engagement", engagementFilter)
 
       const res = await fetch(`/api/outreach-contacts?${params.toString()}`)
       if (res.ok) {
@@ -140,7 +142,7 @@ export default function OutreachContactsPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, search, businessTypeFilter])
+  }, [page, search, businessTypeFilter, engagementFilter])
 
   const fetchBusinessTypes = useCallback(async () => {
     try {
@@ -519,10 +521,23 @@ export default function OutreachContactsPage() {
             }}
           />
         </div>
+        <Select value={engagementFilter} onValueChange={(v) => { setEngagementFilter(v); setPage(1) }}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Engagement" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Engagement</SelectItem>
+            <SelectItem value="bounced">Bounced</SelectItem>
+            <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+            <SelectItem value="clicked">Clicked</SelectItem>
+            <SelectItem value="opened">Opened</SelectItem>
+            <SelectItem value="none">No Engagement</SelectItem>
+          </SelectContent>
+        </Select>
         <Button variant="ghost" size="icon" onClick={fetchContacts} disabled={loading}>
           <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
         </Button>
-        {(search || businessTypeFilter) && (
+        {(search || businessTypeFilter || engagementFilter !== "all") && (
           <Button
             variant="ghost"
             size="sm"
@@ -530,6 +545,7 @@ export default function OutreachContactsPage() {
               setSearch("")
               setSearchInput("")
               setBusinessTypeFilter("")
+              setEngagementFilter("all")
               setPage(1)
             }}
           >

@@ -72,6 +72,7 @@ export async function GET(request: NextRequest) {
     const featured = searchParams.get("featured")
     const hasEmail = searchParams.get("has_email")
     const excludeEmailedDays = searchParams.get("exclude_emailed_days")
+    const engagement = searchParams.get("engagement") // bounced, unsubscribed, clicked, opened, none
     const distinct = searchParams.get("distinct")
     const page = parseInt(searchParams.get("page") || "1", 10)
     const pageLimit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 5000)
@@ -203,6 +204,19 @@ export async function GET(request: NextRequest) {
           }
         }
       }
+    }
+
+    // Engagement filter
+    if (engagement === "bounced") {
+      query = query.not("bounced_at", "is", null)
+    } else if (engagement === "unsubscribed") {
+      query = query.not("unsubscribed_at", "is", null)
+    } else if (engagement === "clicked") {
+      query = query.gt("total_clicks", 0)
+    } else if (engagement === "opened") {
+      query = query.gt("total_opens", 0)
+    } else if (engagement === "none") {
+      query = query.eq("total_opens", 0).eq("total_clicks", 0).is("bounced_at", null).is("unsubscribed_at", null)
     }
 
     // Pagination

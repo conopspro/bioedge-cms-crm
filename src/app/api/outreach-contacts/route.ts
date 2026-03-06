@@ -11,7 +11,7 @@ import { createClient } from "@/lib/supabase/server"
 //   search       string (email or practice_name partial match)
 //   businessType string (exact match on business_type column)
 //   state        string (exact match on state column)
-//   engagement   'any' | 'opened' | 'clicked'
+//   engagement   'any' | 'bounced' | 'unsubscribed' | 'clicked' | 'opened' | 'none'
 export async function GET(request: Request) {
   try {
     const supabase = await createClient()
@@ -47,6 +47,12 @@ export async function GET(request: Request) {
       query = query.gt("total_clicks", 0)
     } else if (engagement === "opened") {
       query = query.gt("total_opens", 0)
+    } else if (engagement === "bounced") {
+      query = query.not("bounced_at", "is", null)
+    } else if (engagement === "unsubscribed") {
+      query = query.not("unsubscribed_at", "is", null)
+    } else if (engagement === "none") {
+      query = query.eq("total_opens", 0).eq("total_clicks", 0).is("bounced_at", null).is("unsubscribed_at", null)
     }
 
     // Pagination

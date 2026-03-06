@@ -22,6 +22,7 @@ export default function ContactsPage() {
   const [catchAllFilter, setCatchAllFilter] = useState("all")
   const [visibilityFilter, setVisibilityFilter] = useState("all")
   const [outreachFilter, setOutreachFilter] = useState("all")
+  const [engagementFilter, setEngagementFilter] = useState("all")
   const [loading, setLoading] = useState(true)
 
   // Debounce search
@@ -47,6 +48,7 @@ export default function ContactsPage() {
       if (catchAllFilter !== "all") params.set("catch_all", catchAllFilter)
       if (visibilityFilter !== "all") params.set("visibility", visibilityFilter)
       if (outreachFilter !== "all") params.set("outreach", outreachFilter)
+      if (engagementFilter !== "all") params.set("engagement", engagementFilter)
 
       const res = await fetch(`/api/contacts?${params}`)
       if (res.ok) {
@@ -59,18 +61,18 @@ export default function ContactsPage() {
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, debouncedSearch, notWithinFilter, convertedFilter, catchAllFilter, visibilityFilter, outreachFilter])
+  }, [page, pageSize, debouncedSearch, notWithinFilter, convertedFilter, catchAllFilter, visibilityFilter, outreachFilter, engagementFilter])
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setPage(1)
-  }, [notWithinFilter, convertedFilter, catchAllFilter, visibilityFilter, outreachFilter])
+  }, [notWithinFilter, convertedFilter, catchAllFilter, visibilityFilter, outreachFilter, engagementFilter])
 
   // Fetch when debounced search or other params change
   useEffect(() => {
     fetchContacts()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, debouncedSearch, notWithinFilter, convertedFilter, catchAllFilter, visibilityFilter, outreachFilter])
+  }, [page, pageSize, debouncedSearch, notWithinFilter, convertedFilter, catchAllFilter, visibilityFilter, outreachFilter, engagementFilter])
 
   return (
     <div className="space-y-6">
@@ -102,6 +104,7 @@ export default function ContactsPage() {
         catchAllFilter={catchAllFilter}
         visibilityFilter={visibilityFilter}
         outreachFilter={outreachFilter}
+        engagementFilter={engagementFilter}
         loading={loading}
         onSearchChange={setSearch}
         onNotWithinChange={setNotWithinFilter}
@@ -109,6 +112,7 @@ export default function ContactsPage() {
         onCatchAllChange={setCatchAllFilter}
         onVisibilityChange={setVisibilityFilter}
         onOutreachChange={setOutreachFilter}
+        onEngagementChange={setEngagementFilter}
         onPageChange={setPage}
         onRefresh={fetchContacts}
       />

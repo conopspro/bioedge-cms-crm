@@ -60,6 +60,7 @@ interface ContactsTableProps {
   catchAllFilter: string
   visibilityFilter: string
   outreachFilter: string
+  engagementFilter: string
   loading: boolean
   onSearchChange: (search: string) => void
   onNotWithinChange: (notWithin: string) => void
@@ -67,6 +68,7 @@ interface ContactsTableProps {
   onCatchAllChange: (catchAll: string) => void
   onVisibilityChange: (visibility: string) => void
   onOutreachChange: (outreach: string) => void
+  onEngagementChange: (engagement: string) => void
   onPageChange: (page: number) => void
   onRefresh: () => void
 }
@@ -85,6 +87,7 @@ export function ContactsTable({
   catchAllFilter,
   visibilityFilter,
   outreachFilter,
+  engagementFilter,
   loading,
   onSearchChange,
   onNotWithinChange,
@@ -92,6 +95,7 @@ export function ContactsTable({
   onCatchAllChange,
   onVisibilityChange,
   onOutreachChange,
+  onEngagementChange,
   onPageChange,
   onRefresh,
 }: ContactsTableProps) {
@@ -178,6 +182,18 @@ export function ContactsTable({
           <option value="30d">Within 30 Days</option>
           <option value="90d">Within 90 Days</option>
           <option value="90d_plus">90+ Days Ago</option>
+        </select>
+        <select
+          value={engagementFilter}
+          onChange={(e) => onEngagementChange(e.target.value)}
+          className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+        >
+          <option value="all">Engagement: All</option>
+          <option value="bounced">Bounced</option>
+          <option value="unsubscribed">Unsubscribed</option>
+          <option value="clicked">Clicked</option>
+          <option value="opened">Opened</option>
+          <option value="none">No Engagement</option>
         </select>
         {loading && (
           <RefreshCw className="h-4 w-4 animate-spin text-muted-foreground" />

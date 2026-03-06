@@ -80,6 +80,7 @@ export default function ClinicsPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [stateFilter, setStateFilter] = useState("all")
   const [activeFilter, setActiveFilter] = useState("all")
+  const [engagementFilter, setEngagementFilter] = useState("all")
   const [showUploader, setShowUploader] = useState(false)
   const [exporting, setExporting] = useState(false)
 
@@ -126,6 +127,7 @@ export default function ClinicsPage() {
         if (stateFilter && stateFilter !== "all") params.set("state", stateFilter)
         if (activeFilter === "active") params.set("active", "true")
         if (activeFilter === "inactive") params.set("active", "false")
+        if (engagementFilter !== "all") params.set("engagement", engagementFilter)
 
         const res = await fetch(`/api/clinics?${params.toString()}`)
         if (res.ok) {
@@ -139,7 +141,7 @@ export default function ClinicsPage() {
         setLoading(false)
       }
     },
-    [searchQuery, stateFilter, activeFilter]
+    [searchQuery, stateFilter, activeFilter, engagementFilter]
   )
 
   useEffect(() => {
@@ -244,6 +246,20 @@ export default function ClinicsPage() {
             <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={engagementFilter} onValueChange={setEngagementFilter}>
+          <SelectTrigger className="w-[160px]">
+            <SelectValue placeholder="Engagement" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Engagement</SelectItem>
+            <SelectItem value="bounced">Bounced</SelectItem>
+            <SelectItem value="unsubscribed">Unsubscribed</SelectItem>
+            <SelectItem value="clicked">Clicked</SelectItem>
+            <SelectItem value="opened">Opened</SelectItem>
+            <SelectItem value="none">No Engagement</SelectItem>
           </SelectContent>
         </Select>
 
