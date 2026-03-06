@@ -232,7 +232,7 @@ export function HomepageEvents({
                           &ldquo;{displayTagline}&rdquo;
                         </p>
                       )}
-                      <div className="flex items-center gap-3 text-xs text-white/50 flex-wrap">
+                      <div className="flex items-center gap-3 text-xs text-[#f8f9fa] flex-wrap">
                         {event.start_date && (
                           <div className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
