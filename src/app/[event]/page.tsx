@@ -1914,7 +1914,7 @@ export default async function EventLandingPage({ params }: PageProps) {
 
   const clinicPromoSectionEl = (() => {
     if (!landingPageSettings?.clinic_promo?.visible) return null
-    return <ClinicPromoSection totalClinics={totalClinics} />
+    return <ClinicPromoSection totalClinics={totalClinics} sectionClassName="bg-white" />
   })()
 
   const sectionRenderMap: Record<string, React.ReactNode> = {

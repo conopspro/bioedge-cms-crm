@@ -3,13 +3,14 @@ import { MapPin, Star } from "lucide-react"
 
 interface ClinicPromoSectionProps {
   totalClinics?: number | null
+  sectionClassName?: string
 }
 
-export function ClinicPromoSection({ totalClinics }: ClinicPromoSectionProps) {
+export function ClinicPromoSection({ totalClinics, sectionClassName }: ClinicPromoSectionProps) {
   const clinicCount = totalClinics ? `${totalClinics.toLocaleString()}+` : null
 
   return (
-    <section className="py-10 px-8 bg-white">
+    <section className={`py-6 px-8 ${sectionClassName ?? ""}`}>
       <div className="mx-auto max-w-[1200px]">
         <Link
           href="/clinics"
