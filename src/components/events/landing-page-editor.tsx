@@ -1424,6 +1424,42 @@ export function LandingPageEditor({
                               </div>
                             )}
 
+                            {/* Hero Video URL — when set, overrides layout with portrait video on right */}
+                            <div className="pt-3 border-t space-y-2">
+                              <Label htmlFor="hero-video-url">Hero Video URL</Label>
+                              <p className="text-xs text-muted-foreground">
+                                Paste a YouTube URL (including Shorts) to display a portrait video alongside the hero text, matching the homepage style. Clears automatically when removed.
+                              </p>
+                              <div className="flex gap-2">
+                                <Input
+                                  id="hero-video-url"
+                                  value={(settings.hero as HeroSectionSettings).video_url || ""}
+                                  onChange={(e) => {
+                                    setSettings((prev) => ({
+                                      ...prev,
+                                      hero: { ...prev.hero, video_url: e.target.value || null },
+                                    }))
+                                  }}
+                                  placeholder="https://www.youtube.com/shorts/..."
+                                  className="flex-1"
+                                />
+                                {(settings.hero as HeroSectionSettings).video_url && (
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => {
+                                      setSettings((prev) => ({
+                                        ...prev,
+                                        hero: { ...prev.hero, video_url: null },
+                                      }))
+                                    }}
+                                  >
+                                    <X className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+
                             {/* Split Image Options */}
                             {(settings.hero as HeroSectionSettings).layout === 'split_image' && (
                               <div className="pt-3 space-y-3">

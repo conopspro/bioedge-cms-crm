@@ -15,6 +15,7 @@ import React from "react"
 import { HomepageFeaturedPresentations } from "@/components/home/homepage-featured-presentations"
 import { ClinicPromoSection } from "@/components/home/clinic-promo-section"
 import { EdgeFramework } from "@/components/home/edge-framework"
+import { LazyYouTube } from "@/components/ui/lazy-youtube"
 
 // TODO: Re-enable caching for production
 export const revalidate = 60
@@ -289,6 +290,8 @@ export default async function EventLandingPage({ params }: PageProps) {
       show_early_bird?: boolean
       early_bird_text?: string | null
       // Media
+      background_image_url?: string | null
+      video_url?: string | null
       overlay_opacity?: number
     }
     value_props?: {
@@ -476,6 +479,7 @@ export default async function EventLandingPage({ params }: PageProps) {
   const heroShowEarlyBird = heroSettings?.show_early_bird !== false
   const heroEarlyBirdText = heroSettings?.early_bird_text || event.early_bird_text
   const heroOverlayOpacity = heroSettings?.overlay_opacity ?? event.hero_overlay_opacity ?? 70
+  const heroVideoUrl = heroSettings?.video_url || null
 
   // ============================================
   // SECTION VARIABLES (for section_order support)
@@ -649,8 +653,8 @@ export default async function EventLandingPage({ params }: PageProps) {
         <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-pink-accent/10 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-16">
-        <div className="max-w-3xl">
+      <div className={`relative z-10 max-w-5xl mx-auto px-4 sm:px-6 py-10 md:py-16 ${heroVideoUrl ? 'flex flex-col lg:flex-row items-center gap-8 lg:gap-16' : ''}`}>
+        <div className={heroVideoUrl ? 'flex-1 w-full' : 'max-w-3xl'}>
           {/* Event Logo */}
           {heroLogoUrl && (
             <img
@@ -750,6 +754,27 @@ export default async function EventLandingPage({ params }: PageProps) {
             </p>
           )}
         </div>
+
+        {/* Portrait YouTube video — only shown when video_url is set (desktop only) */}
+        {heroVideoUrl && (
+          <div className="hidden lg:flex flex-shrink-0 items-center justify-center">
+            <div
+              className="relative overflow-hidden rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.4)]"
+              style={{
+                width: 315,
+                height: 560,
+                border: "3px solid rgba(255, 145, 77, 0.6)",
+                boxShadow: "0 0 30px rgba(255, 145, 77, 0.2), 0 25px 50px -12px rgba(0,0,0,0.4)",
+              }}
+            >
+              <LazyYouTube
+                url={heroVideoUrl}
+                title={event.name}
+                className="absolute inset-0 h-full w-full border-0 p-0 cursor-pointer group"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )}
