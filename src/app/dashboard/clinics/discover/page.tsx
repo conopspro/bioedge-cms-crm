@@ -40,7 +40,10 @@ import {
 const TAG_PRESETS = [
   "Anti-Aging Clinic",
   "Biohacking",
+  "Concierge Doctor",
+  "Concierge Physician",
   "Cryotherapy",
+  "Direct Primary Care",
   "EBO2",
   "Exosome Therapy",
   "Functional Medicine",
@@ -51,6 +54,7 @@ const TAG_PRESETS = [
   "IV Therapy",
   "Longevity Clinic",
   "Med Spa",
+  "Membership Medicine",
   "Methylene Blue Therapy",
   "Microcurrent Therapy",
   "NAD+ Therapy",
