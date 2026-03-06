@@ -838,7 +838,7 @@ export default async function EventLandingPage({ params }: PageProps) {
                 <p className="font-heading text-xs font-bold uppercase tracking-[2px] mb-1" style={{ color: valuePropsColors.subtitle }}>{vpSubtitle}</p>
                 <h2 className="font-heading text-2xl font-bold" style={{ color: valuePropsColors.title }}>{vpTitle}</h2>
                 {vpDescription && (
-                  <p className="mt-3 text-lg whitespace-pre-line" style={{ color: valuePropsColors.text }}><RichText>{vpDescription}</RichText></p>
+                  <p className="mt-3 text-lg whitespace-pre-line text-left" style={{ color: valuePropsColors.text }}><RichText>{vpDescription}</RichText></p>
                 )}
               </div>
 
